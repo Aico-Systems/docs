@@ -45,7 +45,7 @@ POST /api/flows/:flowId/test-chat
   - Persist a pending session record so the agent worker joins the right flow
 
 GET /api/flows/sessions/:sessionId
-  - Read-only session inspection (used by the FlowTestModal dashboard)
+  - Read-only session inspection (used by the FlowTestPanel dashboard)
   - Returns: session metadata, context, history, test metadata
 ```
 
@@ -86,8 +86,8 @@ Phone Call (Telnyx SIP) ─┐
 Browser Audio Test  ─────┼─→ LiveKit room + metadata
 Browser Chat Test   ─────┘
 
-POST /api/flows/:flowId/test-audio  ← FlowTestModal
-POST /api/flows/:flowId/test-chat   ← FlowTestModal
+POST /api/flows/:flowId/test-audio  ← FlowTestPanel
+POST /api/flows/:flowId/test-chat   ← FlowTestPanel
 SIP dispatch rule                   ← Telnyx ↔ LiveKit
 ```
 
@@ -246,7 +246,7 @@ Response:
   "completed": false
 }
 
-// 3. FlowTestModal polls session state for observability
+// 3. FlowTestPanel polls session state for observability
 GET /api/flows/sessions/session_1234567890_xyz
 Response:
 {
