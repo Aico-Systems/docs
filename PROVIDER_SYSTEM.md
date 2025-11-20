@@ -176,11 +176,11 @@ Example:
 { model: "gpt-4o-mini", temperature: 0.9, maxTokens: 1000 }
 ```
 
-## Database Migration
+## Database Schema
 
-New init file: `backend/src/db/init/11_provider_system.sql`
+Tables are defined in `backend/src/db/schema.ts` and pushed via `drizzle-kit push`.
 
-To apply:
+To apply schema changes:
 ```bash
 make rebootstrap
 ```
@@ -308,8 +308,8 @@ New system:
 ## Files Changed/Created
 
 ### Database
-- `backend/src/db/schema.ts` - Added 3 new tables
-- `backend/src/db/init/11_provider_system.sql` - Migration script
+- `backend/src/db/schema.ts` - Added 3 new tables (pushed via drizzle-kit)
+- `backend/src/db/init.sql` - Consolidated init script (functions, triggers, RLS)
 
 ### Backend
 - `backend/src/providers/types.ts` - Type definitions
