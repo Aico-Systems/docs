@@ -1,0 +1,16 @@
+{
+  "pythonVersion": "3.13",
+  "pythonPlatform": "Linux",
+  "venvPath": ".",
+  "venv": ".direnv/python-3.13",
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "**/__pycache__",
+    ".direnv"
+  ],
+  "typeCheckingMode": "standard",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false
+}

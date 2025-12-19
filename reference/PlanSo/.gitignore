@@ -1,0 +1,28 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution
+dist/
+*.egg-info/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+.direnv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
