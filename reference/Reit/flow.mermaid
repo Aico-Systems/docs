@@ -1,0 +1,79 @@
+flowchart LR
+  %% =========================
+  %% Inbound Anrufe (Miro)
+  %% =========================
+
+  A1([Eingangsanruf])
+  A2[Weiterleitung nach 7 Sekunden<br/>innerhalb der Öffnungszeiten<br/>und sofort außerhalb Öffnungszeiten]
+  A3((Begrüßung ohne Tracking und Aufzeichnung und Kunden nachfragen<br/>in Stimme des KI Agenten, ob weiteres Vorgehen ok inkl. Aufzeichnung.<br/>Sollte mit Drücken einer Taste bestätigt werden))
+  A4{Entscheidung<br/>ob ok}
+  A5[Weiterleitung auf<br/>Mailbox]
+
+  A1 --> A2 --> A3 --> A4
+  A4 -- Nein --> A5
+
+  B0[Identifikation<br/>Anrufgrund]
+  A4 -- Ja --> B0
+
+  B1[Neue<br/>Schadensmeldung]
+  B2[Statusabfrage]
+  B3[Terminverein-<br/>barung]
+  B4[Sonstiges]
+
+  B0 --> B1
+  B0 --> B2
+  B0 --> B3
+  B0 --> B4
+
+  %% --- Identifikation wer anruft (separater Block) ---
+  H0[Identifikation wer<br/>anruft]
+  H1[Flottenbetreiber]
+  H2[Sonstiges<br/>(verkäufer etc.)]
+  H3[Versicherer]
+
+  B0 -. parallel .-> H0
+  H0 --> H1
+  H0 --> H2
+  H0 --> H3
+
+  %% --- Neue Schadensmeldung ---
+  C0["1. Schadensart?<br/>2. Welches Fahrzeug: Hersteller, Modell und Kennzeichen?<br/>3. Sind sie selber Schuld? → bei nein → weiterleiten an Menschen/Mitarbeiter<br/>4. Ist Ihr Fahrzeug noch verkehrssicher (über fahrbereit)? (Bsp. Spiegel/Scheinwerfer/Platten)<br/>5. Wo sind sie versichert?<br/>6. Haben Sie den Schaden schon gemeldet?<br/>&nbsp;&nbsp;a. wenn ja: Haben sie schon eine Schadennummer?<br/>7. Bilder vom Schaden → Vorbeikommen oder Link zur App?<br/>&nbsp;&nbsp;(abhängig vom Standort: besser vorbeikommen oder per Link, Grenze bei 15km)"]
+
+  N0[/Verkehrssicher →<br/>Offizielle Definition<br/>leicht erklärbar machen/]
+
+  D0[Bisherige Daten des<br/>Calls sollen<br/>weitergegeben werden]
+  D1[weiterleitung an Mitarbeiter<br/>bei nicht selber schuld]
+
+  G0["Im Falle selber Schuld:<br/>Terminierung für Besichtigung:<br/>Montag–Freitag 8–17<br/>Samstag 8–11<br/>Keinen Vorlauf, am besten Folgetag,<br/>selber Tag nicht mehr"]
+  G1[Schnittstelle Kalender<br/>Outlookkalender<br/>für Besichtigungen]
+  G2[Terminbestätigung<br/>per Email an den Kunden<br/>Alternativ per SMS]
+
+  B1 --> C0
+  N0 -. Hinweis .-> C0
+
+  C0 --> D0
+  D0 --> D1
+  D0 -->|im Falle selber Schuld| G0
+  G0 --> G1 --> G2
+
+  %% --- Statusabfrage ---
+  E0["Agent hat keinen Fragekatalog aber folgende Infos werden häufig angefragt:<br/><br/>Aber Kennzeichen und Identifikation vom Kunden erforderlich:<br/>Kennzeichen + Namen<br/>Fertigstellungsdatum (unverbindlich)<br/>Welchen Status hat das Fahrzeug<br/>Teileverfügbarkeit<br/><br/>Wenn Teile noch fehlen → voraussichtliche Lieferzeit ist zuverlässiger<br/>im Gespräch mit den Mitarbeitern zu erfahren"]
+  E1[weiterleitung an Mitarbeiter<br/>Falls Teile nicht verfügbar<br/>oder wenn Fahrzeug eher als<br/>voraussichtlich geplant<br/>benötigt wird]
+
+  B2 --> E0
+  E0 --> E1
+
+  %% --- Terminvereinbarung (Reparatur) ---
+  F0["Termin für die Reparatur –<br/>bedeutet Voraussetzung: Schaden wurde schon aufgenommen und bewertet<br/>(bedeutet auch nur verkehrssichere Fälle)<br/>Montag oder Dienstag jeweils vormittags (14 Tage Vorlauf)<br/>Terminsynchro mit PlanSO"]
+  F1[Schnittstelle<br/>PlanSO]
+
+  B3 --> F0 --> F1
+
+  %% (optional) Zusammenhang: PlanSO/Statusinfos unterstützen Statusabfrage/Verfügbarkeit
+  F1 -. Status/Teile/Planung .-> E0
+
+  %% =========================
+  %% Styling (optional)
+  %% =========================
+  classDef highlight fill:#ffe680,stroke:#333,stroke-width:1px,color:#000;
+  class A2,B0,H0,A5 highlight;
