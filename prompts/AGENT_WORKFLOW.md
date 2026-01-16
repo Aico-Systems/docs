@@ -102,7 +102,7 @@ bun scripts/flow/test-flow.ts <flow-slug> --trace --show-vars --verbose
 - `--trace` - Shows execution path with timing for each node
 - `--show-vars` - Displays working memory (session) and semantic memory (persistent) after each step
 - `--verbose` - Shows debug logs and detailed output including node outputs
-- `--no-livekit` - Uses polling instead of LiveKit (useful for debugging)
+- LiveKit monitoring is required; there is no polling fallback.
 
 **Interactive Commands:**
 
