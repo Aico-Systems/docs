@@ -1,0 +1,3279 @@
+Flow Execution Logs - Autohaus Reit - Hauptanruf-Flow (Simplified)
+Session ID: sess_89c61c89-b232-4748-a0f3-e40468b5b9f5
+Timestamp: 2026-01-20T16:14:12.454Z
+
+SUMMARY
+=======
+Total Messages: 9
+Total Nodes: 12
+Total Tools: 0
+Total Variables: 7
+Duration: 46.31s
+Errors: 0
+Flow Status: completed
+Current Node: end_success
+Connection Status: disconnected
+
+CONVERSATION
+============
+[4:57:06 PM] ASSISTANT: Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?
+[4:57:17 PM] USER: Ja, ist in Ordnung.
+[4:57:18 PM] ASSISTANT: Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?
+[4:57:25 PM] USER: Will wissen, wie weit mein Auto ist.
+[4:57:26 PM] ASSISTANT: Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.
+[4:57:41 PM] USER: BS
+[4:57:41 PM] ASSISTANT: Ich brauche noch: einen Namen bitte
+[4:57:45 PM] USER: Mauder.
+[4:57:52 PM] ASSISTANT: Vielen Dank für Ihren Anruf. Auf Wiederhören!
+
+NODE TIMELINE
+=============
+start (start) - COMPLETED
+consent_check (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?",
+    "metadata": {
+      "elicitationVariable": "consent"
+    },
+    "portName": "response"
+  }
+]
+consent_check (elicitation) - COMPLETED - 1000ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "ja",
+      "confidence": 0.95
+    },
+    "portName": "validated"
+  }
+]
+smart_entry (agenticLLM) - WAITING - 1209ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "respond",
+    "portName": "intent"
+  }
+]
+smart_entry (agenticLLM) - COMPLETED
+smart_entry (agenticLLM) - COMPLETED - 1092ms
+  Output: [
+  {
+    "tts": true,
+    "value": "",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "statusabfrage",
+    "portName": "intent"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.",
+    "metadata": {
+      "elicitationVariable": "status_id"
+    },
+    "portName": "response"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Ich brauche noch: einen Namen bitte",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_status_id (elicitation) - COMPLETED - 1521ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "name": "Mauder",
+      "kennzeichen": "BS"
+    },
+    "portName": "validated"
+  }
+]
+filler_lookup_status (wait) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Einen Moment bitte, ich schaue das kurz nach.",
+    "metadata": {
+      "type": "filler",
+      "targetNodeId": "lookup_status"
+    },
+    "portName": "message"
+  }
+]
+lookup_status (toolExecutor) - COMPLETED - 3035ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "output": {
+        "gefunden": true,
+        "auftraege": [
+          {
+            "id": 20692,
+            "kba": "0603CUX",
+            "vin": "WVWZZZED8SE031547",
+            "city": "",
+            "email": "",
+            "hu_au": null,
+            "phone": "01739486663",
+            "plate": "BB-SM 996E",
+            "damage": "KL 2-3",
+            "person": "LPS Alfred Ritter GmbH/ Maurer",
+            "address": "",
+            "country": "",
+            "mileage": null,
+            "zip_code": "",
+            "shop_date": "2026-01-20",
+            "model_name": null,
+            "short_name": "BB-SM 996E",
+            "station_id": 2,
+            "curb_weight": null,
+            "engine_code": null,
+            "engine_size": null,
+            "engine_type": null,
+            "finish_date": "2026-01-24",
+            "owner_phone": null,
+            "repair_date": "2026-01-19",
+            "engine_power": null,
+            "express_link": "[Keine Auswahl]",
+            "gross_weight": null,
+            "parts_status": "E-Teile komplett",
+            "missing_parts": 0,
+            "owner_address": null,
+            "station_state": "active",
+            "vehicle_owner": null,
+            "est_hours_karo": 18.71,
+            "est_hours_lack": 10.29,
+            "est_hours_mech": 0,
+            "project_status": "Karo",
+            "sub_model_name": null,
+            "appointment_date": "2025-12-11",
+            "country_of_origin": null,
+            "last_registration": null,
+            "manufacturer_name": "Volkswagen",
+            "first_registration": null,
+            "external_calculation": "False",
+            "planned_delivery_date": "2026-01-23"
+          },
+          {
+            "id": 20793,
+            "kba": "0005CZD",
+            "vin": "WBA21FZ010FR56982",
+            "city": "",
+            "email": "u.schmauder@gmx.de",
+            "hu_au": null,
+            "phone": "017624211099",
+            "plate": "BS-US 99",
+            "damage": "KL 2-3",
+            "person": "Mobexo/Schmauder",
+            "address": "",
+            "country": "",
+            "mileage": "88535",
+            "zip_code": "",
+            "shop_date": "2026-01-09",
+            "model_name": null,
+            "short_name": "BS-US 99",
+            "station_id": 3,
+            "curb_weight": null,
+            "engine_code": null,
+            "engine_size": null,
+            "engine_type": null,
+            "finish_date": "2026-01-21",
+            "owner_phone": null,
+            "repair_date": "2026-01-07",
+            "engine_power": null,
+            "express_link": "[Keine Auswahl]",
+            "gross_weight": null,
+            "parts_status": "E-Teile teilweise eingetroffen",
+            "missing_parts": 1,
+            "owner_address": null,
+            "station_state": "active",
+            "vehicle_owner": null,
+            "est_hours_karo": 19.05,
+            "est_hours_lack": 9.67,
+            "est_hours_mech": 0,
+            "project_status": "Vorarbeit",
+            "sub_model_name": null,
+            "appointment_date": "2026-01-07",
+            "country_of_origin": null,
+            "last_registration": null,
+            "manufacturer_name": "BMW",
+            "first_registration": null,
+            "external_calculation": "False",
+            "planned_delivery_date": "2026-01-10"
+          }
+        ],
+        "kennzeichen": "BS",
+        "anzahl_auftraege": 2
+      },
+      "success": true,
+      "metadata": {
+        "workerId": "worker-0",
+        "consoleLogs": [],
+        "memoryUsage": {
+          "rss": 68702208,
+          "external": 1045153,
+          "heapUsed": 2420897,
+          "heapTotal": 2713600,
+          "arrayBuffers": 0
+        }
+      },
+      "executionTime": 34
+    },
+    "portName": "success"
+  },
+  {
+    "tts": false,
+    "value": "Ich habe Informationen zu zwei Fahrzeugen mit dem Kennzeichen BS.\n\nDas erste Fahrzeug ist ein Volkswagen mit dem Kennzeichen BB-SM 996E.  \nDer aktuelle Stand ist aktiv.  \nDie voraussichtliche Fertigstellung ist am 24. Januar 2026.  \nAlle Teile sind komplett vorhanden.\n\nDas zweite Fahrzeug ist ein BMW mit dem Kennzeichen BS-US 99.  \nDer aktuelle Stand ist ebenfalls aktiv.  \nDie voraussichtliche Fertigstellung ist am 21. Januar 2026.  \nEin Teil fehlt noch.",
+    "portName": "formatted"
+  }
+]
+end_success (end) - COMPLETED - 1ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Vielen Dank für Ihren Anruf. Auf Wiederhören!",
+    "portName": "message"
+  }
+]
+
+VARIABLES
+=========
+consent: {
+  "intent": "ja",
+  "confidence": 0.95
+}
+entry_response: ""
+lastAgenticDecision: "statusabfrage"
+lastAgenticResponse: ""
+last_user_message: "Will wissen, wie weit mein Auto ist."
+status_id: {
+  "name": "Mauder",
+  "kennzeichen": "BS"
+}
+fahrzeug_status: {
+  "output": {
+    "gefunden": true,
+    "auftraege": [
+      {
+        "id": 20692,
+        "kba": "0603CUX",
+        "vin": "WVWZZZED8SE031547",
+        "city": "",
+        "email": "",
+        "hu_au": null,
+        "phone": "01739486663",
+        "plate": "BB-SM 996E",
+        "damage": "KL 2-3",
+        "person": "LPS Alfred Ritter GmbH/ Maurer",
+        "address": "",
+        "country": "",
+        "mileage": null,
+        "zip_code": "",
+        "shop_date": "2026-01-20",
+        "model_name": null,
+        "short_name": "BB-SM 996E",
+        "station_id": 2,
+        "curb_weight": null,
+        "engine_code": null,
+        "engine_size": null,
+        "engine_type": null,
+        "finish_date": "2026-01-24",
+        "owner_phone": null,
+        "repair_date": "2026-01-19",
+        "engine_power": null,
+        "express_link": "[Keine Auswahl]",
+        "gross_weight": null,
+        "parts_status": "E-Teile komplett",
+        "missing_parts": 0,
+        "owner_address": null,
+        "station_state": "active",
+        "vehicle_owner": null,
+        "est_hours_karo": 18.71,
+        "est_hours_lack": 10.29,
+        "est_hours_mech": 0,
+        "project_status": "Karo",
+        "sub_model_name": null,
+        "appointment_date": "2025-12-11",
+        "country_of_origin": null,
+        "last_registration": null,
+        "manufacturer_name": "Volkswagen",
+        "first_registration": null,
+        "external_calculation": "False",
+        "planned_delivery_date": "2026-01-23"
+      },
+      {
+        "id": 20793,
+        "kba": "0005CZD",
+        "vin": "WBA21FZ010FR56982",
+        "city": "",
+        "email": "u.schmauder@gmx.de",
+        "hu_au": null,
+        "phone": "017624211099",
+        "plate": "BS-US 99",
+        "damage": "KL 2-3",
+        "person": "Mobexo/Schmauder",
+        "address": "",
+        "country": "",
+        "mileage": "88535",
+        "zip_code": "",
+        "shop_date": "2026-01-09",
+        "model_name": null,
+        "short_name": "BS-US 99",
+        "station_id": 3,
+        "curb_weight": null,
+        "engine_code": null,
+        "engine_size": null,
+        "engine_type": null,
+        "finish_date": "2026-01-21",
+        "owner_phone": null,
+        "repair_date": "2026-01-07",
+        "engine_power": null,
+        "express_link": "[Keine Auswahl]",
+        "gross_weight": null,
+        "parts_status": "E-Teile teilweise eingetroffen",
+        "missing_parts": 1,
+        "owner_address": null,
+        "station_state": "active",
+        "vehicle_owner": null,
+        "est_hours_karo": 19.05,
+        "est_hours_lack": 9.67,
+        "est_hours_mech": 0,
+        "project_status": "Vorarbeit",
+        "sub_model_name": null,
+        "appointment_date": "2026-01-07",
+        "country_of_origin": null,
+        "last_registration": null,
+        "manufacturer_name": "BMW",
+        "first_registration": null,
+        "external_calculation": "False",
+        "planned_delivery_date": "2026-01-10"
+      }
+    ],
+    "kennzeichen": "BS",
+    "anzahl_auftraege": 2
+  },
+  "success": true,
+  "metadata": {
+    "workerId": "worker-0",
+    "consoleLogs": [],
+    "memoryUsage": {
+      "rss": 68702208,
+      "external": 1045153,
+      "heapUsed": 2420897,
+      "heapTotal": 2713600,
+      "arrayBuffers": 0
+    }
+  },
+  "executionTime": 34
+}
+
+RAW STORE STATE (for debugging)
+================================
+{
+  "sessionId": "sess_89c61c89-b232-4748-a0f3-e40468b5b9f5",
+  "flowStatus": "completed",
+  "currentNodeId": "end_success",
+  "connectionStatus": "disconnected",
+  "messagesCount": 9,
+  "timelineCount": 12,
+  "toolExecutionsCount": 0,
+  "variablesCount": 7,
+  "variableHistoryCount": 0
+}
+
+Flow Execution Logs - Autohaus Reit - Hauptanruf-Flow (Simplified)
+Session ID: sess_9baafc15-f978-40d5-a204-5113c6e74d2e
+Timestamp: 2026-01-20T16:14:27.200Z
+
+SUMMARY
+=======
+Total Messages: 9
+Total Nodes: 12
+Total Tools: 0
+Total Variables: 7
+Duration: 47.28s
+Errors: 0
+Flow Status: completed
+Current Node: end_success
+Connection Status: disconnected
+
+CONVERSATION
+============
+[4:55:06 PM] ASSISTANT: Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?
+[4:55:18 PM] USER: Ja, geht in Ordnung für mich.
+[4:55:19 PM] ASSISTANT: Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?
+[4:55:28 PM] USER: Ich würd gern wissen, wie weit mein Fahrzeug ist.
+[4:55:28 PM] ASSISTANT: Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.
+[4:55:41 PM] USER: BS
+[4:55:41 PM] ASSISTANT: Ich brauche noch: einen Namen bitte
+[4:55:44 PM] USER: US 9 9 Schmauder.
+[4:55:53 PM] ASSISTANT: Vielen Dank für Ihren Anruf. Auf Wiederhören!
+
+NODE TIMELINE
+=============
+start (start) - COMPLETED
+consent_check (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?",
+    "metadata": {
+      "elicitationVariable": "consent"
+    },
+    "portName": "response"
+  }
+]
+consent_check (elicitation) - COMPLETED - 737ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "ja",
+      "confidence": 0.95
+    },
+    "portName": "validated"
+  }
+]
+smart_entry (agenticLLM) - WAITING - 1690ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "respond",
+    "portName": "intent"
+  }
+]
+smart_entry (agenticLLM) - COMPLETED
+smart_entry (agenticLLM) - COMPLETED - 910ms
+  Output: [
+  {
+    "tts": true,
+    "value": "",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "statusabfrage",
+    "portName": "intent"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.",
+    "metadata": {
+      "elicitationVariable": "status_id"
+    },
+    "portName": "response"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Ich brauche noch: einen Namen bitte",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_status_id (elicitation) - COMPLETED - 1231ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "name": "US 9 9 Schmauder",
+      "kennzeichen": "BS"
+    },
+    "portName": "validated"
+  }
+]
+filler_lookup_status (wait) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Einen Moment bitte, ich schaue das kurz nach.",
+    "metadata": {
+      "type": "filler",
+      "targetNodeId": "lookup_status"
+    },
+    "portName": "message"
+  }
+]
+lookup_status (toolExecutor) - COMPLETED - 4871ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "output": {
+        "gefunden": true,
+        "auftraege": [
+          {
+            "id": 20692,
+            "kba": "0603CUX",
+            "vin": "WVWZZZED8SE031547",
+            "city": "",
+            "email": "",
+            "hu_au": null,
+            "phone": "01739486663",
+            "plate": "BB-SM 996E",
+            "damage": "KL 2-3",
+            "person": "LPS Alfred Ritter GmbH/ Maurer",
+            "address": "",
+            "country": "",
+            "mileage": null,
+            "zip_code": "",
+            "shop_date": "2026-01-20",
+            "model_name": null,
+            "short_name": "BB-SM 996E",
+            "station_id": 2,
+            "curb_weight": null,
+            "engine_code": null,
+            "engine_size": null,
+            "engine_type": null,
+            "finish_date": "2026-01-24",
+            "owner_phone": null,
+            "repair_date": "2026-01-19",
+            "engine_power": null,
+            "express_link": "[Keine Auswahl]",
+            "gross_weight": null,
+            "parts_status": "E-Teile komplett",
+            "missing_parts": 0,
+            "owner_address": null,
+            "station_state": "active",
+            "vehicle_owner": null,
+            "est_hours_karo": 18.71,
+            "est_hours_lack": 10.29,
+            "est_hours_mech": 0,
+            "project_status": "Karo",
+            "sub_model_name": null,
+            "appointment_date": "2025-12-11",
+            "country_of_origin": null,
+            "last_registration": null,
+            "manufacturer_name": "Volkswagen",
+            "first_registration": null,
+            "external_calculation": "False",
+            "planned_delivery_date": "2026-01-23"
+          },
+          {
+            "id": 20793,
+            "kba": "0005CZD",
+            "vin": "WBA21FZ010FR56982",
+            "city": "",
+            "email": "u.schmauder@gmx.de",
+            "hu_au": null,
+            "phone": "017624211099",
+            "plate": "BS-US 99",
+            "damage": "KL 2-3",
+            "person": "Mobexo/Schmauder",
+            "address": "",
+            "country": "",
+            "mileage": "88535",
+            "zip_code": "",
+            "shop_date": "2026-01-09",
+            "model_name": null,
+            "short_name": "BS-US 99",
+            "station_id": 3,
+            "curb_weight": null,
+            "engine_code": null,
+            "engine_size": null,
+            "engine_type": null,
+            "finish_date": "2026-01-21",
+            "owner_phone": null,
+            "repair_date": "2026-01-07",
+            "engine_power": null,
+            "express_link": "[Keine Auswahl]",
+            "gross_weight": null,
+            "parts_status": "E-Teile teilweise eingetroffen",
+            "missing_parts": 1,
+            "owner_address": null,
+            "station_state": "active",
+            "vehicle_owner": null,
+            "est_hours_karo": 19.05,
+            "est_hours_lack": 9.67,
+            "est_hours_mech": 0,
+            "project_status": "Vorarbeit",
+            "sub_model_name": null,
+            "appointment_date": "2026-01-07",
+            "country_of_origin": null,
+            "last_registration": null,
+            "manufacturer_name": "BMW",
+            "first_registration": null,
+            "external_calculation": "False",
+            "planned_delivery_date": "2026-01-10"
+          }
+        ],
+        "kennzeichen": "BS",
+        "anzahl_auftraege": 2
+      },
+      "success": true,
+      "metadata": {
+        "workerId": "worker-0",
+        "consoleLogs": [],
+        "memoryUsage": {
+          "rss": 68530176,
+          "external": 1034746,
+          "heapUsed": 2396378,
+          "heapTotal": 2664448,
+          "arrayBuffers": 0
+        }
+      },
+      "executionTime": 33
+    },
+    "portName": "success"
+  },
+  {
+    "tts": false,
+    "value": "Ich habe Informationen zu zwei Fahrzeugen mit dem Kennzeichen BS.\n\nDas erste Fahrzeug hat das Kennzeichen BB-SM 996E. Der aktuelle Stand ist Karo. Die voraussichtliche Fertigstellung ist am 24. Januar 2026. Alle benötigten Teile sind komplett vorhanden.\n\nDas zweite Fahrzeug hat das Kennzeichen BS-US 99. Der aktuelle Stand ist Vorarbeit. Die voraussichtliche Fertigstellung ist am 21. Januar 2026. Es fehlen noch ein paar Teile.",
+    "portName": "formatted"
+  }
+]
+end_success (end) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Vielen Dank für Ihren Anruf. Auf Wiederhören!",
+    "portName": "message"
+  }
+]
+
+VARIABLES
+=========
+consent: {
+  "intent": "ja",
+  "confidence": 0.95
+}
+entry_response: ""
+lastAgenticDecision: "statusabfrage"
+lastAgenticResponse: ""
+last_user_message: "Ich würd gern wissen, wie weit mein Fahrzeug ist."
+status_id: {
+  "name": "US 9 9 Schmauder",
+  "kennzeichen": "BS"
+}
+fahrzeug_status: {
+  "output": {
+    "gefunden": true,
+    "auftraege": [
+      {
+        "id": 20692,
+        "kba": "0603CUX",
+        "vin": "WVWZZZED8SE031547",
+        "city": "",
+        "email": "",
+        "hu_au": null,
+        "phone": "01739486663",
+        "plate": "BB-SM 996E",
+        "damage": "KL 2-3",
+        "person": "LPS Alfred Ritter GmbH/ Maurer",
+        "address": "",
+        "country": "",
+        "mileage": null,
+        "zip_code": "",
+        "shop_date": "2026-01-20",
+        "model_name": null,
+        "short_name": "BB-SM 996E",
+        "station_id": 2,
+        "curb_weight": null,
+        "engine_code": null,
+        "engine_size": null,
+        "engine_type": null,
+        "finish_date": "2026-01-24",
+        "owner_phone": null,
+        "repair_date": "2026-01-19",
+        "engine_power": null,
+        "express_link": "[Keine Auswahl]",
+        "gross_weight": null,
+        "parts_status": "E-Teile komplett",
+        "missing_parts": 0,
+        "owner_address": null,
+        "station_state": "active",
+        "vehicle_owner": null,
+        "est_hours_karo": 18.71,
+        "est_hours_lack": 10.29,
+        "est_hours_mech": 0,
+        "project_status": "Karo",
+        "sub_model_name": null,
+        "appointment_date": "2025-12-11",
+        "country_of_origin": null,
+        "last_registration": null,
+        "manufacturer_name": "Volkswagen",
+        "first_registration": null,
+        "external_calculation": "False",
+        "planned_delivery_date": "2026-01-23"
+      },
+      {
+        "id": 20793,
+        "kba": "0005CZD",
+        "vin": "WBA21FZ010FR56982",
+        "city": "",
+        "email": "u.schmauder@gmx.de",
+        "hu_au": null,
+        "phone": "017624211099",
+        "plate": "BS-US 99",
+        "damage": "KL 2-3",
+        "person": "Mobexo/Schmauder",
+        "address": "",
+        "country": "",
+        "mileage": "88535",
+        "zip_code": "",
+        "shop_date": "2026-01-09",
+        "model_name": null,
+        "short_name": "BS-US 99",
+        "station_id": 3,
+        "curb_weight": null,
+        "engine_code": null,
+        "engine_size": null,
+        "engine_type": null,
+        "finish_date": "2026-01-21",
+        "owner_phone": null,
+        "repair_date": "2026-01-07",
+        "engine_power": null,
+        "express_link": "[Keine Auswahl]",
+        "gross_weight": null,
+        "parts_status": "E-Teile teilweise eingetroffen",
+        "missing_parts": 1,
+        "owner_address": null,
+        "station_state": "active",
+        "vehicle_owner": null,
+        "est_hours_karo": 19.05,
+        "est_hours_lack": 9.67,
+        "est_hours_mech": 0,
+        "project_status": "Vorarbeit",
+        "sub_model_name": null,
+        "appointment_date": "2026-01-07",
+        "country_of_origin": null,
+        "last_registration": null,
+        "manufacturer_name": "BMW",
+        "first_registration": null,
+        "external_calculation": "False",
+        "planned_delivery_date": "2026-01-10"
+      }
+    ],
+    "kennzeichen": "BS",
+    "anzahl_auftraege": 2
+  },
+  "success": true,
+  "metadata": {
+    "workerId": "worker-0",
+    "consoleLogs": [],
+    "memoryUsage": {
+      "rss": 68530176,
+      "external": 1034746,
+      "heapUsed": 2396378,
+      "heapTotal": 2664448,
+      "arrayBuffers": 0
+    }
+  },
+  "executionTime": 33
+}
+
+RAW STORE STATE (for debugging)
+================================
+{
+  "sessionId": "sess_9baafc15-f978-40d5-a204-5113c6e74d2e",
+  "flowStatus": "completed",
+  "currentNodeId": "end_success",
+  "connectionStatus": "disconnected",
+  "messagesCount": 9,
+  "timelineCount": 12,
+  "toolExecutionsCount": 0,
+  "variablesCount": 7,
+  "variableHistoryCount": 0
+}
+
+Flow Execution Logs - Autohaus Reit - Hauptanruf-Flow (Simplified)
+Session ID: sess_3d9b3a92-a207-43b0-8a93-6315634bf467
+Timestamp: 2026-01-20T16:14:33.605Z
+
+SUMMARY
+=======
+Total Messages: 9
+Total Nodes: 12
+Total Tools: 0
+Total Variables: 7
+Duration: 40.34s
+Errors: 0
+Flow Status: completed
+Current Node: end_success
+Connection Status: disconnected
+
+CONVERSATION
+============
+[4:53:15 PM] ASSISTANT: Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?
+[4:53:27 PM] USER: Okay.
+[4:53:29 PM] ASSISTANT: Wie kann ich Ihnen helfen?
+[4:53:35 PM] USER: Will wissen, wie weit mein Fahrzeug ist.
+[4:53:36 PM] ASSISTANT: Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.
+[4:53:47 PM] USER: US 9 9.
+[4:53:47 PM] ASSISTANT: Ich brauche noch: einen Namen bitte
+[4:53:50 PM] USER: Wender Schmauder.
+[4:53:55 PM] ASSISTANT: Vielen Dank für Ihren Anruf. Auf Wiederhören!
+
+NODE TIMELINE
+=============
+start (start) - COMPLETED
+consent_check (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?",
+    "metadata": {
+      "elicitationVariable": "consent"
+    },
+    "portName": "response"
+  }
+]
+consent_check (elicitation) - COMPLETED - 785ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "ja",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+smart_entry (agenticLLM) - WAITING - 1170ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Wie kann ich Ihnen helfen?",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "respond",
+    "portName": "intent"
+  }
+]
+smart_entry (agenticLLM) - COMPLETED
+smart_entry (agenticLLM) - COMPLETED - 1167ms
+  Output: [
+  {
+    "tts": true,
+    "value": "",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "statusabfrage",
+    "portName": "intent"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.",
+    "metadata": {
+      "elicitationVariable": "status_id"
+    },
+    "portName": "response"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Ich brauche noch: einen Namen bitte",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_status_id (elicitation) - COMPLETED - 1949ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "name": "Wender Schmauder",
+      "kennzeichen": "US 9 9"
+    },
+    "portName": "validated"
+  }
+]
+filler_lookup_status (wait) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Einen Moment bitte, ich schaue das kurz nach.",
+    "metadata": {
+      "type": "filler",
+      "targetNodeId": "lookup_status"
+    },
+    "portName": "message"
+  }
+]
+lookup_status (toolExecutor) - COMPLETED - 2235ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "output": {
+        "gefunden": true,
+        "auftraege": [
+          {
+            "id": 20793,
+            "kba": "0005CZD",
+            "vin": "WBA21FZ010FR56982",
+            "city": "",
+            "email": "u.schmauder@gmx.de",
+            "hu_au": null,
+            "phone": "017624211099",
+            "plate": "BS-US 99",
+            "damage": "KL 2-3",
+            "person": "Mobexo/Schmauder",
+            "address": "",
+            "country": "",
+            "mileage": "88535",
+            "zip_code": "",
+            "shop_date": "2026-01-09",
+            "model_name": null,
+            "short_name": "BS-US 99",
+            "station_id": 3,
+            "curb_weight": null,
+            "engine_code": null,
+            "engine_size": null,
+            "engine_type": null,
+            "finish_date": "2026-01-21",
+            "owner_phone": null,
+            "repair_date": "2026-01-07",
+            "engine_power": null,
+            "express_link": "[Keine Auswahl]",
+            "gross_weight": null,
+            "parts_status": "E-Teile teilweise eingetroffen",
+            "missing_parts": 1,
+            "owner_address": null,
+            "station_state": "active",
+            "vehicle_owner": null,
+            "est_hours_karo": 19.05,
+            "est_hours_lack": 9.67,
+            "est_hours_mech": 0,
+            "project_status": "Vorarbeit",
+            "sub_model_name": null,
+            "appointment_date": "2026-01-07",
+            "country_of_origin": null,
+            "last_registration": null,
+            "manufacturer_name": "BMW",
+            "first_registration": null,
+            "external_calculation": "False",
+            "planned_delivery_date": "2026-01-10"
+          }
+        ],
+        "kennzeichen": "US 9 9",
+        "anzahl_auftraege": 1
+      },
+      "success": true,
+      "metadata": {
+        "workerId": "worker-0",
+        "consoleLogs": [],
+        "memoryUsage": {
+          "rss": 68775936,
+          "external": 1033126,
+          "heapUsed": 2393222,
+          "heapTotal": 2663424,
+          "arrayBuffers": 0
+        }
+      },
+      "executionTime": 36
+    },
+    "portName": "success"
+  },
+  {
+    "tts": false,
+    "value": "Das Fahrzeug mit dem Kennzeichen US 9 9 ist gefunden. Es gibt einen Auftrag unter der ID 20793. Der aktuelle Status ist \"Vorarbeit\". Die voraussichtliche Fertigstellung ist am 21. Januar 2026. Teile sind teilweise eingetroffen. Es fehlt noch ein Teil.",
+    "portName": "formatted"
+  }
+]
+end_success (end) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Vielen Dank für Ihren Anruf. Auf Wiederhören!",
+    "portName": "message"
+  }
+]
+
+VARIABLES
+=========
+consent: {
+  "intent": "ja",
+  "confidence": 0.9
+}
+entry_response: ""
+lastAgenticDecision: "statusabfrage"
+lastAgenticResponse: ""
+last_user_message: "Will wissen, wie weit mein Fahrzeug ist."
+status_id: {
+  "name": "Wender Schmauder",
+  "kennzeichen": "US 9 9"
+}
+fahrzeug_status: {
+  "output": {
+    "gefunden": true,
+    "auftraege": [
+      {
+        "id": 20793,
+        "kba": "0005CZD",
+        "vin": "WBA21FZ010FR56982",
+        "city": "",
+        "email": "u.schmauder@gmx.de",
+        "hu_au": null,
+        "phone": "017624211099",
+        "plate": "BS-US 99",
+        "damage": "KL 2-3",
+        "person": "Mobexo/Schmauder",
+        "address": "",
+        "country": "",
+        "mileage": "88535",
+        "zip_code": "",
+        "shop_date": "2026-01-09",
+        "model_name": null,
+        "short_name": "BS-US 99",
+        "station_id": 3,
+        "curb_weight": null,
+        "engine_code": null,
+        "engine_size": null,
+        "engine_type": null,
+        "finish_date": "2026-01-21",
+        "owner_phone": null,
+        "repair_date": "2026-01-07",
+        "engine_power": null,
+        "express_link": "[Keine Auswahl]",
+        "gross_weight": null,
+        "parts_status": "E-Teile teilweise eingetroffen",
+        "missing_parts": 1,
+        "owner_address": null,
+        "station_state": "active",
+        "vehicle_owner": null,
+        "est_hours_karo": 19.05,
+        "est_hours_lack": 9.67,
+        "est_hours_mech": 0,
+        "project_status": "Vorarbeit",
+        "sub_model_name": null,
+        "appointment_date": "2026-01-07",
+        "country_of_origin": null,
+        "last_registration": null,
+        "manufacturer_name": "BMW",
+        "first_registration": null,
+        "external_calculation": "False",
+        "planned_delivery_date": "2026-01-10"
+      }
+    ],
+    "kennzeichen": "US 9 9",
+    "anzahl_auftraege": 1
+  },
+  "success": true,
+  "metadata": {
+    "workerId": "worker-0",
+    "consoleLogs": [],
+    "memoryUsage": {
+      "rss": 68775936,
+      "external": 1033126,
+      "heapUsed": 2393222,
+      "heapTotal": 2663424,
+      "arrayBuffers": 0
+    }
+  },
+  "executionTime": 36
+}
+
+RAW STORE STATE (for debugging)
+================================
+{
+  "sessionId": "sess_3d9b3a92-a207-43b0-8a93-6315634bf467",
+  "flowStatus": "completed",
+  "currentNodeId": "end_success",
+  "connectionStatus": "disconnected",
+  "messagesCount": 9,
+  "timelineCount": 12,
+  "toolExecutionsCount": 0,
+  "variablesCount": 7,
+  "variableHistoryCount": 0
+}
+
+Flow Execution Logs - Autohaus Reit - Hauptanruf-Flow (Simplified)
+Session ID: sess_627e9631-e025-4d0e-83ee-2bf5838b2fc7
+Timestamp: 2026-01-20T16:14:41.600Z
+
+SUMMARY
+=======
+Total Messages: 10
+Total Nodes: 13
+Total Tools: 0
+Total Variables: 8
+Duration: 39.22s
+Errors: 0
+Flow Status: cancelled
+Current Node: confirm_transfer
+Connection Status: disconnected
+
+CONVERSATION
+============
+[4:52:21 PM] ASSISTANT: Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?
+[4:52:33 PM] USER: Ja, ist in Ordnung für mich.
+[4:52:35 PM] ASSISTANT: Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?
+[4:52:43 PM] USER: Ich will den Status zu meinem Fahrzeug in Erfahrung bringen.
+[4:52:44 PM] ASSISTANT: Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.
+[4:52:54 PM] USER: U l 9 9
+[4:52:54 PM] ASSISTANT: Ich brauche noch: einen Namen bitte
+[4:52:57 PM] USER: Schmauder. Mein Name.
+[4:53:01 PM] ASSISTANT: Leider konnte ich keinen Auftrag zum Kennzeichen U L 9 9 finden. Ich werde Sie nun weiterleiten, damit Ihnen jemand anders weiterhelfen kann.
+[4:53:01 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+
+NODE TIMELINE
+=============
+start (start) - COMPLETED
+consent_check (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?",
+    "metadata": {
+      "elicitationVariable": "consent"
+    },
+    "portName": "response"
+  }
+]
+consent_check (elicitation) - COMPLETED - 847ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "ja",
+      "confidence": 0.95
+    },
+    "portName": "validated"
+  }
+]
+smart_entry (agenticLLM) - WAITING - 1862ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "respond",
+    "portName": "intent"
+  }
+]
+smart_entry (agenticLLM) - COMPLETED
+smart_entry (agenticLLM) - COMPLETED - 936ms
+  Output: [
+  {
+    "tts": true,
+    "value": "",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "statusabfrage",
+    "portName": "intent"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.",
+    "metadata": {
+      "elicitationVariable": "status_id"
+    },
+    "portName": "response"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Ich brauche noch: einen Namen bitte",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_status_id (elicitation) - COMPLETED - 1595ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "name": "Schmauder",
+      "kennzeichen": "U l 9 9"
+    },
+    "portName": "validated"
+  }
+]
+filler_lookup_status (wait) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Einen Moment bitte, ich schaue das kurz nach.",
+    "metadata": {
+      "type": "filler",
+      "targetNodeId": "lookup_status"
+    },
+    "portName": "message"
+  }
+]
+lookup_status (toolExecutor) - COMPLETED - 2031ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "output": {
+        "gefunden": false,
+        "auftraege": [],
+        "kennzeichen": "U L 9 9",
+        "anzahl_auftraege": 0
+      },
+      "success": true,
+      "metadata": {
+        "workerId": "worker-0",
+        "consoleLogs": [],
+        "memoryUsage": {
+          "rss": 68644864,
+          "external": 1027833,
+          "heapUsed": 2380889,
+          "heapTotal": 2629632,
+          "arrayBuffers": 0
+        }
+      },
+      "executionTime": 180
+    },
+    "portName": "success"
+  },
+  {
+    "tts": false,
+    "value": "Das Fahrzeug mit dem Kennzeichen U L 9 9 wurde nicht gefunden. Aktuell gibt es keine Aufträge für dieses Fahrzeug. Daher kann ich keine voraussichtliche Fertigstellung angeben. Es fehlen keine Teile, da keine Aufträge vorliegen.",
+    "portName": "formatted"
+  }
+]
+handle_status_result (agenticLLM) - COMPLETED - 1411ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Leider konnte ich keinen Auftrag zum Kennzeichen U L 9 9 finden. Ich werde Sie nun weiterleiten, damit Ihnen jemand anders weiterhelfen kann.",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "transfer",
+    "portName": "intent"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+
+VARIABLES
+=========
+consent: {
+  "intent": "ja",
+  "confidence": 0.95
+}
+entry_response: ""
+lastAgenticDecision: "transfer"
+lastAgenticResponse: "Leider konnte ich keinen Auftrag zum Kennzeichen U L 9 9 finden. Ich werde Sie nun weiterleiten, damit Ihnen jemand anders weiterhelfen kann."
+last_user_message: "Ich will den Status zu meinem Fahrzeug in Erfahrung bringen."
+status_id: {
+  "name": "Schmauder",
+  "kennzeichen": "U l 9 9"
+}
+fahrzeug_status: {
+  "output": {
+    "gefunden": false,
+    "auftraege": [],
+    "kennzeichen": "U L 9 9",
+    "anzahl_auftraege": 0
+  },
+  "success": true,
+  "metadata": {
+    "workerId": "worker-0",
+    "consoleLogs": [],
+    "memoryUsage": {
+      "rss": 68644864,
+      "external": 1027833,
+      "heapUsed": 2380889,
+      "heapTotal": 2629632,
+      "arrayBuffers": 0
+    }
+  },
+  "executionTime": 180
+}
+status_decision: "Leider konnte ich keinen Auftrag zum Kennzeichen U L 9 9 finden. Ich werde Sie nun weiterleiten, damit Ihnen jemand anders weiterhelfen kann."
+
+RAW STORE STATE (for debugging)
+================================
+{
+  "sessionId": "sess_627e9631-e025-4d0e-83ee-2bf5838b2fc7",
+  "flowStatus": "cancelled",
+  "currentNodeId": "confirm_transfer",
+  "connectionStatus": "disconnected",
+  "messagesCount": 10,
+  "timelineCount": 13,
+  "toolExecutionsCount": 0,
+  "variablesCount": 8,
+  "variableHistoryCount": 0
+}
+
+Flow Execution Logs - Autohaus Reit - Hauptanruf-Flow (Simplified)
+Session ID: sess_0e67c301-dda5-490c-9214-5b248c77896a
+Timestamp: 2026-01-20T16:14:53.533Z
+
+SUMMARY
+=======
+Total Messages: 10
+Total Nodes: 13
+Total Tools: 0
+Total Variables: 8
+Duration: 46.22s
+Errors: 0
+Flow Status: cancelled
+Current Node: confirm_transfer
+Connection Status: disconnected
+
+CONVERSATION
+============
+[4:51:00 PM] ASSISTANT: Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?
+[4:51:16 PM] USER: Ja, ist in Ordnung.
+[4:51:18 PM] ASSISTANT: Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?
+[4:51:26 PM] USER: Ich würd gern den Status von meinem Fahrzeug in Erfahrung bringen.
+[4:51:27 PM] ASSISTANT: Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.
+[4:51:38 PM] USER: US 9 9
+[4:51:38 PM] ASSISTANT: Ich brauche noch: einen Namen bitte
+[4:51:40 PM] USER: Mauder.
+[4:51:46 PM] ASSISTANT: Das Fahrzeug mit dem Kennzeichen U S 9 9 wurde gefunden. Der Status ist, dass wir derzeit auf einige Ersatzteile warten, die noch nicht vollständig eingetroffen sind. Es gibt insgesamt einen Auftrag, und die geplante Lieferung ist für den zehnten Januar zweitausendsechsundzwanzig vorgesehen. Ich werde Sie jetzt an einen Kollegen weiterleiten, der Ihnen weitere Informationen geben kann.
+[4:51:46 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+
+NODE TIMELINE
+=============
+start (start) - COMPLETED
+consent_check (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?",
+    "metadata": {
+      "elicitationVariable": "consent"
+    },
+    "portName": "response"
+  }
+]
+consent_check (elicitation) - COMPLETED - 911ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "ja",
+      "confidence": 0.95
+    },
+    "portName": "validated"
+  }
+]
+smart_entry (agenticLLM) - WAITING - 1622ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "respond",
+    "portName": "intent"
+  }
+]
+smart_entry (agenticLLM) - COMPLETED
+smart_entry (agenticLLM) - COMPLETED - 1073ms
+  Output: [
+  {
+    "tts": true,
+    "value": "",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "statusabfrage",
+    "portName": "intent"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.",
+    "metadata": {
+      "elicitationVariable": "status_id"
+    },
+    "portName": "response"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Ich brauche noch: einen Namen bitte",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_status_id (elicitation) - COMPLETED - 1312ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "name": "Mauder",
+      "kennzeichen": "US 9 9"
+    },
+    "portName": "validated"
+  }
+]
+filler_lookup_status (wait) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Einen Moment bitte, ich schaue das kurz nach.",
+    "metadata": {
+      "type": "filler",
+      "targetNodeId": "lookup_status"
+    },
+    "portName": "message"
+  }
+]
+lookup_status (toolExecutor) - COMPLETED - 2862ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "output": {
+        "gefunden": true,
+        "auftraege": [
+          {
+            "id": 20793,
+            "kba": "0005CZD",
+            "vin": "WBA21FZ010FR56982",
+            "city": "",
+            "email": "u.schmauder@gmx.de",
+            "hu_au": null,
+            "phone": "017624211099",
+            "plate": "BS-US 99",
+            "damage": "KL 2-3",
+            "person": "Mobexo/Schmauder",
+            "address": "",
+            "country": "",
+            "mileage": "88535",
+            "zip_code": "",
+            "shop_date": "2026-01-09",
+            "model_name": null,
+            "short_name": "BS-US 99",
+            "station_id": 3,
+            "curb_weight": null,
+            "engine_code": null,
+            "engine_size": null,
+            "engine_type": null,
+            "finish_date": "2026-01-21",
+            "owner_phone": null,
+            "repair_date": "2026-01-07",
+            "engine_power": null,
+            "express_link": "[Keine Auswahl]",
+            "gross_weight": null,
+            "parts_status": "E-Teile teilweise eingetroffen",
+            "missing_parts": 1,
+            "owner_address": null,
+            "station_state": "active",
+            "vehicle_owner": null,
+            "est_hours_karo": 19.05,
+            "est_hours_lack": 9.67,
+            "est_hours_mech": 0,
+            "project_status": "Vorarbeit",
+            "sub_model_name": null,
+            "appointment_date": "2026-01-07",
+            "country_of_origin": null,
+            "last_registration": null,
+            "manufacturer_name": "BMW",
+            "first_registration": null,
+            "external_calculation": "False",
+            "planned_delivery_date": "2026-01-10"
+          }
+        ],
+        "kennzeichen": "US 9 9",
+        "anzahl_auftraege": 1
+      },
+      "success": true,
+      "metadata": {
+        "workerId": "worker-0",
+        "consoleLogs": [],
+        "memoryUsage": {
+          "rss": 68259840,
+          "external": 1017559,
+          "heapUsed": 2357991,
+          "heapTotal": 2613248,
+          "arrayBuffers": 0
+        }
+      },
+      "executionTime": 76
+    },
+    "portName": "success"
+  },
+  {
+    "tts": false,
+    "value": "Das Fahrzeug mit dem Kennzeichen US 9 9 hat einen aktuellen Status in der Vorarbeit. Die voraussichtliche Fertigstellung ist am 21. Januar 2026. Teile sind teilweise eingetroffen, es fehlt jedoch ein Teil. Die Reparatur ist für den 7. Januar 2026 geplant.",
+    "portName": "formatted"
+  }
+]
+handle_status_result (agenticLLM) - COMPLETED - 3183ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Das Fahrzeug mit dem Kennzeichen U S 9 9 wurde gefunden. Der Status ist, dass wir derzeit auf einige Ersatzteile warten, die noch nicht vollständig eingetroffen sind. Es gibt insgesamt einen Auftrag, und die geplante Lieferung ist für den zehnten Januar zweitausendsechsundzwanzig vorgesehen. Ich werde Sie jetzt an einen Kollegen weiterleiten, der Ihnen weitere Informationen geben kann.",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "transfer",
+    "portName": "intent"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+
+VARIABLES
+=========
+consent: {
+  "intent": "ja",
+  "confidence": 0.95
+}
+entry_response: ""
+lastAgenticDecision: "transfer"
+lastAgenticResponse: "Das Fahrzeug mit dem Kennzeichen U S 9 9 wurde gefunden. Der Status ist, dass wir derzeit auf einige Ersatzteile warten, die noch nicht vollständig eingetroffen sind. Es gibt insgesamt einen Auftrag, und die geplante Lieferung ist für den zehnten Januar zweitausendsechsundzwanzig vorgesehen. Ich werde Sie jetzt an einen Kollegen weiterleiten, der Ihnen weitere Informationen geben kann."
+last_user_message: "Ich würd gern den Status von meinem Fahrzeug in Erfahrung bringen."
+status_id: {
+  "name": "Mauder",
+  "kennzeichen": "US 9 9"
+}
+fahrzeug_status: {
+  "output": {
+    "gefunden": true,
+    "auftraege": [
+      {
+        "id": 20793,
+        "kba": "0005CZD",
+        "vin": "WBA21FZ010FR56982",
+        "city": "",
+        "email": "u.schmauder@gmx.de",
+        "hu_au": null,
+        "phone": "017624211099",
+        "plate": "BS-US 99",
+        "damage": "KL 2-3",
+        "person": "Mobexo/Schmauder",
+        "address": "",
+        "country": "",
+        "mileage": "88535",
+        "zip_code": "",
+        "shop_date": "2026-01-09",
+        "model_name": null,
+        "short_name": "BS-US 99",
+        "station_id": 3,
+        "curb_weight": null,
+        "engine_code": null,
+        "engine_size": null,
+        "engine_type": null,
+        "finish_date": "2026-01-21",
+        "owner_phone": null,
+        "repair_date": "2026-01-07",
+        "engine_power": null,
+        "express_link": "[Keine Auswahl]",
+        "gross_weight": null,
+        "parts_status": "E-Teile teilweise eingetroffen",
+        "missing_parts": 1,
+        "owner_address": null,
+        "station_state": "active",
+        "vehicle_owner": null,
+        "est_hours_karo": 19.05,
+        "est_hours_lack": 9.67,
+        "est_hours_mech": 0,
+        "project_status": "Vorarbeit",
+        "sub_model_name": null,
+        "appointment_date": "2026-01-07",
+        "country_of_origin": null,
+        "last_registration": null,
+        "manufacturer_name": "BMW",
+        "first_registration": null,
+        "external_calculation": "False",
+        "planned_delivery_date": "2026-01-10"
+      }
+    ],
+    "kennzeichen": "US 9 9",
+    "anzahl_auftraege": 1
+  },
+  "success": true,
+  "metadata": {
+    "workerId": "worker-0",
+    "consoleLogs": [],
+    "memoryUsage": {
+      "rss": 68259840,
+      "external": 1017559,
+      "heapUsed": 2357991,
+      "heapTotal": 2613248,
+      "arrayBuffers": 0
+    }
+  },
+  "executionTime": 76
+}
+status_decision: "Das Fahrzeug mit dem Kennzeichen U S 9 9 wurde gefunden. Der Status ist, dass wir derzeit auf einige Ersatzteile warten, die noch nicht vollständig eingetroffen sind. Es gibt insgesamt einen Auftrag, und die geplante Lieferung ist für den zehnten Januar zweitausendsechsundzwanzig vorgesehen. Ich werde Sie jetzt an einen Kollegen weiterleiten, der Ihnen weitere Informationen geben kann."
+
+RAW STORE STATE (for debugging)
+================================
+{
+  "sessionId": "sess_0e67c301-dda5-490c-9214-5b248c77896a",
+  "flowStatus": "cancelled",
+  "currentNodeId": "confirm_transfer",
+  "connectionStatus": "disconnected",
+  "messagesCount": 10,
+  "timelineCount": 13,
+  "toolExecutionsCount": 0,
+  "variablesCount": 8,
+  "variableHistoryCount": 0
+}
+
+Flow Execution Logs - Autohaus Reit - Hauptanruf-Flow (Simplified)
+Session ID: sess_6ab7f141-d27e-4f1e-96c4-1ba11d4c652a
+Timestamp: 2026-01-20T16:15:05.841Z
+
+SUMMARY
+=======
+Total Messages: 23
+Total Nodes: 16
+Total Tools: 0
+Total Variables: 5
+Duration: 84.64s
+Errors: 0
+Flow Status: cancelled
+Current Node: elicit_rechnung_info
+Connection Status: disconnected
+
+CONVERSATION
+============
+[4:48:51 PM] ASSISTANT: Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?
+[4:49:03 PM] USER: Ja,
+[4:49:07 PM] ASSISTANT: Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?
+[4:49:15 PM] USER: Ich hab eine Frage zu 'ner Rechnung.
+[4:49:15 PM] ASSISTANT: Für Rechnungsfragen brauche ich Ihr Kennzeichen oder die Rechnungsnummer.
+[4:49:28 PM] USER: Sekunde bitte.
+[4:49:28 PM] ASSISTANT: Haben Sie das Kennzeichen oder die Rechnungsnummer?
+[4:49:34 PM] USER: Sekunde bitte.
+[4:49:34 PM] ASSISTANT: Haben Sie das Kennzeichen oder die Rechnungsnummer?
+[4:49:41 PM] USER: Eine Sekunde bitte warten,
+[4:49:41 PM] ASSISTANT: Haben Sie das Kennzeichen oder die Rechnungsnummer?
+[4:49:48 PM] USER: Ich hab's Kennzeichen.
+[4:49:48 PM] ASSISTANT: Haben Sie das Kennzeichen oder die Rechnungsnummer?
+[4:49:53 PM] USER: Ich hab
+[4:49:53 PM] ASSISTANT: Haben Sie das Kennzeichen oder die Rechnungsnummer?
+[4:49:55 PM] USER: das Kennzeichen.
+[4:49:55 PM] ASSISTANT: Haben Sie das Kennzeichen oder die Rechnungsnummer?
+[4:50:01 PM] USER: Kennzeichen.
+[4:50:01 PM] ASSISTANT: Haben Sie das Kennzeichen oder die Rechnungsnummer?
+[4:50:09 PM] USER: WNS 9 9 8 3.
+[4:50:09 PM] ASSISTANT: Haben Sie das Kennzeichen oder die Rechnungsnummer?
+[4:50:15 PM] USER: Ich habe das Kennzeichen.
+[4:50:15 PM] ASSISTANT: Haben Sie das Kennzeichen oder die Rechnungsnummer?
+
+NODE TIMELINE
+=============
+start (start) - COMPLETED
+consent_check (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?",
+    "metadata": {
+      "elicitationVariable": "consent"
+    },
+    "portName": "response"
+  }
+]
+consent_check (elicitation) - COMPLETED - 855ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "ja",
+      "confidence": 0.95
+    },
+    "portName": "validated"
+  }
+]
+smart_entry (agenticLLM) - WAITING - 4519ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "respond",
+    "portName": "intent"
+  }
+]
+smart_entry (agenticLLM) - COMPLETED
+smart_entry (agenticLLM) - COMPLETED - 865ms
+  Output: [
+  {
+    "tts": true,
+    "value": "",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "rechnung",
+    "portName": "intent"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Für Rechnungsfragen brauche ich Ihr Kennzeichen oder die Rechnungsnummer.",
+    "metadata": {
+      "elicitationVariable": "rechnung_id"
+    },
+    "portName": "response"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Haben Sie das Kennzeichen oder die Rechnungsnummer?",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Haben Sie das Kennzeichen oder die Rechnungsnummer?",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Haben Sie das Kennzeichen oder die Rechnungsnummer?",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Haben Sie das Kennzeichen oder die Rechnungsnummer?",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Haben Sie das Kennzeichen oder die Rechnungsnummer?",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Haben Sie das Kennzeichen oder die Rechnungsnummer?",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Haben Sie das Kennzeichen oder die Rechnungsnummer?",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Haben Sie das Kennzeichen oder die Rechnungsnummer?",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_rechnung_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Haben Sie das Kennzeichen oder die Rechnungsnummer?",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+
+VARIABLES
+=========
+consent: {
+  "intent": "ja",
+  "confidence": 0.95
+}
+entry_response: ""
+lastAgenticDecision: "rechnung"
+lastAgenticResponse: ""
+last_user_message: "Ich hab eine Frage zu 'ner Rechnung."
+
+RAW STORE STATE (for debugging)
+================================
+{
+  "sessionId": "sess_6ab7f141-d27e-4f1e-96c4-1ba11d4c652a",
+  "flowStatus": "cancelled",
+  "currentNodeId": "elicit_rechnung_info",
+  "connectionStatus": "disconnected",
+  "messagesCount": 23,
+  "timelineCount": 16,
+  "toolExecutionsCount": 0,
+  "variablesCount": 5,
+  "variableHistoryCount": 0
+}
+
+Flow Execution Logs - Autohaus Reit - Hauptanruf-Flow (Simplified)
+Session ID: sess_dbfa1b4d-40c6-4008-af6a-c70546e3487d
+Timestamp: 2026-01-20T16:16:14.736Z
+
+SUMMARY
+=======
+Total Messages: 52
+Total Nodes: 59
+Total Tools: 0
+Total Variables: 10
+Duration: 278.21s
+Errors: 0
+Flow Status: cancelled
+Current Node: confirm_transfer
+Connection Status: disconnected
+
+CONVERSATION
+============
+[4:43:54 PM] ASSISTANT: Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?
+[4:44:06 PM] USER: Ja, absolut.
+[4:44:07 PM] ASSISTANT: Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?
+[4:44:20 PM] USER: Ich würd gerne Status für mein Fahrzeug in Erfahrung bringen.
+[4:44:21 PM] ASSISTANT: Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.
+[4:44:34 PM] USER: Sekunde bitte.
+[4:44:34 PM] ASSISTANT: Ich brauche noch: ein Fahrzeugkennzeichen, einen Namen bitte
+[4:44:49 PM] USER: W n minus m a 1 2 2 1. Mein Name ist AIDA.
+[4:44:54 PM] ASSISTANT: Es tut mir leid, aber ich konnte keinen Auftrag für das Kennzeichen W N MINUS M A 1 2 2 1 finden. Ich werde Sie jetzt an einen Kollegen weiterleiten, der Ihnen weiterhelfen kann.
+[4:44:54 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+[4:45:20 PM] USER: Ja, ich will 'n anderes Kennzeichen nennen.
+[4:45:21 PM] ASSISTANT: Kein Problem. Wie lautet Ihr Kennzeichen und Ihr Name?
+[4:45:33 PM] USER: WNS0 8 5
+[4:45:38 PM] ASSISTANT: Es tut mir leid, aber ich konnte keinen Auftrag für das Kennzeichen W N S 0 8 5 finden. Ich werde Sie jetzt an einen Kollegen weiterleiten, der Ihnen weiterhelfen kann.
+[4:45:38 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+[4:46:00 PM] USER: 0.
+[4:46:00 PM] ASSISTANT: Kein Problem. Was kann ich stattdessen für Sie tun?
+[4:46:02 PM] USER: Otte.
+[4:46:03 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+[4:46:10 PM] USER: Haben aber auch komische Leute.
+[4:46:10 PM] ASSISTANT: Kein Problem. Was kann ich stattdessen für Sie tun?
+[4:46:14 PM] USER: Ja, ein anderes Kennzeichen.
+[4:46:14 PM] ASSISTANT: Kein Problem. Was kann ich stattdessen für Sie tun?
+[4:46:21 PM] USER: Ein anderes Kennzeichen würde ich gerne sagen.
+[4:46:21 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+[4:46:24 PM] USER: Wär ich auch. Als Kunde wär ich schon stimmsauer drin gewesen.
+[4:46:24 PM] ASSISTANT: Kein Problem. Was kann ich stattdessen für Sie tun?
+[4:46:30 PM] USER: N t
+[4:46:30 PM] ASSISTANT: Kein Problem. Was kann ich stattdessen für Sie tun?
+[4:46:31 PM] USER: Nee. Die sind Du, die ist extrem sensibel eingestellt, dass, wenn Du zu mir redest.
+[4:46:31 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+[4:46:42 PM] USER: Hat er mich grad auch gesagt,
+[4:46:42 PM] ASSISTANT: Kein Problem. Was kann ich stattdessen für Sie tun?
+[4:46:48 PM] USER: NTDT 7 7 3
+[4:46:48 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+[4:46:58 PM] USER: Anderes kennzeichnen.
+[4:46:58 PM] ASSISTANT: Kein Problem. Wie lautet Ihr Kennzeichen und Ihr Name?
+[4:47:10 PM] USER: NTDT 7 7 3. Romeike.
+[4:47:15 PM] ASSISTANT: Das Fahrzeug mit dem Kennzeichen N T D T 7 7 3 ist derzeit in der Karosserie-Instandsetzung. Wir warten auf einen Teil, das noch bestellt werden muss. Ich werde Sie nun an einen Kollegen weiterleiten, der Ihnen weitere Informationen geben kann.
+[4:47:15 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+[4:48:03 PM] USER: Also
+[4:48:03 PM] ASSISTANT: Kein Problem. Was kann ich stattdessen für Sie tun?
+[4:48:13 PM] USER: Wo ist eine Teil? Das hier. Gehört zu dem Auftrag, wo wir ursprünglich mal eine Freigabe hatten, aber jetzt erweitert sich. Sie würden's nicht rot eigentlich?
+[4:48:13 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+[4:48:15 PM] USER: Ne? Weil die nicht bestellt
+[4:48:15 PM] ASSISTANT: Kein Problem. Was kann ich stattdessen für Sie tun?
+[4:48:20 PM] USER: Jetzt, ich hab das erweitert. Für den Auftrag hier hatten wir eine Freigabe.
+[4:48:20 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+[4:48:25 PM] USER: Das ist die Erweiterung.
+[4:48:25 PM] ASSISTANT: Kein Problem. Was kann ich stattdessen für Sie tun?
+[4:48:32 PM] USER: Und das ist der zweite Auftrag, wo noch gar keine Freigabe drin ist. Okay, willst Du hier so machen? Ja. Und
+[4:48:32 PM] ASSISTANT: Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.
+
+NODE TIMELINE
+=============
+start (start) - COMPLETED
+consent_check (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?",
+    "metadata": {
+      "elicitationVariable": "consent"
+    },
+    "portName": "response"
+  }
+]
+consent_check (elicitation) - COMPLETED - 1242ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "ja",
+      "confidence": 0.95
+    },
+    "portName": "validated"
+  }
+]
+smart_entry (agenticLLM) - WAITING - 1815ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Schön, dass Sie wieder anrufen! Wie kann ich Ihnen heute helfen?",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "respond",
+    "portName": "intent"
+  }
+]
+smart_entry (agenticLLM) - COMPLETED
+smart_entry (agenticLLM) - COMPLETED - 1305ms
+  Output: [
+  {
+    "tts": true,
+    "value": "",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "statusabfrage",
+    "portName": "intent"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Für die Statusabfrage brauche ich Ihr Kennzeichen und Ihren Namen.",
+    "metadata": {
+      "elicitationVariable": "status_id"
+    },
+    "portName": "response"
+  }
+]
+elicit_status_id (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Ich brauche noch: ein Fahrzeugkennzeichen, einen Namen bitte",
+    "metadata": {
+      "isRetry": true,
+      "retryCount": 1
+    },
+    "portName": "retryPrompt"
+  }
+]
+elicit_status_id (elicitation) - COMPLETED - 1502ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "name": "AIDA",
+      "kennzeichen": "W n minus m a 1 2 2 1"
+    },
+    "portName": "validated"
+  }
+]
+filler_lookup_status (wait) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Einen Moment bitte, ich schaue das kurz nach.",
+    "metadata": {
+      "type": "filler",
+      "targetNodeId": "lookup_status"
+    },
+    "portName": "message"
+  }
+]
+lookup_status (toolExecutor) - COMPLETED - 2657ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "output": {
+        "gefunden": false,
+        "auftraege": [],
+        "kennzeichen": "W N MINUS M A 1 2 2 1",
+        "anzahl_auftraege": 0
+      },
+      "success": true,
+      "metadata": {
+        "workerId": "worker-0",
+        "consoleLogs": [],
+        "memoryUsage": {
+          "rss": 66621440,
+          "external": 993058,
+          "heapUsed": 2298626,
+          "heapTotal": 2594816,
+          "arrayBuffers": 0
+        }
+      },
+      "executionTime": 203
+    },
+    "portName": "success"
+  },
+  {
+    "tts": false,
+    "value": "Das Fahrzeug mit dem Kennzeichen W N - M A 1 2 2 1 wurde nicht gefunden. Der aktuelle Stand ist, dass es keine Aufträge gibt. Daher gibt es auch keine voraussichtliche Fertigstellung. Es fehlen keine Teile, da keine Aufträge vorliegen.",
+    "portName": "formatted"
+  }
+]
+handle_status_result (agenticLLM) - COMPLETED - 1735ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Es tut mir leid, aber ich konnte keinen Auftrag für das Kennzeichen W N MINUS M A 1 2 2 1 finden. Ich werde Sie jetzt an einen Kollegen weiterleiten, der Ihnen weiterhelfen kann.",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "transfer",
+    "portName": "intent"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+confirm_transfer (elicitation) - COMPLETED - 912ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "neues_kennzeichen",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+elicit_status_id_fresh (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Wie lautet Ihr Kennzeichen und Ihr Name?",
+    "metadata": {
+      "elicitationVariable": "status_id"
+    },
+    "portName": "response"
+  }
+]
+elicit_status_id_fresh (elicitation) - COMPLETED - 1852ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "name": "AIDA",
+      "kennzeichen": "WNS0 8 5"
+    },
+    "portName": "validated"
+  }
+]
+filler_lookup_status (wait) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Einen Moment bitte, ich schaue das kurz nach.",
+    "metadata": {
+      "type": "filler",
+      "targetNodeId": "lookup_status"
+    },
+    "portName": "message"
+  }
+]
+lookup_status (toolExecutor) - COMPLETED - 2052ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "output": {
+        "gefunden": false,
+        "auftraege": [],
+        "kennzeichen": "WNS0 8 5",
+        "anzahl_auftraege": 0
+      },
+      "success": true,
+      "metadata": {
+        "workerId": "worker-0",
+        "consoleLogs": [],
+        "memoryUsage": {
+          "rss": 65974272,
+          "external": 996827,
+          "heapUsed": 2311803,
+          "heapTotal": 2595840,
+          "arrayBuffers": 0
+        }
+      },
+      "executionTime": 41
+    },
+    "portName": "success"
+  },
+  {
+    "tts": false,
+    "value": "Das Fahrzeug mit dem Kennzeichen WNS0 8 5 wurde nicht gefunden. Es gibt aktuell keine Aufträge dazu. Daher kann ich keine voraussichtliche Fertigstellung nennen. Es fehlen auch keine Teile.",
+    "portName": "formatted"
+  }
+]
+handle_status_result (agenticLLM) - COMPLETED - 3593ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Es tut mir leid, aber ich konnte keinen Auftrag für das Kennzeichen W N S 0 8 5 finden. Ich werde Sie jetzt an einen Kollegen weiterleiten, der Ihnen weiterhelfen kann.",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "transfer",
+    "portName": "intent"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+confirm_transfer (elicitation) - COMPLETED - 965ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "nein",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+ask_alternative (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Was kann ich stattdessen für Sie tun?",
+    "metadata": {
+      "elicitationVariable": "alternative_intent"
+    },
+    "portName": "response"
+  }
+]
+ask_alternative (elicitation) - COMPLETED - 969ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "sonstiges",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+confirm_transfer (elicitation) - COMPLETED - 892ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "nein",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+ask_alternative (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Was kann ich stattdessen für Sie tun?",
+    "metadata": {
+      "elicitationVariable": "alternative_intent"
+    },
+    "portName": "response"
+  }
+]
+ask_alternative (elicitation) - COMPLETED - 801ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "default",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+ask_alternative (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Was kann ich stattdessen für Sie tun?",
+    "metadata": {
+      "elicitationVariable": "alternative_intent"
+    },
+    "portName": "response"
+  }
+]
+ask_alternative (elicitation) - COMPLETED - 821ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "sonstiges",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+confirm_transfer (elicitation) - COMPLETED - 907ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "nein",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+ask_alternative (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Was kann ich stattdessen für Sie tun?",
+    "metadata": {
+      "elicitationVariable": "alternative_intent"
+    },
+    "portName": "response"
+  }
+]
+ask_alternative (elicitation) - COMPLETED - 1436ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "default",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+ask_alternative (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Was kann ich stattdessen für Sie tun?",
+    "metadata": {
+      "elicitationVariable": "alternative_intent"
+    },
+    "portName": "response"
+  }
+]
+ask_alternative (elicitation) - COMPLETED - 1139ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "sonstiges",
+      "confidence": 0.8
+    },
+    "portName": "validated"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+confirm_transfer (elicitation) - COMPLETED - 764ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "nein",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+ask_alternative (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Was kann ich stattdessen für Sie tun?",
+    "metadata": {
+      "elicitationVariable": "alternative_intent"
+    },
+    "portName": "response"
+  }
+]
+ask_alternative (elicitation) - COMPLETED - 1209ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "sonstiges",
+      "confidence": 0.8
+    },
+    "portName": "validated"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+confirm_transfer (elicitation) - COMPLETED - 1818ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "neues_kennzeichen",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+elicit_status_id_fresh (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Wie lautet Ihr Kennzeichen und Ihr Name?",
+    "metadata": {
+      "elicitationVariable": "status_id"
+    },
+    "portName": "response"
+  }
+]
+elicit_status_id_fresh (elicitation) - COMPLETED - 1323ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "name": "Romeike",
+      "kennzeichen": "NTDT 7 7 3"
+    },
+    "portName": "validated"
+  }
+]
+filler_lookup_status (wait) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Einen Moment bitte, ich schaue das kurz nach.",
+    "metadata": {
+      "type": "filler",
+      "targetNodeId": "lookup_status"
+    },
+    "portName": "message"
+  }
+]
+lookup_status (toolExecutor) - COMPLETED - 2654ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "output": {
+        "gefunden": true,
+        "auftraege": [
+          {
+            "id": 20722,
+            "kba": "2222BLB",
+            "vin": "W1NKM0KB9TF451708",
+            "city": "",
+            "email": "nils.romeike@daimlertruck.com",
+            "hu_au": null,
+            "phone": "+491608601990",
+            "plate": "NT-DT 773E",
+            "damage": "KL 1",
+            "person": "McCar/Romeike",
+            "address": "",
+            "country": "",
+            "mileage": null,
+            "zip_code": "",
+            "shop_date": "2026-01-20",
+            "model_name": null,
+            "short_name": "NT-DT 773E",
+            "station_id": 2,
+            "curb_weight": null,
+            "engine_code": null,
+            "engine_size": null,
+            "engine_type": null,
+            "finish_date": "2026-01-23",
+            "owner_phone": null,
+            "repair_date": "2026-01-20",
+            "engine_power": null,
+            "express_link": "[Keine Auswahl]",
+            "gross_weight": null,
+            "parts_status": "Teilweise eingetroffen und unvollständig bestellt",
+            "missing_parts": 1,
+            "owner_address": null,
+            "station_state": "active",
+            "vehicle_owner": null,
+            "est_hours_karo": 16.74,
+            "est_hours_lack": 8.17,
+            "est_hours_mech": 0,
+            "project_status": "Karo",
+            "sub_model_name": null,
+            "appointment_date": "2025-12-12",
+            "country_of_origin": null,
+            "last_registration": null,
+            "manufacturer_name": "Mercedes-Benz",
+            "first_registration": null,
+            "external_calculation": "False",
+            "planned_delivery_date": "2026-01-23"
+          }
+        ],
+        "kennzeichen": "NTDT 7 7 3",
+        "anzahl_auftraege": 1
+      },
+      "success": true,
+      "metadata": {
+        "workerId": "worker-0",
+        "consoleLogs": [],
+        "memoryUsage": {
+          "rss": 68845568,
+          "external": 1015709,
+          "heapUsed": 2349725,
+          "heapTotal": 2612224,
+          "arrayBuffers": 0
+        }
+      },
+      "executionTime": 86
+    },
+    "portName": "success"
+  },
+  {
+    "tts": false,
+    "value": "Das Fahrzeug mit dem Kennzeichen NT-DT 773E hat einen aktuellen Auftrag. Der Status ist aktiv. Die voraussichtliche Fertigstellung ist am 23. Januar 2026. Es fehlen Teile, die Bestellung ist unvollständig.",
+    "portName": "formatted"
+  }
+]
+handle_status_result (agenticLLM) - COMPLETED - 2480ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Das Fahrzeug mit dem Kennzeichen N T D T 7 7 3 ist derzeit in der Karosserie-Instandsetzung. Wir warten auf einen Teil, das noch bestellt werden muss. Ich werde Sie nun an einen Kollegen weiterleiten, der Ihnen weitere Informationen geben kann.",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "transfer",
+    "portName": "intent"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+confirm_transfer (elicitation) - COMPLETED - 642ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "nein",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+ask_alternative (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Was kann ich stattdessen für Sie tun?",
+    "metadata": {
+      "elicitationVariable": "alternative_intent"
+    },
+    "portName": "response"
+  }
+]
+ask_alternative (elicitation) - COMPLETED - 804ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "sonstiges",
+      "confidence": 0.8
+    },
+    "portName": "validated"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+confirm_transfer (elicitation) - COMPLETED - 839ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "nein",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+ask_alternative (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Was kann ich stattdessen für Sie tun?",
+    "metadata": {
+      "elicitationVariable": "alternative_intent"
+    },
+    "portName": "response"
+  }
+]
+ask_alternative (elicitation) - COMPLETED - 1037ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "sonstiges",
+      "confidence": 0.8
+    },
+    "portName": "validated"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+confirm_transfer (elicitation) - COMPLETED - 697ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "nein",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+ask_alternative (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Kein Problem. Was kann ich stattdessen für Sie tun?",
+    "metadata": {
+      "elicitationVariable": "alternative_intent"
+    },
+    "portName": "response"
+  }
+]
+ask_alternative (elicitation) - COMPLETED - 820ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "sonstiges",
+      "confidence": 0.8
+    },
+    "portName": "validated"
+  }
+]
+confirm_transfer (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Möchten Sie mit einem Kollegen sprechen? Wenn Sie stattdessen ein anderes Kennzeichen nennen möchten, sagen Sie es bitte.",
+    "metadata": {
+      "elicitationVariable": "transfer_confirmed"
+    },
+    "portName": "response"
+  }
+]
+
+VARIABLES
+=========
+consent: {
+  "intent": "ja",
+  "confidence": 0.95
+}
+entry_response: ""
+lastAgenticDecision: "transfer"
+lastAgenticResponse: "Das Fahrzeug mit dem Kennzeichen N T D T 7 7 3 ist derzeit in der Karosserie-Instandsetzung. Wir warten auf einen Teil, das noch bestellt werden muss. Ich werde Sie nun an einen Kollegen weiterleiten, der Ihnen weitere Informationen geben kann."
+last_user_message: "Ich würd gerne Status für mein Fahrzeug in Erfahrung bringen."
+status_id: {
+  "name": "Romeike",
+  "kennzeichen": "NTDT 7 7 3"
+}
+fahrzeug_status: {
+  "output": {
+    "gefunden": true,
+    "auftraege": [
+      {
+        "id": 20722,
+        "kba": "2222BLB",
+        "vin": "W1NKM0KB9TF451708",
+        "city": "",
+        "email": "nils.romeike@daimlertruck.com",
+        "hu_au": null,
+        "phone": "+491608601990",
+        "plate": "NT-DT 773E",
+        "damage": "KL 1",
+        "person": "McCar/Romeike",
+        "address": "",
+        "country": "",
+        "mileage": null,
+        "zip_code": "",
+        "shop_date": "2026-01-20",
+        "model_name": null,
+        "short_name": "NT-DT 773E",
+        "station_id": 2,
+        "curb_weight": null,
+        "engine_code": null,
+        "engine_size": null,
+        "engine_type": null,
+        "finish_date": "2026-01-23",
+        "owner_phone": null,
+        "repair_date": "2026-01-20",
+        "engine_power": null,
+        "express_link": "[Keine Auswahl]",
+        "gross_weight": null,
+        "parts_status": "Teilweise eingetroffen und unvollständig bestellt",
+        "missing_parts": 1,
+        "owner_address": null,
+        "station_state": "active",
+        "vehicle_owner": null,
+        "est_hours_karo": 16.74,
+        "est_hours_lack": 8.17,
+        "est_hours_mech": 0,
+        "project_status": "Karo",
+        "sub_model_name": null,
+        "appointment_date": "2025-12-12",
+        "country_of_origin": null,
+        "last_registration": null,
+        "manufacturer_name": "Mercedes-Benz",
+        "first_registration": null,
+        "external_calculation": "False",
+        "planned_delivery_date": "2026-01-23"
+      }
+    ],
+    "kennzeichen": "NTDT 7 7 3",
+    "anzahl_auftraege": 1
+  },
+  "success": true,
+  "metadata": {
+    "workerId": "worker-0",
+    "consoleLogs": [],
+    "memoryUsage": {
+      "rss": 68845568,
+      "external": 1015709,
+      "heapUsed": 2349725,
+      "heapTotal": 2612224,
+      "arrayBuffers": 0
+    }
+  },
+  "executionTime": 86
+}
+status_decision: "Das Fahrzeug mit dem Kennzeichen N T D T 7 7 3 ist derzeit in der Karosserie-Instandsetzung. Wir warten auf einen Teil, das noch bestellt werden muss. Ich werde Sie nun an einen Kollegen weiterleiten, der Ihnen weitere Informationen geben kann."
+transfer_confirmed: {
+  "intent": "nein",
+  "confidence": 0.9
+}
+alternative_intent: {
+  "intent": "sonstiges",
+  "confidence": 0.8
+}
+
+RAW STORE STATE (for debugging)
+================================
+{
+  "sessionId": "sess_dbfa1b4d-40c6-4008-af6a-c70546e3487d",
+  "flowStatus": "cancelled",
+  "currentNodeId": "confirm_transfer",
+  "connectionStatus": "disconnected",
+  "messagesCount": 52,
+  "timelineCount": 59,
+  "toolExecutionsCount": 0,
+  "variablesCount": 10,
+  "variableHistoryCount": 0
+}
+
+Flow Execution Logs - Autohaus Reit - Hauptanruf-Flow (Simplified)
+Session ID: sess_c70cc98a-af2b-4e70-9ba9-4f46ac3659ba
+Timestamp: 2026-01-20T16:16:24.047Z
+
+SUMMARY
+=======
+Total Messages: 14
+Total Nodes: 19
+Total Tools: 0
+Total Variables: 12
+Duration: 66.46s
+Errors: 0
+Flow Status: completed
+Current Node: end_success
+Connection Status: disconnected
+
+CONVERSATION
+============
+[4:28:10 PM] ASSISTANT: Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?
+[4:28:21 PM] USER: Ja.
+[4:28:24 PM] ASSISTANT: Wie kann ich Ihnen helfen?
+[4:28:33 PM] USER: Ich würd gern einen Schaden melden beziehungsweise mein Auto hat 'n Unfall gehabt.
+[4:28:38 PM] ASSISTANT: Was für ein Schaden ist es? Und wie lautet Ihr Kennzeichen?
+[4:28:49 PM] USER: Ist 'n Lachs
+[4:28:49 PM] ASSISTANT: Waren Sie selbst schuld am Schaden, oder war jemand anderes beteiligt?
+[4:28:52 PM] USER: vorne an der Stoßstange und mein Kennzeichen des PAF I 5 2 8.
+[4:28:52 PM] ASSISTANT: Können Sie mir den Schaden beschreiben? Sind Spiegel, Lichter oder Reifen betroffen? Funktioniert alles noch?
+[4:29:03 PM] USER: Nee, die Karte ist komplett am Arsch.
+[4:29:03 PM] ASSISTANT: Bei welcher Versicherung sind Sie?
+[4:29:08 PM] USER: Bei der AXA
+[4:29:16 PM] ASSISTANT: Schadensmeldung ist angelegt. Termin ist für den 03.02.2026 vorgemerkt. Bestätigung kommt per SMS. Bitte bringen Sie Fahrzeugpapiere und Versicherungskarte mit. Auf Wiederhören!
+[4:29:16 PM] ASSISTANT: Vielen Dank für Ihren Anruf. Auf Wiederhören!
+
+NODE TIMELINE
+=============
+start (start) - COMPLETED
+consent_check (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Guten Tag, hier ist Marie von der Lackiererei Reit. Ich zeichne das Gespräch auf, um Ihnen besser helfen zu können. Ist das in Ordnung?",
+    "metadata": {
+      "elicitationVariable": "consent"
+    },
+    "portName": "response"
+  }
+]
+consent_check (elicitation) - COMPLETED - 1381ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "ja",
+      "confidence": 0.95
+    },
+    "portName": "validated"
+  }
+]
+smart_entry (agenticLLM) - WAITING - 3039ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Wie kann ich Ihnen helfen?",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "respond",
+    "portName": "intent"
+  }
+]
+smart_entry (agenticLLM) - COMPLETED
+smart_entry (agenticLLM) - COMPLETED - 5579ms
+  Output: [
+  {
+    "tts": true,
+    "value": "",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "schadensmeldung",
+    "portName": "intent"
+  }
+]
+check_schaden_complete (condition) - COMPLETED - 2ms
+  Output: [
+  {
+    "tts": false,
+    "value": false,
+    "portName": "false"
+  }
+]
+check_basis_complete (condition) - COMPLETED - 1ms
+  Output: [
+  {
+    "tts": false,
+    "value": false,
+    "portName": "false"
+  }
+]
+elicit_damage_info (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Was für ein Schaden ist es? Und wie lautet Ihr Kennzeichen?",
+    "metadata": {
+      "elicitationVariable": "schaden_basis"
+    },
+    "portName": "response"
+  }
+]
+elicit_damage_info (elicitation) - COMPLETED - 1378ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "kennzeichen": "Lachs",
+      "schadensart": "Unfall"
+    },
+    "portName": "validated"
+  }
+]
+elicit_schuldfrage (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Waren Sie selbst schuld am Schaden, oder war jemand anderes beteiligt?",
+    "metadata": {
+      "elicitationVariable": "schuldfrage"
+    },
+    "portName": "response"
+  }
+]
+elicit_schuldfrage (elicitation) - COMPLETED - 1435ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "selbst_schuld",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+elicit_schaden_details (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Können Sie mir den Schaden beschreiben? Sind Spiegel, Lichter oder Reifen betroffen? Funktioniert alles noch?",
+    "metadata": {
+      "elicitationVariable": "schaden_details"
+    },
+    "portName": "response"
+  }
+]
+elicit_schaden_details (elicitation) - COMPLETED - 1275ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "intent": "response",
+      "confidence": 0.9
+    },
+    "portName": "validated"
+  }
+]
+elicit_versicherung_komplett (elicitation) - WAITING
+  Output: [
+  {
+    "tts": true,
+    "value": "Bei welcher Versicherung sind Sie?",
+    "metadata": {
+      "elicitationVariable": "versicherung_info"
+    },
+    "portName": "response"
+  }
+]
+elicit_versicherung_komplett (elicitation) - COMPLETED - 1066ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "versicherung": "AXA"
+    },
+    "portName": "validated"
+  }
+]
+create_and_book (toolExecutor) - COMPLETED - 3938ms
+  Output: [
+  {
+    "tts": false,
+    "value": {
+      "output": {
+        "kunde": {
+          "name": " || 'Unbekannt'",
+          "telefon": " || caller_id"
+        },
+        "termin": {
+          "shop_date": "03.02.2026",
+          "repair_date": "03.02.2026"
+        },
+        "hinweis": "Auftrag wurde erstellt. Mitarbeiter wird sich wegen nicht verkehrssicheren Fahrzeugs melden.",
+        "schaden": {
+          "art": "Unfall || Unfall",
+          "klasse": "KL 1",
+          "beschreibung": "Unfall || Unfall (Versicherung: AXA || 'Nicht angegeben') [NICHT VERKEHRSSICHER]"
+        },
+        "order_id": 20903,
+        "kennzeichen": "|| LACHS",
+        "project_number": "26298",
+        "auftrag_erstellt": true,
+        "naechster_schritt": "mitarbeiter_kontakt",
+        "weiterleitung_erforderlich": false
+      },
+      "success": true,
+      "metadata": {
+        "workerId": "worker-0",
+        "consoleLogs": [],
+        "memoryUsage": {
+          "rss": 66519040,
+          "external": 1048478,
+          "heapUsed": 2384446,
+          "heapTotal": 2613248,
+          "arrayBuffers": 0
+        }
+      },
+      "executionTime": 941
+    },
+    "portName": "success"
+  },
+  {
+    "tts": false,
+    "value": "Hallo! Ihr Auftrag wurde erfolgreich erstellt. \n\nDie Order-ID ist 20903 und die Projektnummer ist 26298. \n\nIhr Kennzeichen lautet: LACHS. \n\nDer Schaden ist ein Unfall der Klasse KL 1. \n\nDas Fahrzeug ist nicht verkehrssicher. \n\nDer Reparaturtermin ist am 03. Februar 2026. \n\nEin Mitarbeiter wird sich wegen des nicht verkehrssicheren Fahrzeugs bei Ihnen melden. \n\nHaben Sie noch Fragen?",
+    "portName": "formatted"
+  }
+]
+confirm_schaden_end (agenticLLM) - COMPLETED - 3782ms
+  Output: [
+  {
+    "tts": true,
+    "value": "Schadensmeldung ist angelegt. Termin ist für den 03.02.2026 vorgemerkt. Bestätigung kommt per SMS. Bitte bringen Sie Fahrzeugpapiere und Versicherungskarte mit. Auf Wiederhören!",
+    "metadata": {
+      "streaming": false
+    },
+    "portName": "response"
+  },
+  {
+    "tts": false,
+    "value": "respond",
+    "portName": "intent"
+  }
+]
+end_success (end) - COMPLETED
+  Output: [
+  {
+    "tts": true,
+    "value": "Vielen Dank für Ihren Anruf. Auf Wiederhören!",
+    "portName": "message"
+  }
+]
+
+VARIABLES
+=========
+consent: {
+  "intent": "ja",
+  "confidence": 0.95
+}
+entry_response: ""
+lastAgenticDecision: "respond"
+lastAgenticResponse: "Schadensmeldung ist angelegt. Termin ist für den 03.02.2026 vorgemerkt. Bestätigung kommt per SMS. Bitte bringen Sie Fahrzeugpapiere und Versicherungskarte mit. Auf Wiederhören!"
+last_user_message: "Ich würd gern einen Schaden melden beziehungsweise mein Auto hat 'n Unfall gehabt."
+schadensart: "Unfall"
+schaden_basis: {
+  "kennzeichen": "Lachs",
+  "schadensart": "Unfall"
+}
+schuldfrage: {
+  "intent": "selbst_schuld",
+  "confidence": 0.9
+}
+schaden_details: {
+  "intent": "response",
+  "confidence": 0.9
+}
+versicherung_info: {
+  "versicherung": "AXA"
+}
+schadensmeldung_result: {
+  "output": {
+    "kunde": {
+      "name": " || 'Unbekannt'",
+      "telefon": " || caller_id"
+    },
+    "termin": {
+      "shop_date": "03.02.2026",
+      "repair_date": "03.02.2026"
+    },
+    "hinweis": "Auftrag wurde erstellt. Mitarbeiter wird sich wegen nicht verkehrssicheren Fahrzeugs melden.",
+    "schaden": {
+      "art": "Unfall || Unfall",
+      "klasse": "KL 1",
+      "beschreibung": "Unfall || Unfall (Versicherung: AXA || 'Nicht angegeben') [NICHT VERKEHRSSICHER]"
+    },
+    "order_id": 20903,
+    "kennzeichen": "|| LACHS",
+    "project_number": "26298",
+    "auftrag_erstellt": true,
+    "naechster_schritt": "mitarbeiter_kontakt",
+    "weiterleitung_erforderlich": false
+  },
+  "success": true,
+  "metadata": {
+    "workerId": "worker-0",
+    "consoleLogs": [],
+    "memoryUsage": {
+      "rss": 66519040,
+      "external": 1048478,
+      "heapUsed": 2384446,
+      "heapTotal": 2613248,
+      "arrayBuffers": 0
+    }
+  },
+  "executionTime": 941
+}
+schaden_confirmation: "Schadensmeldung ist angelegt. Termin ist für den 03.02.2026 vorgemerkt. Bestätigung kommt per SMS. Bitte bringen Sie Fahrzeugpapiere und Versicherungskarte mit. Auf Wiederhören!"
+
+RAW STORE STATE (for debugging)
+================================
+{
+  "sessionId": "sess_c70cc98a-af2b-4e70-9ba9-4f46ac3659ba",
+  "flowStatus": "completed",
+  "currentNodeId": "end_success",
+  "connectionStatus": "disconnected",
+  "messagesCount": 14,
+  "timelineCount": 19,
+  "toolExecutionsCount": 0,
+  "variablesCount": 12,
+  "variableHistoryCount": 0
+}
+
