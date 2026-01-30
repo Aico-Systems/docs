@@ -1,0 +1,128 @@
+flowchart LR
+    %% Styles
+    classDef yellow fill:#F4D03F,stroke:#333,stroke-width:1px,color:black;
+    classDef orange fill:#E67E22,stroke:#333,stroke-width:2px,color:black;
+    classDef green fill:#58D68D,stroke:#333,stroke-width:1px,color:black;
+    classDef pink fill:#F1948A,stroke:#333,stroke-width:1px,color:black;
+    classDef grey fill:#EAEDED,stroke:#333,stroke-width:1px,color:black;
+    classDef black fill:#17202A,stroke:#333,stroke-width:2px,color:white;
+    classDef white fill:#FFFFFF,stroke:#333,stroke-width:1px,color:black;
+    classDef transparent fill:none,stroke:none,color:black;
+
+    %% Title
+    TitleNode[Inbound Anrufe<br/>Gemeinsam vereinbarter<br/>Stand Kick-Off -<br/>22.12.2025]:::transparent
+
+    %% Main Entry Sequence
+    subgraph Entry [Eingang]
+        direction TB
+        Start((Eingangsanruf)):::grey
+        Wait[Weiterleitung nach 7<br/>Sekunden innerhalb<br/>der Öffnungszeiten<br/>und sofort außerhalb<br/>Öffnungszeiten]:::yellow
+        Greeting((Begrüßung ohne Tracking und<br/>Aufzeichnung und Kunden<br/>nachfragen in Stimme des KI<br/>Agenten, ob weiteres Vorgehen<br/>ok inkl. Aufzeichnung. Sollte<br/>mit Drücken einer Taste<br/>bestätigt werden<br/>--> in der zweiten Nachricht)):::orange
+        Bianca[Bianca AP für Demoaufträge:<br/>071519032492]:::yellow
+        Decision{Entscheidung<br/>ob<br/>ok}:::black
+        Mailbox[Weiterleitung auf<br/>Mailbox]:::yellow
+        Ident[Identifikation<br/>Anrufgrund]:::yellow
+    end
+
+    %% Connections Entry
+    Start --> Wait
+    Wait --> Greeting
+    Greeting -.- Bianca
+    Greeting --> Decision
+    Decision -- Nein --> Mailbox
+    Decision -- ok --> Ident
+
+    %% Branch 1: Neue Schadensmeldung
+    subgraph Damage [Neue Schadensmeldung]
+        direction LR
+        NewDamage[Neue<br/>Schadens-<br/>meldung]:::white
+        SafeDef[Verkehrssicher --><br/>Offizielle Definition<br/>leicht erklärbar machen]:::white
+        Questions[1. Schadensart?<br/>2. Welches Fahrzeughersteller, Modell und Kennzeichen?<br/>3. Sind sie selber Schuld? → bei nein → weiterleitung<br/>menschen/Mitarbeiter<br/>4. Ist Ihr Fahrzeug noch verkehrssicher #40;über fahrbereit#41;?<br/>#40;Bsp. Spiegel/Scheinwerfer/Platten#41;<br/>5. Wo sind sie versichert?<br/>6. Haben Sie den Schaden schon gemeldet?<br/>a. wenn ja: Haben sie schon eine Schadennummer?<br/>7. Bilder vom Schaden → Vorbeikommen oder Link zur App?<br/>#40;abhängig vom Standort: besser vorbeikommen oder per<br/>Link, Grenze bei 15km#41;]:::grey
+        DataTransfer[Bisherige Daten des<br/>Calls sollen<br/>weitergegeben werden]:::white
+        ForwardNotFault[weiterleitung an Mitarbeiter<br/>bei nicht selber schuld]:::grey
+    end
+
+    %% Branch 1 Connections
+    Ident --> NewDamage
+    NewDamage --> Questions
+    NewDamage -.- SafeDef
+    Questions --> ForwardNotFault
+    Questions -.- DataTransfer
+
+    %% Branch 2: Statusabfrage
+    subgraph Status [Statusabfrage]
+        direction TB
+        StatusNode[Statusabfrage]:::white
+
+        StatusDetails[Agent hat keinen Fragekatalog aber folge Infos werden häufig angefragt:<br/>Aber Kennzeichen und Identifikation vom Kunden erforderlich:<br/>Kennzeichen + Namen<br/>Fertigstellungsdatum unverbindlich<br/>Welchen Status hat das Fahrzeug<br/>Teileverfügbarkeit<br/>Wenn Teile noch fehlen --> Voraussichtliche Lieferzeit ist zuverlässiger im Gespräch<br/>mit den Mitarbeiter zu erfahren<br/>Potentielle Status:<br/>• Kalkulation ohne Rückfragen bei den Mitarbeitern in KaRo #40;div = Teile fehlen#41;<br/>• KoVo bei Karo: wartet noch auf die Freigabe vom Kostenvoranschlag<br/>#40;entweder selbst bei privat oder Flotte bei Firmenfahrzeug#41;<br/>• KaRo: Fahrzeug wird noch zerlegt und ist dem Karosseriebauer zugeteilt zum<br/>bearbeiten<br/>• KaRo Vorarbeit<br/>• Lackierer-Status #40;egal welche#41;: 'Befindet sich in der Lackierkabine'<br/>• Finish<br/>• Montage<br/>• Reinigung<br/>• Abnahme<br/>Fertigstellungsdatum siehe Auftagsdaten #40;keine Abschätzung aus dem Status<br/>abgeleitet#41; - Datenpflege ab 9Uhr täglich<br/>Teileverfügbarkeit sollte ausgegeben werden<br/>Bei Selbstholer/Bringer: am selben Tag bei Fertigstellung bis 15 Uhr möglich<br/>Bei Hol und Bring-Service ist die Grenze 12 Uhr #40;Im System Fertigstellungszeit wird<br/>als Auslieferungszeit dargestellt#41;]:::grey
+
+        DeliveryGreen[Bei Hol und Bring-Service soll die Lieferzeit vom Agent abgefragt<br/>werden.<br/>3h Korridor #40;bsp. 9-12Uhr für lieferzeit#41; oder Folgetag #40;nur im Falle von<br/>selben Tag, wenn nur Folgetag, dann nur ein Tag zur Auswahl#41; +<br/>Lieferadresse/Bestätigung der Abholadresse<br/>Absprache 29.01. Abfrage des Agenten an den kunden für ein<br/>passendes 3h-fenster für die lieferung zur bestätigung dann an den<br/>mitarbeiter]:::green
+
+        ForwardParts[weiterleitung an Mitarbeiter Falls Teile nicht<br/>verfügbar<br/>oder wenn Fahrzeug eher als voraussichtlich<br/>geplant benötigt wird]:::grey
+
+        NoAccept((Wenn keine Akzeptanz dann<br/>weiterleitung an einen<br/>Mitarbeiter)):::white
+
+        FinalConfirm((Ma Fa. Reit wird sich zu<br/>finalen Bestätigung<br/>nochmal melden +<br/>Terminvorschlag geht vom<br/>Agent an den Mitarbeiter)):::grey
+    end
+
+    %% Branch 2 Connections
+    Ident --> StatusNode
+    StatusNode --> StatusDetails
+    StatusDetails --> DeliveryGreen
+    StatusDetails --> ForwardParts
+    ForwardParts --> NoAccept
+    NoAccept --> FinalConfirm
+    %% Link from Questions to parts logic (implied in original flow)
+    Questions -.-> ForwardParts
+
+    %% Branch 3: Terminvereinbarung
+    subgraph Termin [Terminvereinbarung]
+        direction TB
+        TermNode[Terminverein-<br/>barung]:::white
+
+        SelfFaultTerm[Im Falle selber Schuld:<br/>Terminierung für Besichtigung:<br/>Montag- Freitag 8-17<br/>Samstag 8-11<br/>Keinen Vorlauf, am besten<br/>Folgetag, selber Tag nicht mehr]:::grey
+
+        RepairGreen[Stimmen für die Reparatur / Instandsetzung / Schaden wurde schon aufgenommen und<br/>bewertet #40;vielleicht auch nur anhand von dem Foto#41; -> Meldung an VLA / Anspruch an Termin:<br/>#40;Wenn Auto nicht mehr fahrbereit oder nicht verkehrssicher dann bitte gleich an einen Mitarbeiter<br/>weiterleiten zur Terminfindung/Abschleppung#41;<br/>-> Hol und Bringservice #40;nur wenn fahrbereit oder mit Trailer wenn nötig#41;<br/>-> Kunde kommt vorbei #40;Muss verkehrssicher sein#41;<br/>-> Auto abgeschleppt für die Reparatur -> auftrag muss unterschrieben werden<br/>#40;Muss vorher geklärt werden, wer unterschreibt#41;<br/>Datenerfassung: 29.01. Terminierung für Reparaturen über Mitarbeiter<br/>NOCH OFFEN: wie lange für die reparatur eingeplant werden muss?<br/>Planung mit intervallen? oder fest? -> Vorbereitung -> max. Wartezeit bis kalkulation oder<br/>termin? #40;Beispiel: auto kommt heute? wann schauen wir es uns an? wann bekommt kunde<br/>feedback?#41;<br/>ab wann wird auto aktiv in planung genommen? ab wann kann kunde feedback #40;regelmäßig an<br/>reperaturdauer, kann auch sein das karosseriebauer krank ist und sich verzögert -> kommunikation<br/>der verschiebungen an mitarbeiter]:::green
+
+        TermConfirm[Terminbestätigung<br/>per Email an den<br/>Kunden<br/>Alternativ per SMS]:::grey
+        PlanSO[Schnittstelle<br/>PlanSO]:::pink
+        Outlook[Ausbaustufe:<br/>Schnittstelle<br/>Kalender<br/>Outlookkalender<br/>für Besichtigungen]:::pink
+    end
+
+    %% Branch 3 Connections
+    Ident --> TermNode
+    TermNode --> SelfFaultTerm
+    SelfFaultTerm --> TermConfirm
+    TermNode --> RepairGreen
+    RepairGreen --> PlanSO
+    PlanSO -.- Outlook
+
+    %% Branch 4: Rechnung
+    subgraph Invoice [Rechnung]
+        direction TB
+        InvoiceQuestions[Fragen zu<br/>bestehenden<br/>Rechnungen/Fakturi<br/>erung]:::white
+        Accounting[Weiterleitung an die<br/>Buchhaltung -><br/>kommt noch Fa. Reit]:::yellow
+    end
+
+    %% Branch 4 Connections
+    Ident --> InvoiceQuestions
+    InvoiceQuestions -- Rückfrage zu Kennzeichen<br/>und oder Rechnungsnummer --> Accounting
+
+    %% Branch 5: Sonstiges
+    subgraph Other [Sonstiges]
+        direction LR
+        Others[Sonstiges]:::white
+        Intelligent[Intelligente Antwort und<br/>dann Weiterleitung an<br/>Mitarbeiter wenn kein<br/>anderer Intent erkennbar]:::yellow
+        IdentifyCaller[Identifikation wer<br/>anruft]:::yellow
+        Fleet[Flottenbetreiber]:::grey
+        Insurer[Versicherer]:::grey
+        OtherSeller[Sonstiges<br/>#40;verkäufer etc.#41;]:::grey
+    end
+
+    %% Branch 5 Connections
+    Ident --> Others
+    Others --> Intelligent
+    Intelligent --> Fleet
+    Intelligent --> Insurer
+    Intelligent --> OtherSeller
+    Intelligent -.- IdentifyCaller
