@@ -1,0 +1,97 @@
+{
+	"$schema": "https://mintlify.com/docs.json",
+	"theme": "mint",
+	"name": "AICO",
+	"logo": {
+		"dark": "/logo/LogoWithText-dark.svg",
+		"light": "/logo/LogoWithText-light.svg"
+	},
+	"favicon": "/favicon.svg",
+	"colors": {
+		"primary": "#0D9373",
+		"light": "#07C983",
+		"dark": "#0D9373"
+	},
+	"navigation": {
+		"tabs": [
+			{
+				"tab": "Documentation",
+				"groups": [
+					{
+						"group": "Getting Started",
+						"pages": ["introduction"]
+					},
+					{
+						"group": "Connectors",
+						"pages": [
+							"connectors/introduction",
+							"connectors/quickstart",
+							{
+								"group": "Brunkhorst",
+								"pages": ["connectors/brunkhorst/overview"]
+							},
+							{
+								"group": "PlanSo",
+								"pages": ["connectors/reit/overview"]
+							}
+						]
+					}
+				]
+			},
+			{
+				"tab": "Brunkhorst API",
+				"groups": [
+					{
+						"group": "Brunkhorst API",
+						"openapi": {
+							"source": "connectors/openapi/brunkhorst-openapi.json",
+							"directory": "api/brunkhorst"
+						}
+					}
+				]
+			},
+			{
+				"tab": "PlanSo API",
+				"groups": [
+					{
+						"group": "PlanSo API",
+						"openapi": {
+							"source": "connectors/openapi/reit-openapi.json",
+							"directory": "api/planso"
+						}
+					}
+				]
+			}
+		],
+		"anchors": [
+			{
+				"anchor": "GitHub",
+				"icon": "github",
+				"href": "https://github.com/aico-systems"
+			}
+		]
+	},
+	"navbar": {
+		"links": [
+			{
+				"label": "Support",
+				"href": "mailto:support@aicoflow.com"
+			}
+		],
+		"primary": {
+			"type": "button",
+			"label": "Dashboard",
+			"href": "https://app.aicoflow.com"
+		}
+	},
+	"footer": {
+		"socials": {
+			"github": "https://github.com/aico-systems"
+		}
+	},
+	"api": {
+		"playground": {
+			"display": "interactive"
+		}
+	}
+}
