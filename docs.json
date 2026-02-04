@@ -40,27 +40,11 @@
 			},
 			{
 				"tab": "Brunkhorst API",
-				"groups": [
-					{
-						"group": "Brunkhorst API",
-						"openapi": {
-							"source": "connectors/openapi/brunkhorst-openapi.json",
-							"directory": "api/brunkhorst"
-						}
-					}
-				]
+				"openapi": "connectors/openapi/brunkhorst-openapi.json"
 			},
 			{
 				"tab": "PlanSo API",
-				"groups": [
-					{
-						"group": "PlanSo API",
-						"openapi": {
-							"source": "connectors/openapi/reit-openapi.json",
-							"directory": "api/planso"
-						}
-					}
-				]
+				"openapi": "connectors/openapi/reit-openapi.json"
 			}
 		],
 		"anchors": [
