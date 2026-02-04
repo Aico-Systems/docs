@@ -1,0 +1,959 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Brunkhorst Connector",
+    "description": "\n## Zeitmechanik Booking Integration\n\nThis connector provides a REST API for the Zeitmechanik workshop booking system used by Autohaus Brunkhorst.\n\n### Features\n\n- **Service Catalog**: Browse available workshop services (inspections, maintenance, repairs)\n- **Availability Check**: Find available days and time slots for selected services\n- **Appointment Booking**: Two-step reservation and confirmation flow\n- **Customer Lookup**: Search existing customers by phone, name, or license plate\n\n### Booking Flow\n\n1. **Get Services** \u2192 List available services and select one or more\n2. **Check Days** \u2192 Get available days for the selected services (filtered to 14+ days out)\n3. **Check Times** \u2192 Get available time slots for a specific day\n4. **Reserve** \u2192 Reserve a time slot (holds for ~10 minutes)\n5. **Confirm** \u2192 Complete booking with customer and vehicle details\n\n### Authentication\n\nThis API currently does not require authentication. Rate limiting may apply.\n",
+    "contact": {
+      "name": "AICO Engineering",
+      "url": "https://aicoflow.com/"
+    },
+    "license": {
+      "name": "Proprietary"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://brunkhorst.connectors.aicoflow.com",
+      "description": "Production"
+    },
+    {
+      "url": "http://localhost:8101",
+      "description": "Local development"
+    }
+  ],
+  "paths": {
+    "/api/services": {
+      "get": {
+        "tags": [
+          "Services"
+        ],
+        "summary": "List all services",
+        "description": "Returns all available workshop services including inspections, maintenance, and repair categories.",
+        "operationId": "list_services_api_services_get",
+        "responses": {
+          "200": {
+            "description": "List of services with their IDs, names, and categories",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/services/{service_id}": {
+      "get": {
+        "tags": [
+          "Services"
+        ],
+        "summary": "Get service details",
+        "description": "Returns detailed information for a specific service by ID.",
+        "operationId": "get_service_api_services__service_id__get",
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Service Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service details including name, category, and duration",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/availability/days": {
+      "post": {
+        "tags": [
+          "Availability"
+        ],
+        "summary": "Get available days",
+        "description": "Find available days for the selected services.\n\n**Note**: Days within 14 days from today are automatically filtered out to ensure adequate preparation time.\n\nReturns enriched day information including weekday names and month names in German.",
+        "operationId": "get_available_days_api_availability_days_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AvailabilityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "List of available days with date details",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/availability/times": {
+      "post": {
+        "tags": [
+          "Availability"
+        ],
+        "summary": "Get available time slots",
+        "description": "Returns available appointment times for a specific day and set of services. Times are returned in ISO format.",
+        "operationId": "get_available_times_api_availability_times_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "List of available time slots",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/booking/reserve": {
+      "post": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Reserve appointment slot",
+        "description": "Reserve a time slot for an appointment. This is step 1 of the two-step booking process.\n\n**Important**: Reservations are temporary and typically expire after ~10 minutes. You must call `/booking/confirm` to complete the booking.\n\nThe `session_id` parameter can be used to link multiple operations together. If not provided, the appointment ID is stored under the key \"latest\".",
+        "operationId": "reserve_appointment_api_booking_reserve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReserveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Reservation details including appointment_id and expiration time",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/booking/confirm": {
+      "post": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Confirm appointment",
+        "description": "Complete the booking by providing customer and vehicle details. This is step 2 of the two-step booking process.\n\n**Required information**:\n- **Vehicle**: License plate, type/make/model, mileage\n- **Customer**: Name (surname or first+last), email, at least one phone number\n\n**Appointment ID Resolution**:\n- If `appointment_id` is provided, it will be used directly\n- Otherwise, the API looks up the ID stored during `/booking/reserve` using the `session_id`\n- If neither is found, the request fails",
+        "operationId": "confirm_appointment_api_booking_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Confirmation status",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookup/phone": {
+      "post": {
+        "tags": [
+          "Lookup"
+        ],
+        "summary": "Lookup by phone",
+        "description": "Search for existing customers by phone number. Partial matches are supported.",
+        "operationId": "lookup_by_phone_api_lookup_phone_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "List of matching customers with their details",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookup/name": {
+      "post": {
+        "tags": [
+          "Lookup"
+        ],
+        "summary": "Lookup by name",
+        "description": "Search for existing customers by name. Searches both first and last names with partial matching.",
+        "operationId": "lookup_by_name_api_lookup_name_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "List of matching customers with their details",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lookup/plate": {
+      "post": {
+        "tags": [
+          "Lookup"
+        ],
+        "summary": "Lookup by license plate",
+        "description": "Search for customers and vehicles by license plate number. Returns both customer and vehicle records.",
+        "operationId": "lookup_by_plate_api_lookup_plate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LookupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Matching customers and vehicles",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vapi/webhook": {
+      "post": {
+        "tags": [
+          "vapi-webhook"
+        ],
+        "summary": "Vapi Webhook",
+        "description": "Main VAPI webhook endpoint that handles tool call requests.\n\nThis endpoint receives tool calls from VAPI, executes them against\nthe internal API, and returns results in VAPI's expected format.\n\nArgs:\n    request: FastAPI request object (for session tracking)\n    vapi_request: VAPI webhook request with tool calls\n\nReturns:\n    VapiWebhookResponse with results for each tool call\n\nExample VAPI Request:\n    {\n        \"message\": {\n            \"type\": \"tool-calls\",\n            \"toolCallList\": [\n                {\n                    \"id\": \"call_123\",\n                    \"name\": \"listeServices\",\n                    \"arguments\": {}\n                }\n            ]\n        }\n    }\n\nExample Response:\n    {\n        \"results\": [\n            {\n                \"toolCallId\": \"call_123\",\n                \"result\": \"{\"success\": true, \"services\": [...]}\"\n            }\n        ]\n    }",
+        "operationId": "vapi_webhook_api_vapi_webhook_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VapiWebhookRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VapiWebhookResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vapi/webhook/test": {
+      "post": {
+        "tags": [
+          "vapi-webhook"
+        ],
+        "summary": "Test Webhook",
+        "description": "Test endpoint to verify webhook connectivity.\n\nReturns a simple success response to verify VAPI can reach the webhook.",
+        "operationId": "test_webhook_api_vapi_webhook_test_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health check",
+        "description": "Returns OK if the service is running. Use for liveness probes.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Readiness check",
+        "description": "Checks external dependencies. Use for readiness probes.",
+        "operationId": "ready_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AvailabilityRequest": {
+        "properties": {
+          "service_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Service Ids",
+            "description": "List of service IDs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_ids"
+        ],
+        "title": "AvailabilityRequest",
+        "description": "Request model for availability check."
+      },
+      "CarInfo": {
+        "properties": {
+          "license_plate": {
+            "type": "string",
+            "title": "License Plate"
+          },
+          "make": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "mileage": {
+            "type": "string",
+            "title": "Mileage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "license_plate",
+          "mileage"
+        ],
+        "title": "CarInfo",
+        "description": "Car information model."
+      },
+      "ConfirmRequest": {
+        "properties": {
+          "appointment_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Appointment Id"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "car": {
+            "$ref": "#/components/schemas/CarInfo"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerInfo"
+          },
+          "comment": {
+            "type": "string",
+            "title": "Comment",
+            "default": ""
+          },
+          "customer_wants_to_wait": {
+            "type": "boolean",
+            "title": "Customer Wants To Wait",
+            "default": false
+          },
+          "customer_needs_rental": {
+            "type": "boolean",
+            "title": "Customer Needs Rental",
+            "default": false
+          },
+          "storage_number": {
+            "type": "string",
+            "title": "Storage Number",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "car",
+          "customer"
+        ],
+        "title": "ConfirmRequest",
+        "description": "Request model for confirming an appointment."
+      },
+      "CustomerInfo": {
+        "properties": {
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "surname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Surname"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "phones": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Phone"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phones"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "CustomerInfo",
+        "description": "Customer information model."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LookupRequest": {
+        "properties": {
+          "term": {
+            "type": "string",
+            "title": "Term",
+            "description": "Search term (phone, name, or license plate)"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "description": "Maximum number of results",
+            "default": 15
+          }
+        },
+        "type": "object",
+        "required": [
+          "term"
+        ],
+        "title": "LookupRequest",
+        "description": "Request model for customer/vehicle lookups."
+      },
+      "Phone": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "default": "mobile"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number"
+        ],
+        "title": "Phone",
+        "description": "Phone number model."
+      },
+      "ReserveRequest": {
+        "properties": {
+          "time": {
+            "type": "string",
+            "title": "Time",
+            "description": "Time in ISO format (YYYY-MM-DDTHH:MM:SS)"
+          },
+          "service_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Service Ids",
+            "description": "List of service IDs"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id",
+            "description": "Session ID for linking reservation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time",
+          "service_ids"
+        ],
+        "title": "ReserveRequest",
+        "description": "Request model for reserving an appointment."
+      },
+      "TimesRequest": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "title": "Date",
+            "description": "Date in YYYY-MM-DD format"
+          },
+          "service_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Service Ids",
+            "description": "List of service IDs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "service_ids"
+        ],
+        "title": "TimesRequest",
+        "description": "Request model for getting available times."
+      },
+      "ToolCall": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique tool call ID"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Function name to execute"
+          },
+          "arguments": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Arguments",
+            "description": "Function arguments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "ToolCall",
+        "description": "Individual tool call from VAPI."
+      },
+      "ToolCallMessage": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "description": "Message type (should be 'tool-calls')"
+          },
+          "toolCallList": {
+            "items": {
+              "$ref": "#/components/schemas/ToolCall"
+            },
+            "type": "array",
+            "title": "Toolcalllist",
+            "description": "List of tool calls to execute"
+          },
+          "call": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Call",
+            "description": "Call metadata"
+          },
+          "assistant": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Assistant",
+            "description": "Assistant metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "toolCallList"
+        ],
+        "title": "ToolCallMessage",
+        "description": "VAPI tool call message structure."
+      },
+      "ToolCallResult": {
+        "properties": {
+          "toolCallId": {
+            "type": "string",
+            "title": "Toolcallid",
+            "description": "Tool call ID from request"
+          },
+          "result": {
+            "type": "string",
+            "title": "Result",
+            "description": "Serialized result"
+          }
+        },
+        "type": "object",
+        "required": [
+          "toolCallId",
+          "result"
+        ],
+        "title": "ToolCallResult",
+        "description": "Individual tool call result for VAPI."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VapiWebhookRequest": {
+        "properties": {
+          "message": {
+            "$ref": "#/components/schemas/ToolCallMessage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "VapiWebhookRequest",
+        "description": "Top-level VAPI webhook request."
+      },
+      "VapiWebhookResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ToolCallResult"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "results"
+        ],
+        "title": "VapiWebhookResponse",
+        "description": "VAPI webhook response format."
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Services",
+      "description": "Service catalog operations. Browse available workshop services like inspections, maintenance, and repairs."
+    },
+    {
+      "name": "Availability",
+      "description": "Check appointment availability. Find open days and time slots for selected services."
+    },
+    {
+      "name": "Booking",
+      "description": "Appointment booking flow. Reserve time slots and confirm appointments with customer/vehicle details."
+    },
+    {
+      "name": "Lookup",
+      "description": "Customer and vehicle lookup. Search existing records by phone, name, or license plate."
+    },
+    {
+      "name": "Health",
+      "description": "Service health and readiness checks."
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+---
+title: Brunkhorst Connector
+description: "Zeitmechanik booking integration for Autohaus Brunkhorst"
+---
+
+# Brunkhorst Connector
+
+The Brunkhorst Connector provides a REST API for the Zeitmechanik workshop booking system used by Autohaus Brunkhorst.
+
+## Features
+
+- **Service Catalog**: Browse available workshop services (inspections, maintenance, repairs)
+- **Availability Check**: Find available days and time slots for selected services
+- **Appointment Booking**: Two-step reservation and confirmation flow
+- **Customer Lookup**: Search existing customers by phone, name, or license plate
+
+## Base URL
+
+<CodeGroup>
+```bash Production
+https://brunkhorst.connectors.aicoflow.com
+```
+
+```bash Development
+http://localhost:8101
+```
+
+</CodeGroup>
+
+## Booking Flow
+
+The appointment booking process follows a two-step flow to prevent conflicts:
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API
+    participant Zeitmechanik
+
+    Client->>API: 1. GET /api/services
+    API-->>Client: List of services
+
+    Client->>API: 2. POST /api/availability/days
+    API->>Zeitmechanik: Check availability
+    API-->>Client: Available days
+
+    Client->>API: 3. POST /api/availability/times
+    API->>Zeitmechanik: Get time slots
+    API-->>Client: Available times
+
+    Client->>API: 4. POST /api/booking/reserve
+    API->>Zeitmechanik: Reserve slot
+    API-->>Client: Reservation (expires ~10min)
+
+    Client->>API: 5. POST /api/booking/confirm
+    API->>Zeitmechanik: Confirm with details
+    API-->>Client: Booking confirmed
+```
+
+<Warning>
+	Reservations expire after approximately 10 minutes. Make sure to confirm
+	quickly!
+</Warning>
+
+## API Reference
+
+See the **Brunkhorst API** tab above for the full interactive API reference with all endpoints:
+
+- **Services**: List and get details for available workshop services
+- **Availability**: Check available days and time slots
+- **Booking**: Reserve and confirm appointments
+- **Lookup**: Search customers by phone, name, or license plate
+
+## Notes
+
+- **14-day buffer**: Available days are filtered to be at least 14 days in the future to ensure adequate preparation time
+- **German localization**: Day and month names are returned in German
+- **Session storage**: The API stores reservation IDs server-side, linked by `session_id` for multi-step flows

@@ -1,0 +1,146 @@
+---
+title: Quickstart
+description: "Get started with AICO Connectors in minutes"
+---
+
+# Quickstart
+
+This guide will help you make your first API calls to the AICO Connectors.
+
+## Base URLs
+
+Each connector has its own base URL:
+
+| Connector | Production URL | Local Development |
+|-----------|---------------|-------------------|
+| Brunkhorst | `https://brunkhorst.connectors.aicoflow.com` | `http://localhost:8101` |
+| PlanSo | `https://reit.connectors.aicoflow.com` | `http://localhost:8102` |
+
+## Authentication
+
+Currently, the connector APIs do not require client-side authentication. Server-side credentials for external systems (Zeitmechanik, PlanSo) are configured via environment variables.
+
+<Note>
+  Rate limiting may apply to prevent abuse. Contact support if you need higher limits.
+</Note>
+
+## Example: Book an Appointment (Brunkhorst)
+
+<Steps>
+  <Step title="List Available Services">
+    ```bash
+    curl https://brunkhorst.connectors.aicoflow.com/api/services
+    ```
+    
+    Response:
+    ```json
+    {
+      "success": true,
+      "services": [
+        {"id": "inspektion", "name": "Inspektion", "category": "maintenance"},
+        {"id": "oelwechsel", "name": "Ölwechsel", "category": "maintenance"}
+      ],
+      "count": 2
+    }
+    ```
+  </Step>
+  
+  <Step title="Check Available Days">
+    ```bash
+    curl -X POST https://brunkhorst.connectors.aicoflow.com/api/availability/days \
+      -H "Content-Type: application/json" \
+      -d '{"service_ids": ["inspektion"]}'
+    ```
+  </Step>
+  
+  <Step title="Get Time Slots">
+    ```bash
+    curl -X POST https://brunkhorst.connectors.aicoflow.com/api/availability/times \
+      -H "Content-Type: application/json" \
+      -d '{"date": "2026-03-15", "service_ids": ["inspektion"]}'
+    ```
+  </Step>
+  
+  <Step title="Reserve a Slot">
+    ```bash
+    curl -X POST https://brunkhorst.connectors.aicoflow.com/api/booking/reserve \
+      -H "Content-Type: application/json" \
+      -d '{"time": "2026-03-15T09:00:00", "service_ids": ["inspektion"]}'
+    ```
+  </Step>
+  
+  <Step title="Confirm the Booking">
+    ```bash
+    curl -X POST https://brunkhorst.connectors.aicoflow.com/api/booking/confirm \
+      -H "Content-Type: application/json" \
+      -d '{
+        "car": {
+          "license_plate": "HH-AB 1234",
+          "type": "VW Golf",
+          "mileage": "50000"
+        },
+        "customer": {
+          "surname": "Max Mustermann",
+          "email": "max@example.com",
+          "phone": "+49 170 1234567"
+        }
+      }'
+    ```
+  </Step>
+</Steps>
+
+## Example: Query Orders (PlanSo)
+
+```bash
+# Search by license plate
+curl "https://reit.connectors.aicoflow.com/api/orders?plate=HH-AB"
+
+# Search with multiple filters
+curl "https://reit.connectors.aicoflow.com/api/orders?status=in_progress&missing_parts=true&limit=10"
+```
+
+## Health Checks
+
+All connectors expose health endpoints:
+
+```bash
+# Liveness check
+curl https://brunkhorst.connectors.aicoflow.com/health
+
+# Readiness check (includes dependency checks)
+curl https://brunkhorst.connectors.aicoflow.com/ready
+```
+
+## Error Handling
+
+All APIs return consistent error responses:
+
+```json
+{
+  "success": false,
+  "error": "Resource not found",
+  "error_code": "NOT_FOUND",
+  "details": {
+    "resource": "Service",
+    "id": "unknown-service"
+  }
+}
+```
+
+Common HTTP status codes:
+- `200` - Success
+- `400` - Bad request (validation error)
+- `404` - Resource not found
+- `500` - Internal server error
+- `503` - Service unavailable (external dependency down)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Brunkhorst API" icon="calendar" href="/brunkhorst/overview">
+    Full API reference for the Brunkhorst booking connector
+  </Card>
+  <Card title="PlanSo API" icon="car" href="/reit/overview">
+    Full API reference for the PlanSo order connector
+  </Card>
+</CardGroup>

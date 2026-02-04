@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="180" height="50" viewBox="0 0 180 50" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo Icon (scaled down) -->
+  <g transform="matrix(0.11,0,0,0.11,2,2)">
+    <g transform="matrix(1,0,0,1,-48.689016,-45.92511)">
+      <g transform="matrix(1,0,0,1,-0,3.42511)">
+        <path d="M190,80C215,30 285,30 310,80L445,370C470,430 415,465 380,445C330,415 170,415 120,445C85,465 30,430 55,370L190,80ZM268.949,117.542C268.949,106.928 260.332,98.311 249.719,98.311C239.105,98.311 230.488,106.928 230.488,117.542L230.488,363.608C230.488,374.222 239.105,382.839 249.719,382.839C260.332,382.839 268.949,374.222 268.949,363.608L268.949,117.542ZM332.012,216.086C332.012,205.472 323.395,196.855 312.781,196.855C302.168,196.855 293.551,205.472 293.551,216.086L293.551,306.558C293.551,317.171 302.168,325.788 312.781,325.788C323.395,325.788 332.012,317.171 332.012,306.558L332.012,216.086ZM206.449,216.086C206.449,205.472 197.832,196.855 187.219,196.855C176.605,196.855 167.988,205.472 167.988,216.086L167.988,306.558C167.988,317.171 176.605,325.788 187.219,325.788C197.832,325.788 206.449,317.171 206.449,306.558L206.449,216.086Z" style="fill:url(#_Linear1);"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Brand Text (white for dark mode) -->
+  <text x="55" y="33" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="600" fill="#ffffff">AICO</text>
+
+  <defs>
+    <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(402.621969,408.14978,-408.14978,402.621969,48.689016,42.5)">
+      <stop offset="0" style="stop-color:rgb(61,225,231);stop-opacity:1"/>
+      <stop offset="1" style="stop-color:rgb(144,86,255);stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+</svg>

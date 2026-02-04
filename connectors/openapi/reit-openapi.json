@@ -1,0 +1,2857 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PlanSo Connector",
+    "description": "\n## PlanSo Order Management Integration\n\nThis connector provides a REST API for the PlanSo workshop management system, enabling order synchronization and queries.\n\n### Features\n\n- **Order Sync**: Automatic background synchronization from PlanSo to local SQLite database\n- **Rich Queries**: Search orders by plate, person, phone, email, status, damage type, and date ranges\n- **Parts Tracking**: View parts lists with order/delivery status\n- **CRUD Operations**: Create, update, and delete orders in PlanSo\n\n### Sync Architecture\n\nThe connector maintains a local SQLite database that mirrors PlanSo data:\n\n1. **Background Sync**: Runs automatically during business hours (configurable)\n2. **Manual Sync**: Trigger via `/api/sync` endpoint\n3. **Incremental Updates**: Only fetches changed orders when possible\n\n### Data Model\n\n- **Orders**: Repair projects with customer, vehicle, and scheduling info\n- **Parts**: Individual parts linked to orders with ordering/delivery status\n- **Extended Data**: Damaged areas, documents, images (optional sync)\n\n### Authentication\n\nPlanSo credentials are configured server-side. The API does not require client authentication.\n",
+    "contact": {
+      "name": "AICO Engineering",
+      "url": "https://aicoflow.com/"
+    },
+    "license": {
+      "name": "Proprietary"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://reit.connectors.aicoflow.com",
+      "description": "Production"
+    },
+    {
+      "url": "http://localhost:8102",
+      "description": "Local development"
+    }
+  ],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login to PlanSo",
+        "description": "Authenticate with PlanSo using username and password. Session cookies are persisted for subsequent requests.",
+        "operationId": "login_api_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Login status and session validity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sync": {
+      "post": {
+        "tags": [
+          "Sync"
+        ],
+        "summary": "Trigger manual sync",
+        "description": "Manually trigger a synchronization of orders from PlanSo to the local database.\n\nThe sync process:\n1. Fetches the project list from PlanSo\n2. For each project, fetches order details\n3. Optionally fetches parts data (if configured)\n4. Stores everything in the local SQLite database\n\n**Note**: Background sync runs automatically during business hours if enabled.",
+        "operationId": "sync_orders_api_sync_post",
+        "responses": {
+          "200": {
+            "description": "Sync result with current status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sync/status": {
+      "get": {
+        "tags": [
+          "Sync"
+        ],
+        "summary": "Get sync status",
+        "description": "Returns the current synchronization status including last sync time, duration, and any errors.",
+        "operationId": "get_sync_status_api_sync_status_get",
+        "responses": {
+          "200": {
+            "description": "Current sync status details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncStatusModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Query orders",
+        "description": "Search and filter orders from the local database.\n\n### Available Filters\n\n- **text**: Free-text search across multiple fields\n- **plate**: Filter by license plate (partial match)\n- **person**: Filter by customer name (partial match)\n- **phone**: Filter by phone number\n- **email**: Filter by email address\n- **status**: Filter by project status\n- **damage**: Filter by damage category\n- **station**: Filter by station ID\n- **missing_parts**: Only show orders with missing parts\n- **after/before**: Filter by shop date range (YYYY-MM-DD)\n- **finish_after/finish_before**: Filter by finish date range\n\n### Pagination\n\nUse `limit` and `offset` for pagination. Maximum 1000 results per request.",
+        "operationId": "query_orders_api_orders_get",
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Free-text search query",
+              "title": "Text"
+            },
+            "description": "Free-text search query"
+          },
+          {
+            "name": "plate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "License plate filter",
+              "title": "Plate"
+            },
+            "description": "License plate filter"
+          },
+          {
+            "name": "person",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Person name filter",
+              "title": "Person"
+            },
+            "description": "Person name filter"
+          },
+          {
+            "name": "phone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Phone number filter",
+              "title": "Phone"
+            },
+            "description": "Phone number filter"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Email filter",
+              "title": "Email"
+            },
+            "description": "Email filter"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Project status filter",
+              "title": "Status"
+            },
+            "description": "Project status filter"
+          },
+          {
+            "name": "damage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Damage category filter",
+              "title": "Damage"
+            },
+            "description": "Damage category filter"
+          },
+          {
+            "name": "station",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Station ID filter",
+              "title": "Station"
+            },
+            "description": "Station ID filter"
+          },
+          {
+            "name": "missing_parts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Filter orders with missing parts",
+              "default": false,
+              "title": "Missing Parts"
+            },
+            "description": "Filter orders with missing parts"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Shop date >= YYYY-MM-DD",
+              "title": "After"
+            },
+            "description": "Shop date >= YYYY-MM-DD"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Shop date <= YYYY-MM-DD",
+              "title": "Before"
+            },
+            "description": "Shop date <= YYYY-MM-DD"
+          },
+          {
+            "name": "finish_after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Finish date >= YYYY-MM-DD",
+              "title": "Finish After"
+            },
+            "description": "Finish date >= YYYY-MM-DD"
+          },
+          {
+            "name": "finish_before",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Finish date <= YYYY-MM-DD",
+              "title": "Finish Before"
+            },
+            "description": "Finish date <= YYYY-MM-DD"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "description": "Maximum results per page",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Maximum results per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of results to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Number of results to skip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of orders matching the filters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Create new order",
+        "description": "Create a new order/appointment in PlanSo.\n\n### Required Fields\n\n- **vehicle_details**: Complete vehicle information (VIN, plate, make/model, registration)\n- **person**: Customer name\n- **phone**: Customer phone number\n- **email**: Customer email address\n- **customer_category**: Customer category ID\n- **damage**: Damage classification (e.g., 'KL 2-3')\n- **repair_date**: Scheduled repair date (DD.MM.YYYY)\n- **shop_date**: Workshop date (DD.MM.YYYY)\n- **est_hours_karo**: Estimated body shop hours\n- **est_hours_lack**: Estimated paint shop hours\n\nThe newly created order is automatically synced to the local database.",
+        "operationId": "create_new_order_api_orders_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created order ID and project number",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateOrderResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{order_id}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get order details",
+        "description": "Retrieve detailed information for a specific order by ID, including customer, vehicle, and scheduling data.",
+        "operationId": "get_order_api_orders__order_id__get",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Full order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Update order",
+        "description": "Update an existing order in PlanSo. Only provided fields will be updated; omitted fields remain unchanged.",
+        "operationId": "update_existing_order_api_orders__order_id__put",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateOrderResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Delete order",
+        "description": "Delete an order from PlanSo.\n\n**Security**: Requires password confirmation to prevent accidental deletions. The password should match the authenticated user's password.",
+        "operationId": "delete_existing_order_api_orders__order_id__delete",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deletion confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteOrderResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{order_id}/parts": {
+      "get": {
+        "tags": [
+          "Parts"
+        ],
+        "summary": "Get order parts",
+        "description": "Retrieve the parts list for an order, including part numbers, quantities, prices, and delivery status.",
+        "operationId": "get_order_parts_api_orders__order_id__parts_get",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of parts with status information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{order_id}/extended": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get extended order data",
+        "description": "Retrieve extended/supplementary data for an order including:\n\n- **Damaged areas**: Visual damage mapping\n- **Documents**: Attached documents and files\n- **Images**: Photos of the vehicle/damage\n- **Other sections**: Additional data captured during sync\n\n**Note**: Extended data is only available if `sync_with_extended_data` is enabled in configuration.",
+        "operationId": "get_order_extended_api_orders__order_id__extended_get",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Extended data sections as key-value pairs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Order Extended Api Orders  Order Id  Extended Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health check",
+        "description": "Returns OK if the service is running. Use for liveness probes.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ready": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Readiness check",
+        "description": "Checks external dependencies. Use for readiness probes.",
+        "operationId": "ready_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateOrderRequest": {
+        "properties": {
+          "vehicle_details": {
+            "$ref": "#/components/schemas/VehicleDetailsModel",
+            "description": "Complete vehicle information"
+          },
+          "person": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Person",
+            "description": "Customer/driver name"
+          },
+          "phone": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Phone",
+            "description": "Customer phone number"
+          },
+          "email": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Email",
+            "description": "Customer email address"
+          },
+          "customer_category": {
+            "type": "integer",
+            "title": "Customer Category",
+            "description": "Customer category ID"
+          },
+          "damage": {
+            "type": "string",
+            "title": "Damage",
+            "description": "Damage class/type (e.g., 'KL 2-3')"
+          },
+          "repair_date": {
+            "type": "string",
+            "title": "Repair Date",
+            "description": "Repair date (DD.MM.YYYY)"
+          },
+          "shop_date": {
+            "type": "string",
+            "title": "Shop Date",
+            "description": "Workshop date (DD.MM.YYYY)"
+          },
+          "est_hours_karo": {
+            "type": "number",
+            "title": "Est Hours Karo",
+            "description": "Body shop estimated hours"
+          },
+          "est_hours_lack": {
+            "type": "number",
+            "title": "Est Hours Lack",
+            "description": "Paint shop estimated hours"
+          },
+          "appointment_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Appointment Date",
+            "description": "Appointment created timestamp (DD.MM.YYYY HH:MM:SS)"
+          },
+          "service_advisor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Advisor",
+            "description": "Service advisor initials/name"
+          },
+          "pickup_service": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pickup Service",
+            "description": "Pick-up/delivery service (e.g., 'kommt', 'bringt')"
+          },
+          "remarks": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remarks",
+            "description": "Additional comments/remarks"
+          },
+          "parts_delivery_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parts Delivery Date",
+            "description": "Parts delivery date (DD.MM.YYYY)"
+          },
+          "paint_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paint Date",
+            "description": "Paint date (DD.MM.YYYY)"
+          },
+          "shop_back_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shop Back Date",
+            "description": "Shop return date (DD.MM.YYYY)"
+          },
+          "repair_date_time_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Date Time From",
+            "description": "Repair time slot start"
+          },
+          "repair_date_time_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Date Time To",
+            "description": "Repair time slot end"
+          },
+          "estimate_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimate Date",
+            "description": "Estimate date"
+          },
+          "return_date_time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Return Date Time",
+            "description": "Return date/time"
+          },
+          "type_of_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type Of Date",
+            "description": "Type of date",
+            "default": "0"
+          },
+          "damage_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Damage Description",
+            "description": "Detailed damage description"
+          },
+          "workshop_distribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workshop Distribution",
+            "description": "Workshop distribution"
+          },
+          "parts_needed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parts Needed",
+            "description": "Parts needed description"
+          },
+          "rental_car_deductible": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rental Car Deductible",
+            "description": "Rental car deductible"
+          },
+          "rental_car_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rental Car Type",
+            "description": "Rental car type"
+          },
+          "rental_car_motor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rental Car Motor",
+            "description": "Rental car motor type"
+          },
+          "rental_car_transmission": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rental Car Transmission",
+            "description": "Rental car transmission"
+          },
+          "rental_car_navi": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rental Car Navi",
+            "description": "Rental car navigation"
+          },
+          "rental_car_bluetooth": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rental Car Bluetooth",
+            "description": "Rental car bluetooth"
+          },
+          "rental_car_hitch": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rental Car Hitch",
+            "description": "Rental car tow hitch"
+          },
+          "rental_car_isofix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rental Car Isofix",
+            "description": "Rental car ISOFIX"
+          },
+          "external_calculation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Calculation",
+            "description": "External calculation reference"
+          },
+          "external_calculation_done": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Calculation Done",
+            "description": "External calculation completion status"
+          },
+          "express_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Express Link",
+            "description": "Express link status"
+          },
+          "insurance_adjuster": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Insurance Adjuster",
+            "description": "Insurance adjuster"
+          },
+          "activate_invoice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activate Invoice",
+            "description": "Invoice activation status"
+          },
+          "deductible": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deductible",
+            "description": "Deductible amount"
+          },
+          "pickup_location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pickup Location",
+            "description": "Pickup location"
+          },
+          "distance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance",
+            "description": "Distance"
+          },
+          "pickup_company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pickup Company",
+            "description": "Pickup company name"
+          },
+          "address_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Notes",
+            "description": "Address notes/hints"
+          },
+          "vehicle_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vehicle Class",
+            "description": "Vehicle class"
+          },
+          "complaint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complaint",
+            "description": "Complaint/reclamation flag"
+          }
+        },
+        "type": "object",
+        "required": [
+          "vehicle_details",
+          "person",
+          "phone",
+          "email",
+          "customer_category",
+          "damage",
+          "repair_date",
+          "shop_date",
+          "est_hours_karo",
+          "est_hours_lack"
+        ],
+        "title": "CreateOrderRequest",
+        "description": "Request to create a new order/appointment."
+      },
+      "CreateOrderResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          },
+          "order_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Id"
+          },
+          "project_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Number"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "CreateOrderResponse",
+        "description": "Response after creating an order."
+      },
+      "DeleteOrderRequest": {
+        "properties": {
+          "order_id": {
+            "type": "integer",
+            "title": "Order Id",
+            "description": "Order ID to delete"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Password",
+            "description": "User password for confirmation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "order_id",
+          "password"
+        ],
+        "title": "DeleteOrderRequest",
+        "description": "Request to delete an order."
+      },
+      "DeleteOrderResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "DeleteOrderResponse",
+        "description": "Response after deleting an order."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LoginRequest": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "description": "Login request."
+      },
+      "LoginResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          },
+          "session_valid": {
+            "type": "boolean",
+            "title": "Session Valid",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "LoginResponse",
+        "description": "Login response."
+      },
+      "OrderDetailResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrderModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "OrderDetailResponse",
+        "description": "Single order detail response."
+      },
+      "OrderModel": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "short_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Name"
+          },
+          "plate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plate"
+          },
+          "person": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "damage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Damage"
+          },
+          "project_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Status"
+          },
+          "station_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Station Id"
+          },
+          "station_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Station State"
+          },
+          "shop_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shop Date"
+          },
+          "repair_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Date"
+          },
+          "finish_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finish Date"
+          },
+          "planned_delivery_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Delivery Date"
+          },
+          "parts_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parts Status"
+          },
+          "missing_parts": {
+            "type": "integer",
+            "title": "Missing Parts",
+            "default": 0
+          },
+          "est_hours_karo": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Est Hours Karo"
+          },
+          "est_hours_lack": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Est Hours Lack"
+          },
+          "est_hours_mech": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Est Hours Mech"
+          },
+          "vin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vin"
+          },
+          "kba": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kba"
+          },
+          "manufacturer_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manufacturer Name"
+          },
+          "model_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Name"
+          },
+          "sub_model_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub Model Name"
+          },
+          "engine_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine Type"
+          },
+          "engine_size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine Size"
+          },
+          "engine_power": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine Power"
+          },
+          "curb_weight": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Curb Weight"
+          },
+          "gross_weight": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Weight"
+          },
+          "first_registration": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Registration"
+          },
+          "last_registration": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Registration"
+          },
+          "hu_au": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hu Au"
+          },
+          "mileage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mileage"
+          },
+          "engine_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine Code"
+          },
+          "country_of_origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Of Origin"
+          },
+          "vehicle_owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vehicle Owner"
+          },
+          "owner_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Phone"
+          },
+          "owner_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Address"
+          },
+          "appointment_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Appointment Date"
+          },
+          "external_calculation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Calculation"
+          },
+          "express_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Express Link"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "zip_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zip Code"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "remarks": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remarks"
+          },
+          "total_net_cost": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Net Cost"
+          },
+          "total_gross_cost": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Gross Cost"
+          },
+          "insurance_json": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Insurance Json"
+          },
+          "costs_json": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Costs Json"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "OrderModel",
+        "description": "Order/Project record."
+      },
+      "PartModel": {
+        "properties": {
+          "order_id": {
+            "type": "integer",
+            "title": "Order Id"
+          },
+          "part_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Part No"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "lead_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead No"
+          },
+          "order_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order No"
+          },
+          "row_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Row Id"
+          },
+          "part_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Part Id"
+          },
+          "qty": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qty"
+          },
+          "price_each": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Each"
+          },
+          "price_total": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Total"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "status_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Code"
+          },
+          "status_icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Icon"
+          },
+          "order_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Date"
+          },
+          "delivery_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivery Date"
+          },
+          "eta_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta Date"
+          },
+          "is_missing": {
+            "type": "integer",
+            "title": "Is Missing",
+            "default": 0
+          },
+          "is_to_order": {
+            "type": "integer",
+            "title": "Is To Order",
+            "default": 0
+          },
+          "is_ordered": {
+            "type": "integer",
+            "title": "Is Ordered",
+            "default": 0
+          },
+          "is_delivered": {
+            "type": "integer",
+            "title": "Is Delivered",
+            "default": 0
+          },
+          "is_backorder": {
+            "type": "integer",
+            "title": "Is Backorder",
+            "default": 0
+          },
+          "is_mandatory": {
+            "type": "integer",
+            "title": "Is Mandatory",
+            "default": 0
+          },
+          "is_price_checked": {
+            "type": "integer",
+            "title": "Is Price Checked",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "order_id"
+        ],
+        "title": "PartModel",
+        "description": "Part record for an order."
+      },
+      "PartsResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/PartModel"
+            },
+            "type": "array",
+            "title": "Parts"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "parts",
+          "total"
+        ],
+        "title": "PartsResponse",
+        "description": "Parts list response."
+      },
+      "QueryResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "orders": {
+            "items": {
+              "$ref": "#/components/schemas/OrderModel"
+            },
+            "type": "array",
+            "title": "Orders"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "orders",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "QueryResponse",
+        "description": "Query orders response."
+      },
+      "SyncResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SyncStatusModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "SyncResponse",
+        "description": "Sync trigger response."
+      },
+      "SyncStatusModel": {
+        "properties": {
+          "is_running": {
+            "type": "boolean",
+            "title": "Is Running"
+          },
+          "last_sync_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Sync At"
+          },
+          "last_sync_duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Sync Duration Seconds"
+          },
+          "total_orders": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Orders"
+          },
+          "synced_orders": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Synced Orders"
+          },
+          "failed_orders": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failed Orders"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_running"
+        ],
+        "title": "SyncStatusModel",
+        "description": "Sync operation status."
+      },
+      "UpdateOrderRequest": {
+        "properties": {
+          "order_id": {
+            "type": "integer",
+            "title": "Order Id",
+            "description": "Order ID to update"
+          },
+          "vehicle_details": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VehicleDetailsModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "person": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "customer_category": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Customer Category"
+          },
+          "damage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Damage"
+          },
+          "repair_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Date"
+          },
+          "shop_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shop Date"
+          },
+          "est_hours_karo": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Est Hours Karo"
+          },
+          "est_hours_lack": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Est Hours Lack"
+          },
+          "appointment_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Appointment Date"
+          },
+          "service_advisor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Advisor"
+          },
+          "pickup_service": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pickup Service"
+          },
+          "remarks": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remarks"
+          },
+          "parts_delivery_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parts Delivery Date"
+          },
+          "paint_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paint Date"
+          },
+          "shop_back_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shop Back Date"
+          },
+          "repair_date_time_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Date Time From"
+          },
+          "repair_date_time_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repair Date Time To"
+          },
+          "estimate_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimate Date"
+          },
+          "return_date_time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Return Date Time"
+          },
+          "damage_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Damage Description"
+          },
+          "workshop_distribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workshop Distribution"
+          },
+          "external_calculation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Calculation"
+          },
+          "express_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Express Link"
+          }
+        },
+        "type": "object",
+        "required": [
+          "order_id"
+        ],
+        "title": "UpdateOrderRequest",
+        "description": "Request to update an existing order."
+      },
+      "UpdateOrderResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          },
+          "order_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "UpdateOrderResponse",
+        "description": "Response after updating an order."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VehicleDetailsModel": {
+        "properties": {
+          "number_plate": {
+            "type": "string",
+            "title": "Number Plate",
+            "description": "License plate number"
+          },
+          "kba": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kba",
+            "description": "KBA number"
+          },
+          "vin": {
+            "type": "string",
+            "title": "Vin",
+            "description": "Vehicle Identification Number (VIN)"
+          },
+          "makeID": {
+            "type": "integer",
+            "title": "Makeid",
+            "description": "Manufacturer ID"
+          },
+          "modelID": {
+            "type": "integer",
+            "title": "Modelid",
+            "description": "Model ID"
+          },
+          "hu_au": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hu Au",
+            "description": "Inspection dates (HU/AU)"
+          },
+          "engine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine",
+            "description": "Engine type code"
+          },
+          "engine_size": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine Size",
+            "description": "Engine size in ccm"
+          },
+          "curb_weight": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Curb Weight",
+            "description": "Curb weight in kg"
+          },
+          "gross_weight": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gross Weight",
+            "description": "Gross weight in kg"
+          },
+          "engine_power": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine Power",
+            "description": "Engine power in hp/kw"
+          },
+          "first_registration": {
+            "type": "string",
+            "title": "First Registration",
+            "description": "First registration date (DD.MM.YYYY)"
+          },
+          "last_registration": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Registration",
+            "description": "Last registration date"
+          },
+          "km_stand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Km Stand",
+            "description": "Mileage/odometer reading"
+          },
+          "engine_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine Code",
+            "description": "Engine code"
+          },
+          "all_details": {
+            "type": "boolean",
+            "title": "All Details",
+            "description": "Flag indicating all details are provided",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "number_plate",
+          "vin",
+          "makeID",
+          "modelID",
+          "first_registration"
+        ],
+        "title": "VehicleDetailsModel",
+        "description": "Vehicle details for creating/updating orders."
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "PlanSo session management. Login and maintain authenticated sessions."
+    },
+    {
+      "name": "Sync",
+      "description": "Data synchronization operations. Trigger manual syncs and monitor sync status."
+    },
+    {
+      "name": "Orders",
+      "description": "Order management. Query, create, update, and delete repair orders."
+    },
+    {
+      "name": "Parts",
+      "description": "Parts information. View parts lists and status for orders."
+    },
+    {
+      "name": "Health",
+      "description": "Service health and readiness checks."
+    }
+  ]
+}
