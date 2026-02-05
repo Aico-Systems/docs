@@ -8,9 +8,12 @@
 	},
 	"favicon": "/favicon.svg",
 	"colors": {
-		"primary": "#0D9373",
-		"light": "#07C983",
-		"dark": "#0D9373"
+		"primary": "#22D3EE",
+		"light": "#3DE1E7",
+		"dark": "#22D3EE"
+	},
+	"appearance": {
+		"default": "system"
 	},
 	"navigation": {
 		"tabs": [
@@ -51,7 +54,11 @@
 			{
 				"anchor": "GitHub",
 				"icon": "github",
-				"href": "https://github.com/aico-systems"
+				"href": "https://github.com/aico-systems",
+				"color": {
+					"from": "#3DE1E7",
+					"to": "#9056FF"
+				}
 			}
 		]
 	},
