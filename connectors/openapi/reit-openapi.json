@@ -109,6 +109,69 @@
         }
       }
     },
+    "/api/orders/identify": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Identify caller by plate + name",
+        "description": "Identify a caller by matching their license plate and verifying their name.\n\nReturns the best-matching order with a confidence level:\n- **high** (>= 0.7): Strong name match (handles umlauts, typos, partial names)\n- **low** (>= 0.4): Weak match \u2014 might be the right person\n- **none** (< 0.4): No plausible name match found\n\nIf no `person` is provided, returns orders by plate only with confidence 'high'\n(no name verification needed).",
+        "operationId": "identify_caller_api_orders_identify_get",
+        "parameters": [
+          {
+            "name": "plate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "License plate (required)",
+              "title": "Plate"
+            },
+            "description": "License plate (required)"
+          },
+          {
+            "name": "person",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Customer name for verification",
+              "title": "Person"
+            },
+            "description": "Customer name for verification"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Best matching order with confidence level",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentifyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/orders": {
       "get": {
         "tags": [
@@ -1300,6 +1363,58 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "IdentifyResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "match": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OrderModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confidence": {
+            "type": "string",
+            "title": "Confidence",
+            "default": "none"
+          },
+          "confidence_score": {
+            "type": "number",
+            "title": "Confidence Score",
+            "default": 0.0
+          },
+          "all_orders": {
+            "items": {
+              "$ref": "#/components/schemas/OrderModel"
+            },
+            "type": "array",
+            "title": "All Orders",
+            "default": []
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "default": 0
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "success"
+        ],
+        "title": "IdentifyResponse",
+        "description": "Response for caller identification (plate + name verification)."
       },
       "LoginRequest": {
         "properties": {
@@ -2655,6 +2770,13 @@
           "type": {
             "type": "string",
             "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
           }
         },
         "type": "object",
