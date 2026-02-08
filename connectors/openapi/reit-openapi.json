@@ -109,14 +109,14 @@
         }
       }
     },
-    "/api/orders/identify": {
+    "/api/identify": {
       "get": {
         "tags": [
           "Orders"
         ],
         "summary": "Identify caller by plate + name",
         "description": "Identify a caller by matching their license plate and verifying their name.\n\nReturns the best-matching order with a confidence level:\n- **high** (>= 0.7): Strong name match (handles umlauts, typos, partial names)\n- **low** (>= 0.4): Weak match \u2014 might be the right person\n- **none** (< 0.4): No plausible name match found\n\nIf no `person` is provided, returns orders by plate only with confidence 'high'\n(no name verification needed).",
-        "operationId": "identify_caller_api_orders_identify_get",
+        "operationId": "identify_caller_api_identify_get",
         "parameters": [
           {
             "name": "plate",
