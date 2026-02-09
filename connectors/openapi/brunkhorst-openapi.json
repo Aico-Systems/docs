@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Brunkhorst Connector",
-    "description": "\n## Zeitmechanik Booking Integration\n\nThis connector provides a REST API for the Zeitmechanik workshop booking system used by Autohaus Brunkhorst.\n\n### Features\n\n- **Service Catalog**: Browse available workshop services (inspections, maintenance, repairs)\n- **Availability Check**: Find available days and time slots for selected services\n- **Appointment Booking**: Two-step reservation and confirmation flow\n- **Customer Lookup**: Search existing customers by phone, name, or license plate\n\n### Booking Flow\n\n1. **Get Services** \u2192 List available services and select one or more\n2. **Check Days** \u2192 Get available days for the selected services (filtered to 14+ days out)\n3. **Check Times** \u2192 Get available time slots for a specific day\n4. **Reserve** \u2192 Reserve a time slot (holds for ~10 minutes)\n5. **Confirm** \u2192 Complete booking with customer and vehicle details\n\n### Authentication\n\nThis API currently does not require authentication. Rate limiting may apply.\n",
+    "description": "\n## Zeitmechanik Booking Integration\n\nThis connector provides a REST API for the Zeitmechanik workshop booking system used by Autohaus Brunkhorst.\n\n### Features\n\n- **Service Catalog**: Browse available workshop services (inspections, maintenance, repairs)\n- **Availability Check**: Find available days and time slots for selected services\n- **Appointment Booking**: Two-step reservation and confirmation flow\n- **Customer Lookup**: Search existing customers by phone, name, or license plate\n\n### Booking Flow\n\n1. **Get Services** \u2192 List available services and select one or more\n2. **Check Days** \u2192 Get available days for the selected services (filtered to 14+ days out)\n3. **Check Times** \u2192 Get available time slots for a specific day\n4. **Reserve** \u2192 Reserve a time slot (holds for ~10 minutes)\n5. **Confirm** \u2192 Complete booking with customer and vehicle details\n\n### Authentication\n\nAll endpoints (except `/health` and `/ready`) require an `X-API-Key` header. Requests may also be restricted by IP whitelist.\n",
     "contact": {
       "name": "AICO Engineering",
       "url": "https://aicoflow.com/"
@@ -939,6 +939,13 @@
         "title": "VapiWebhookResponse",
         "description": "VAPI webhook response format."
       }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
     }
   },
   "tags": [
@@ -961,6 +968,11 @@
     {
       "name": "Health",
       "description": "Service health and readiness checks."
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
     }
   ]
 }

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "PlanSo Connector",
-    "description": "\n## PlanSo Order Management Integration\n\nThis connector provides a REST API for the PlanSo workshop management system, enabling order synchronization and queries.\n\n### Features\n\n- **Order Sync**: Automatic background synchronization from PlanSo to local SQLite database\n- **Rich Queries**: Search orders by plate, person, phone, email, status, damage type, and date ranges\n- **Parts Tracking**: View parts lists with order/delivery status\n- **CRUD Operations**: Create, update, and delete orders in PlanSo\n\n### Sync Architecture\n\nThe connector maintains a local SQLite database that mirrors PlanSo data:\n\n1. **Background Sync**: Runs automatically during business hours (configurable)\n2. **Manual Sync**: Trigger via `/api/sync` endpoint\n3. **Incremental Updates**: Only fetches changed orders when possible\n\n### Data Model\n\n- **Orders**: Repair projects with customer, vehicle, and scheduling info\n- **Parts**: Individual parts linked to orders with ordering/delivery status\n- **Extended Data**: Damaged areas, documents, images (optional sync)\n\n### Authentication\n\nPlanSo credentials are configured server-side. The API does not require client authentication.\n",
+    "description": "\n## PlanSo Order Management Integration\n\nThis connector provides a REST API for the PlanSo workshop management system, enabling order synchronization and queries.\n\n### Features\n\n- **Order Sync**: Automatic background synchronization from PlanSo to local SQLite database\n- **Rich Queries**: Search orders by plate, person, phone, email, status, damage type, and date ranges\n- **Parts Tracking**: View parts lists with order/delivery status\n- **CRUD Operations**: Create, update, and delete orders in PlanSo\n\n### Sync Architecture\n\nThe connector maintains a local SQLite database that mirrors PlanSo data:\n\n1. **Background Sync**: Runs automatically during business hours (configurable)\n2. **Manual Sync**: Trigger via `/api/sync` endpoint\n3. **Incremental Updates**: Only fetches changed orders when possible\n\n### Data Model\n\n- **Orders**: Repair projects with customer, vehicle, and scheduling info\n- **Parts**: Individual parts linked to orders with ordering/delivery status\n- **Extended Data**: Damaged areas, documents, images (optional sync)\n\n### Authentication\n\nAll endpoints (except `/health` and `/ready`) require an `X-API-Key` header. Requests may also be restricted by IP whitelist.\n",
     "contact": {
       "name": "AICO Engineering",
       "url": "https://aicoflow.com/"
@@ -2952,6 +2952,13 @@
         "title": "VehicleDetailsModel",
         "description": "Vehicle details for creating/updating orders."
       }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
     }
   },
   "tags": [
@@ -2974,6 +2981,11 @@
     {
       "name": "Health",
       "description": "Service health and readiness checks."
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
     }
   ]
 }
