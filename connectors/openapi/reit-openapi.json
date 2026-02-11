@@ -115,7 +115,7 @@
           "Orders"
         ],
         "summary": "Identify caller by plate + name",
-        "description": "Identify a caller by matching their license plate and verifying their name.\n\nReturns the best-matching order with a confidence level:\n- **high** (>= 0.7): Strong name match (handles umlauts, typos, partial names)\n- **low** (>= 0.4): Weak match \u2014 might be the right person\n- **none** (< 0.4): No plausible name match found\n\nIf no `person` is provided, returns orders by plate only with confidence 'high'\n(no name verification needed).",
+        "description": "Identify a caller by matching their license plate and verifying their name.\n\n**Enhanced with phonetic matching**: Handles spoken license plates like:\n- \"l b a r 3 7 3\" \u2192 \"LB-AR 373\"\n- \"ludwig bertha anton richard\" \u2192 \"LB-AR...\"\n- \"ingolstadt abel richard 373\" \u2192 \"IN-AR 373\"\n\nReturns the best-matching order with a confidence level:\n- **high** (>= 0.7): Strong name match (handles umlauts, typos, partial names)\n- **low** (>= 0.4): Weak match \u2014 might be the right person\n- **none** (< 0.4): No plausible name match found\n\nIf no `person` is provided, returns orders by plate only with confidence 'high'\n(no name verification needed).",
         "operationId": "identify_caller_api_identify_get",
         "parameters": [
           {
@@ -124,10 +124,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "License plate (required)",
+              "description": "License plate (required) - supports phonetic input",
               "title": "Plate"
             },
-            "description": "License plate (required)"
+            "description": "License plate (required) - supports phonetic input"
           },
           {
             "name": "person",
@@ -1278,6 +1278,28 @@
             "type": "integer",
             "title": "Zu Verplanen",
             "default": 0
+          },
+          "plate_city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plate City"
+          },
+          "plate_city_phonetic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plate City Phonetic"
           },
           "remarks": {
             "anyOf": [
