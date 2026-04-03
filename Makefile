@@ -1,4 +1,4 @@
-.PHONY: help dev build install export-connectors
+.PHONY: help dev build install export-connectors export-api
 
 # Use fnm to ensure correct Node version (Mintlify requires Node < 25)
 FNM_SETUP = eval "$$(fnm env)" && fnm use 22
@@ -9,6 +9,7 @@ help:
 	@echo "  make install           - Install dependencies"
 	@echo "  make dev               - Start Mintlify dev server"
 	@echo "  make build             - Build documentation for deployment"
+	@echo "  make export-api        - Export AICO backend OpenAPI spec (requires running backend)"
 	@echo "  make export-connectors - Export OpenAPI specs from connector services"
 
 install:
@@ -19,6 +20,10 @@ dev:
 
 build:
 	@$(FNM_SETUP) && npx mintlify build
+
+export-api:
+	@echo "Exporting AICO backend OpenAPI spec..."
+	@cd .. && bun scripts/docs/export-openapi.ts
 
 export-connectors:
 	@echo "Exporting OpenAPI specs from connector services..."

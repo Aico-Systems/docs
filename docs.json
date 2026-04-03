@@ -42,6 +42,10 @@
 				]
 			},
 			{
+				"tab": "AICO API",
+				"openapi": "api/openapi.json"
+			},
+			{
 				"tab": "Brunkhorst API",
 				"openapi": "connectors/openapi/brunkhorst-openapi.json"
 			},
