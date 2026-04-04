@@ -30,50 +30,62 @@
   "paths": {
     "/healthz": {
       "get": {
-        "operationId": "getHealthz",
+        "operationId": "health_check",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "System"
-        ]
+        ],
+        "summary": "Health Check"
       }
     },
     "/api/config": {
       "get": {
-        "operationId": "getApiConfig",
+        "operationId": "list_config",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Config"
-        ]
+          "System"
+        ],
+        "summary": "List Config"
       }
     },
     "/api/schema": {
       "get": {
-        "operationId": "getApiSchema",
+        "operationId": "list_schema",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Schema"
-        ]
+          "Flows"
+        ],
+        "summary": "List Schema"
       }
     },
     "/api/flows": {
       "get": {
-        "operationId": "getApiFlows",
+        "operationId": "list_flows",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "List Flows"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiFlows",
+        "operationId": "create_flows",
         "requestBody": {
           "required": true,
           "content": {
@@ -146,16 +158,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "Create Flows"
       }
     },
     "/api/flows/{flowId}": {
       "get": {
-        "operationId": "getApiFlowsByFlowId",
+        "operationId": "get_flow",
         "parameters": [
           {
             "schema": {
@@ -167,11 +182,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "Get Flow"
       },
       "put": {
         "parameters": [
@@ -184,7 +202,7 @@
             "required": true
           }
         ],
-        "operationId": "putApiFlowsByFlowId",
+        "operationId": "update_flow",
         "requestBody": {
           "required": true,
           "content": {
@@ -257,14 +275,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "Update Flow"
       },
       "delete": {
-        "operationId": "deleteApiFlowsByFlowId",
+        "operationId": "delete_flow",
         "parameters": [
           {
             "schema": {
@@ -276,16 +297,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "Delete Flow"
       }
     },
     "/api/flows/{flowId}/process": {
       "post": {
-        "operationId": "postApiFlowsByFlowIdProcess",
+        "operationId": "process_flow",
         "parameters": [
           {
             "schema": {
@@ -297,171 +321,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
-      }
-    },
-    "/api/flows/sessions/{sessionId}": {
-      "get": {
-        "operationId": "getApiFlowsSessionsBySessionId",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "sessionId",
-            "required": true
-          }
         ],
-        "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Flows"
-        ]
-      }
-    },
-    "/api/flows/sessions/{sessionId}/end": {
-      "post": {
-        "operationId": "postApiFlowsSessionsBySessionIdEnd",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "sessionId",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Flows"
-        ]
-      }
-    },
-    "/api/flows/sessions/{sessionId}/child-return": {
-      "post": {
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "sessionId",
-            "required": true
-          }
-        ],
-        "operationId": "postApiFlowsSessionsBySessionIdChild-return",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "_def": {
-                  "unknownKeys": "strip",
-                  "catchall": {
-                    "_def": {
-                      "typeName": "ZodNever"
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    }
-                  },
-                  "typeName": "ZodObject"
-                },
-                "~standard": {
-                  "version": 1,
-                  "vendor": "zod"
-                },
-                "_cached": null
-              }
-            },
-            "multipart/form-data": {
-              "schema": {
-                "_def": {
-                  "unknownKeys": "strip",
-                  "catchall": {
-                    "_def": {
-                      "typeName": "ZodNever"
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    }
-                  },
-                  "typeName": "ZodObject"
-                },
-                "~standard": {
-                  "version": 1,
-                  "vendor": "zod"
-                },
-                "_cached": null
-              }
-            },
-            "text/plain": {
-              "schema": {
-                "_def": {
-                  "unknownKeys": "strip",
-                  "catchall": {
-                    "_def": {
-                      "typeName": "ZodNever"
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    }
-                  },
-                  "typeName": "ZodObject"
-                },
-                "~standard": {
-                  "version": 1,
-                  "vendor": "zod"
-                },
-                "_cached": null
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Flows"
-        ]
-      }
-    },
-    "/api/sessions/{sessionId}/monitor": {
-      "post": {
-        "operationId": "postApiSessionsBySessionIdMonitor",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "sessionId",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Sessions"
-        ]
+        "summary": "Process Flow"
       }
     },
     "/api/flows/{flowId}/trigger": {
       "post": {
-        "operationId": "postApiFlowsByFlowIdTrigger",
+        "operationId": "trigger_flow",
         "parameters": [
           {
             "schema": {
@@ -473,11 +345,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "Trigger Flow"
       }
     },
     "/api/flows/{flowId}/start": {
@@ -492,7 +367,7 @@
             "required": true
           }
         ],
-        "operationId": "postApiFlowsByFlowIdStart",
+        "operationId": "start_flow",
         "requestBody": {
           "required": true,
           "content": {
@@ -515,91 +390,7 @@
                   "version": 1,
                   "vendor": "zod"
                 },
-                "_cached": {
-                  "shape": {
-                    "mode": {
-                      "_def": {
-                        "values": [
-                          "audio",
-                          "chat"
-                        ],
-                        "typeName": "ZodEnum",
-                        "description": "Interaction mode for the flow session"
-                      },
-                      "~standard": {
-                        "version": 1,
-                        "vendor": "zod"
-                      },
-                      "_cache": {}
-                    },
-                    "userId": {
-                      "_def": {
-                        "innerType": {
-                          "_def": {
-                            "checks": [],
-                            "typeName": "ZodString",
-                            "coerce": false
-                          },
-                          "~standard": {
-                            "version": 1,
-                            "vendor": "zod"
-                          }
-                        },
-                        "typeName": "ZodOptional",
-                        "description": "User identifier for the session (e.g. +491234567890 or user-abc123)"
-                      },
-                      "~standard": {
-                        "version": 1,
-                        "vendor": "zod"
-                      }
-                    },
-                    "variables": {
-                      "_def": {
-                        "innerType": {
-                          "_def": {
-                            "keyType": {
-                              "_def": {
-                                "checks": [],
-                                "typeName": "ZodString",
-                                "coerce": false
-                              },
-                              "~standard": {
-                                "version": 1,
-                                "vendor": "zod"
-                              }
-                            },
-                            "valueType": {
-                              "_def": {
-                                "typeName": "ZodUnknown"
-                              },
-                              "~standard": {
-                                "version": 1,
-                                "vendor": "zod"
-                              },
-                              "_unknown": true
-                            },
-                            "typeName": "ZodRecord"
-                          },
-                          "~standard": {
-                            "version": 1,
-                            "vendor": "zod"
-                          }
-                        },
-                        "typeName": "ZodOptional",
-                        "description": "Initial session variables"
-                      },
-                      "~standard": {
-                        "version": 1,
-                        "vendor": "zod"
-                      }
-                    }
-                  },
-                  "keys": [
-                    "mode",
-                    "userId",
-                    "variables"
-                  ]
-                }
+                "_cached": null
               }
             },
             "multipart/form-data": {
@@ -621,91 +412,7 @@
                   "version": 1,
                   "vendor": "zod"
                 },
-                "_cached": {
-                  "shape": {
-                    "mode": {
-                      "_def": {
-                        "values": [
-                          "audio",
-                          "chat"
-                        ],
-                        "typeName": "ZodEnum",
-                        "description": "Interaction mode for the flow session"
-                      },
-                      "~standard": {
-                        "version": 1,
-                        "vendor": "zod"
-                      },
-                      "_cache": {}
-                    },
-                    "userId": {
-                      "_def": {
-                        "innerType": {
-                          "_def": {
-                            "checks": [],
-                            "typeName": "ZodString",
-                            "coerce": false
-                          },
-                          "~standard": {
-                            "version": 1,
-                            "vendor": "zod"
-                          }
-                        },
-                        "typeName": "ZodOptional",
-                        "description": "User identifier for the session (e.g. +491234567890 or user-abc123)"
-                      },
-                      "~standard": {
-                        "version": 1,
-                        "vendor": "zod"
-                      }
-                    },
-                    "variables": {
-                      "_def": {
-                        "innerType": {
-                          "_def": {
-                            "keyType": {
-                              "_def": {
-                                "checks": [],
-                                "typeName": "ZodString",
-                                "coerce": false
-                              },
-                              "~standard": {
-                                "version": 1,
-                                "vendor": "zod"
-                              }
-                            },
-                            "valueType": {
-                              "_def": {
-                                "typeName": "ZodUnknown"
-                              },
-                              "~standard": {
-                                "version": 1,
-                                "vendor": "zod"
-                              },
-                              "_unknown": true
-                            },
-                            "typeName": "ZodRecord"
-                          },
-                          "~standard": {
-                            "version": 1,
-                            "vendor": "zod"
-                          }
-                        },
-                        "typeName": "ZodOptional",
-                        "description": "Initial session variables"
-                      },
-                      "~standard": {
-                        "version": 1,
-                        "vendor": "zod"
-                      }
-                    }
-                  },
-                  "keys": [
-                    "mode",
-                    "userId",
-                    "variables"
-                  ]
-                }
+                "_cached": null
               }
             },
             "text/plain": {
@@ -727,106 +434,25 @@
                   "version": 1,
                   "vendor": "zod"
                 },
-                "_cached": {
-                  "shape": {
-                    "mode": {
-                      "_def": {
-                        "values": [
-                          "audio",
-                          "chat"
-                        ],
-                        "typeName": "ZodEnum",
-                        "description": "Interaction mode for the flow session"
-                      },
-                      "~standard": {
-                        "version": 1,
-                        "vendor": "zod"
-                      },
-                      "_cache": {}
-                    },
-                    "userId": {
-                      "_def": {
-                        "innerType": {
-                          "_def": {
-                            "checks": [],
-                            "typeName": "ZodString",
-                            "coerce": false
-                          },
-                          "~standard": {
-                            "version": 1,
-                            "vendor": "zod"
-                          }
-                        },
-                        "typeName": "ZodOptional",
-                        "description": "User identifier for the session (e.g. +491234567890 or user-abc123)"
-                      },
-                      "~standard": {
-                        "version": 1,
-                        "vendor": "zod"
-                      }
-                    },
-                    "variables": {
-                      "_def": {
-                        "innerType": {
-                          "_def": {
-                            "keyType": {
-                              "_def": {
-                                "checks": [],
-                                "typeName": "ZodString",
-                                "coerce": false
-                              },
-                              "~standard": {
-                                "version": 1,
-                                "vendor": "zod"
-                              }
-                            },
-                            "valueType": {
-                              "_def": {
-                                "typeName": "ZodUnknown"
-                              },
-                              "~standard": {
-                                "version": 1,
-                                "vendor": "zod"
-                              },
-                              "_unknown": true
-                            },
-                            "typeName": "ZodRecord"
-                          },
-                          "~standard": {
-                            "version": 1,
-                            "vendor": "zod"
-                          }
-                        },
-                        "typeName": "ZodOptional",
-                        "description": "Initial session variables"
-                      },
-                      "~standard": {
-                        "version": 1,
-                        "vendor": "zod"
-                      }
-                    }
-                  },
-                  "keys": [
-                    "mode",
-                    "userId",
-                    "variables"
-                  ]
-                }
+                "_cached": null
               }
             }
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "Start Flow"
       }
     },
     "/api/flows/{flowId}/providers": {
       "get": {
-        "operationId": "getApiFlowsByFlowIdProviders",
+        "operationId": "list_flow_providers",
         "parameters": [
           {
             "schema": {
@@ -838,16 +464,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "List Flow Providers"
       }
     },
     "/api/flows/{flowId}/providers/effective": {
       "get": {
-        "operationId": "getApiFlowsByFlowIdProvidersEffective",
+        "operationId": "list_flow_providers_effective",
         "parameters": [
           {
             "schema": {
@@ -859,16 +488,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "List Flow Providers Effective"
       }
     },
     "/api/flows/{flowId}/providers/available": {
       "get": {
-        "operationId": "getApiFlowsByFlowIdProvidersAvailable",
+        "operationId": "list_flow_providers_available",
         "parameters": [
           {
             "schema": {
@@ -880,11 +512,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "List Flow Providers Available"
       }
     },
     "/api/flows/{flowId}/providers/{type}": {
@@ -907,7 +542,7 @@
             "required": true
           }
         ],
-        "operationId": "putApiFlowsByFlowIdProvidersByType",
+        "operationId": "set_flow_provider",
         "requestBody": {
           "required": true,
           "content": {
@@ -980,14 +615,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "Set Flow Provider"
       },
       "delete": {
-        "operationId": "deleteApiFlowsByFlowIdProvidersByType",
+        "operationId": "remove_flow_provider",
         "parameters": [
           {
             "schema": {
@@ -1007,16 +645,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "Remove Flow Provider"
       }
     },
     "/api/flows/{flowId}/full": {
       "get": {
-        "operationId": "getApiFlowsByFlowIdFull",
+        "operationId": "list_flow_full",
         "parameters": [
           {
             "schema": {
@@ -1028,26 +669,32 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Flows"
-        ]
+        ],
+        "summary": "List Flow Full"
       }
     },
     "/api/tools": {
       "get": {
-        "operationId": "getApiTools",
+        "operationId": "list_tools",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "List Tools"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiTools",
+        "operationId": "create_tools",
         "requestBody": {
           "required": true,
           "content": {
@@ -1120,37 +767,46 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Create Tools"
       }
     },
     "/api/tools/categories": {
       "get": {
-        "operationId": "getApiToolsCategories",
+        "operationId": "list_tool_categories",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "List Tool Categories"
       }
     },
     "/api/tools/secrets": {
       "get": {
-        "operationId": "getApiToolsSecrets",
+        "operationId": "list_tool_secrets",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "List Tool Secrets"
       },
       "put": {
         "parameters": [],
-        "operationId": "putApiToolsSecrets",
+        "operationId": "set_tool_secrets",
         "requestBody": {
           "required": true,
           "content": {
@@ -1223,16 +879,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Set Tool Secrets"
       }
     },
     "/api/tools/secrets/{secretKey}": {
       "delete": {
-        "operationId": "deleteApiToolsSecretsBySecretKey",
+        "operationId": "remove_tool_secret",
         "parameters": [
           {
             "schema": {
@@ -1244,16 +903,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Remove Tool Secret"
       }
     },
     "/api/tools/{toolName}": {
       "get": {
-        "operationId": "getApiToolsByToolName",
+        "operationId": "get_tool",
         "parameters": [
           {
             "schema": {
@@ -1265,11 +927,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Get Tool"
       },
       "put": {
         "parameters": [
@@ -1282,7 +947,7 @@
             "required": true
           }
         ],
-        "operationId": "putApiToolsByToolName",
+        "operationId": "update_tool",
         "requestBody": {
           "required": true,
           "content": {
@@ -1355,14 +1020,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Update Tool"
       },
       "delete": {
-        "operationId": "deleteApiToolsByToolName",
+        "operationId": "delete_tool",
         "parameters": [
           {
             "schema": {
@@ -1374,17 +1042,20 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Delete Tool"
       }
     },
     "/api/tools/execute": {
       "post": {
         "parameters": [],
-        "operationId": "postApiToolsExecute",
+        "operationId": "execute_tool",
         "requestBody": {
           "required": true,
           "content": {
@@ -1457,17 +1128,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Execute Tool"
       }
     },
     "/api/tools/validate": {
       "post": {
         "parameters": [],
-        "operationId": "postApiToolsValidate",
+        "operationId": "validate_tool",
         "requestBody": {
           "required": true,
           "content": {
@@ -1540,16 +1214,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Validate Tool"
       }
     },
     "/api/tools/{toolName}/test": {
       "post": {
-        "operationId": "postApiToolsByToolNameTest",
+        "operationId": "test_tool",
         "parameters": [
           {
             "schema": {
@@ -1561,16 +1238,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Test Tool"
       }
     },
     "/api/tools/{toolName}/publish": {
       "post": {
-        "operationId": "postApiToolsByToolNamePublish",
+        "operationId": "publish_tool",
         "parameters": [
           {
             "schema": {
@@ -1582,26 +1262,32 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Publish Tool"
       }
     },
     "/api/favorites": {
       "get": {
-        "operationId": "getApiFavorites",
+        "operationId": "list_favorites",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Favorites"
-        ]
+        ],
+        "summary": "List Favorites"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiFavorites",
+        "operationId": "create_favorites",
         "requestBody": {
           "required": true,
           "content": {
@@ -1674,16 +1360,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Favorites"
-        ]
+        ],
+        "summary": "Create Favorites"
       }
     },
     "/api/favorites/{id}": {
       "delete": {
-        "operationId": "deleteApiFavoritesById",
+        "operationId": "delete_favorite",
         "parameters": [
           {
             "schema": {
@@ -1695,11 +1384,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Favorites"
-        ]
+        ],
+        "summary": "Delete Favorite"
       },
       "patch": {
         "parameters": [
@@ -1712,7 +1404,7 @@
             "required": true
           }
         ],
-        "operationId": "patchApiFavoritesById",
+        "operationId": "update_favorite",
         "requestBody": {
           "required": true,
           "content": {
@@ -1785,17 +1477,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Favorites"
-        ]
+        ],
+        "summary": "Update Favorite"
       }
     },
     "/api/favorites/reorder": {
       "post": {
         "parameters": [],
-        "operationId": "postApiFavoritesReorder",
+        "operationId": "reorder_favorite",
         "requestBody": {
           "required": true,
           "content": {
@@ -1868,16 +1563,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Favorites"
-        ]
+        ],
+        "summary": "Reorder Favorite"
       }
     },
     "/api/favorites/check/{type}/{entityId}": {
       "get": {
-        "operationId": "getApiFavoritesCheckByTypeByEntityId",
+        "operationId": "get_favorite_check",
         "parameters": [
           {
             "schema": {
@@ -1897,32 +1595,38 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Favorites"
-        ]
+        ],
+        "summary": "Get Favorite Check"
       }
     },
-    "/api/organizations/{organizationId}/secrets": {
+    "/api/admin/organizations/{orgId}/secrets": {
       "get": {
-        "operationId": "getApiOrganizationsByOrganizationIdSecrets",
+        "operationId": "list_admin_organizations_secrets",
         "parameters": [
           {
             "schema": {
               "type": "string"
             },
             "in": "path",
-            "name": "organizationId",
+            "name": "orgId",
             "required": true
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Organizations"
-        ]
+          "Admin"
+        ],
+        "summary": "List Admin Organizations Secrets"
       },
       "put": {
         "parameters": [
@@ -1931,11 +1635,11 @@
               "type": "string"
             },
             "in": "path",
-            "name": "organizationId",
+            "name": "orgId",
             "required": true
           }
         ],
-        "operationId": "putApiOrganizationsByOrganizationIdSecrets",
+        "operationId": "set_admin_organizations_secrets",
         "requestBody": {
           "required": true,
           "content": {
@@ -2041,151 +1745,32 @@
           }
         },
         "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Organizations"
-        ]
-      }
-    },
-    "/api/organizations/current/secrets": {
-      "get": {
-        "operationId": "getApiOrganizationsCurrentSecrets",
-        "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Organizations"
-        ]
-      },
-      "put": {
-        "parameters": [],
-        "operationId": "putApiOrganizationsCurrentSecrets",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "_def": {
-                  "keyType": {
-                    "_def": {
-                      "checks": [],
-                      "typeName": "ZodString",
-                      "coerce": false
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    }
-                  },
-                  "valueType": {
-                    "_def": {
-                      "typeName": "ZodUnknown"
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    },
-                    "_unknown": true
-                  },
-                  "typeName": "ZodRecord",
-                  "description": "Key-value map of organization secrets"
-                },
-                "~standard": {
-                  "version": 1,
-                  "vendor": "zod"
-                }
-              }
-            },
-            "multipart/form-data": {
-              "schema": {
-                "_def": {
-                  "keyType": {
-                    "_def": {
-                      "checks": [],
-                      "typeName": "ZodString",
-                      "coerce": false
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    }
-                  },
-                  "valueType": {
-                    "_def": {
-                      "typeName": "ZodUnknown"
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    },
-                    "_unknown": true
-                  },
-                  "typeName": "ZodRecord",
-                  "description": "Key-value map of organization secrets"
-                },
-                "~standard": {
-                  "version": 1,
-                  "vendor": "zod"
-                }
-              }
-            },
-            "text/plain": {
-              "schema": {
-                "_def": {
-                  "keyType": {
-                    "_def": {
-                      "checks": [],
-                      "typeName": "ZodString",
-                      "coerce": false
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    }
-                  },
-                  "valueType": {
-                    "_def": {
-                      "typeName": "ZodUnknown"
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    },
-                    "_unknown": true
-                  },
-                  "typeName": "ZodRecord",
-                  "description": "Key-value map of organization secrets"
-                },
-                "~standard": {
-                  "version": 1,
-                  "vendor": "zod"
-                }
-              }
-            }
+          "200": {
+            "description": "Successful response"
           }
         },
-        "responses": {
-          "200": {}
-        },
         "tags": [
-          "Organizations"
-        ]
+          "Admin"
+        ],
+        "summary": "Set Admin Organizations Secrets"
       }
     },
     "/api/organizations": {
       "get": {
-        "operationId": "getApiOrganizations",
+        "operationId": "list_organizations",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "List Organizations"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiOrganizations",
+        "operationId": "create_organizations",
         "requestBody": {
           "required": true,
           "content": {
@@ -2258,37 +1843,46 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Create Organizations"
       }
     },
     "/api/organizations/ensure-personal": {
       "post": {
-        "operationId": "postApiOrganizationsEnsure-personal",
+        "operationId": "create_organization_ensure_personal",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Create Organization Ensure Personal"
       }
     },
     "/api/organizations/current": {
       "get": {
-        "operationId": "getApiOrganizationsCurrent",
+        "operationId": "list_organization_current",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "List Organization Current"
       },
       "patch": {
         "parameters": [],
-        "operationId": "patchApiOrganizationsCurrent",
+        "operationId": "update_organization_current",
         "requestBody": {
           "required": true,
           "content": {
@@ -2361,48 +1955,60 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Update Organization Current"
       },
       "delete": {
-        "operationId": "deleteApiOrganizationsCurrent",
+        "operationId": "remove_organization_current",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Remove Organization Current"
       }
     },
     "/api/organizations/current/config": {
       "put": {
-        "operationId": "putApiOrganizationsCurrentConfig",
+        "operationId": "set_organization_current_config",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Set Organization Current Config"
       }
     },
     "/api/organizations/current/leave": {
       "post": {
-        "operationId": "postApiOrganizationsCurrentLeave",
+        "operationId": "leave_organization",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Leave Organization"
       }
     },
     "/api/organizations/current/transfer-ownership": {
       "post": {
         "parameters": [],
-        "operationId": "postApiOrganizationsCurrentTransfer-ownership",
+        "operationId": "transfer_ownership_organization",
         "requestBody": {
           "required": true,
           "content": {
@@ -2475,26 +2081,32 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Transfer Ownership Organization"
       }
     },
     "/api/organizations/current/jit/email-domains": {
       "get": {
-        "operationId": "getApiOrganizationsCurrentJitEmail-domains",
+        "operationId": "list_organization_current_jit_email_domains",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "List Organization Current JIT Email Domains"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiOrganizationsCurrentJitEmail-domains",
+        "operationId": "create_organization_current_jit_email_domains",
         "requestBody": {
           "required": true,
           "content": {
@@ -2567,15 +2179,18 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Create Organization Current JIT Email Domains"
       },
       "put": {
         "parameters": [],
-        "operationId": "putApiOrganizationsCurrentJitEmail-domains",
+        "operationId": "set_organization_current_jit_email_domains",
         "requestBody": {
           "required": true,
           "content": {
@@ -2648,16 +2263,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Set Organization Current JIT Email Domains"
       }
     },
     "/api/organizations/current/jit/email-domains/{emailDomain}": {
       "delete": {
-        "operationId": "deleteApiOrganizationsCurrentJitEmail-domainsByEmailDomain",
+        "operationId": "remove_organization_email_domain",
         "parameters": [
           {
             "schema": {
@@ -2669,50 +2287,62 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Remove Organization Email Domain"
       }
     },
     "/api/organizations/current/users": {
       "get": {
-        "operationId": "getApiOrganizationsCurrentUsers",
+        "operationId": "list_organization_current_users",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "List Organization Current Users"
       }
     },
     "/api/organizations/current/roles": {
       "get": {
-        "operationId": "getApiOrganizationsCurrentRoles",
+        "operationId": "list_organization_current_roles",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "List Organization Current Roles"
       }
     },
     "/api/organizations/current/invitations": {
       "get": {
-        "operationId": "getApiOrganizationsCurrentInvitations",
+        "operationId": "list_organization_current_invitations",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "List Organization Current Invitations"
       }
     },
     "/api/organizations/current/users/invite": {
       "post": {
         "parameters": [],
-        "operationId": "postApiOrganizationsCurrentUsersInvite",
+        "operationId": "invite_organization",
         "requestBody": {
           "required": true,
           "content": {
@@ -2785,16 +2415,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Invite Organization"
       }
     },
     "/api/organizations/current/users/{userId}": {
       "delete": {
-        "operationId": "deleteApiOrganizationsCurrentUsersByUserId",
+        "operationId": "remove_organization_user",
         "parameters": [
           {
             "schema": {
@@ -2806,16 +2439,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Remove Organization User"
       }
     },
     "/api/organizations/current/invitations/{invitationId}": {
       "delete": {
-        "operationId": "deleteApiOrganizationsCurrentInvitationsByInvitationId",
+        "operationId": "remove_organization_invitation",
         "parameters": [
           {
             "schema": {
@@ -2827,11 +2463,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Remove Organization Invitation"
       }
     },
     "/api/organizations/current/users/{userId}/roles": {
@@ -2846,7 +2485,7 @@
             "required": true
           }
         ],
-        "operationId": "putApiOrganizationsCurrentUsersByUserIdRoles",
+        "operationId": "set_organization_current_users_roles",
         "requestBody": {
           "required": true,
           "content": {
@@ -2919,16 +2558,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Organizations"
-        ]
+        ],
+        "summary": "Set Organization Current Users Roles"
       }
     },
     "/api/invitations/{invitationId}": {
       "get": {
-        "operationId": "getApiInvitationsByInvitationId",
+        "operationId": "get_invitation",
         "parameters": [
           {
             "schema": {
@@ -2940,16 +2582,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Invitations"
-        ]
+          "Organizations"
+        ],
+        "summary": "Get Invitation"
       }
     },
     "/api/invitations/{invitationId}/accept": {
       "post": {
-        "operationId": "postApiInvitationsByInvitationIdAccept",
+        "operationId": "accept_invitation",
         "parameters": [
           {
             "schema": {
@@ -2961,49 +2606,61 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Invitations"
-        ]
+          "Organizations"
+        ],
+        "summary": "Accept Invitation"
       }
     },
-    "/api/livekit/session": {
+    "/api/calls/livekit-token": {
       "post": {
-        "operationId": "postApiLivekitSession",
+        "operationId": "create_call_livekit_token",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "LIVEKIT"
-        ]
+          "Calls"
+        ],
+        "summary": "Create Call LIVEKIT Token"
       }
     },
     "/api/providers": {
       "get": {
-        "operationId": "getApiProviders",
+        "operationId": "list_providers",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Providers"
-        ]
+        ],
+        "summary": "List Providers"
       }
     },
-    "/api/organizations/current/providers": {
+    "/api/providers/configured": {
       "get": {
-        "operationId": "getApiOrganizationsCurrentProviders",
+        "operationId": "list_provider_configured",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Organizations"
-        ]
+          "Providers"
+        ],
+        "summary": "List Provider Configured"
       }
     },
-    "/api/organizations/current/providers/{key}": {
+    "/api/providers/{key}": {
       "get": {
-        "operationId": "getApiOrganizationsCurrentProvidersByKey",
+        "operationId": "get_provider",
         "parameters": [
           {
             "schema": {
@@ -3015,14 +2672,17 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Organizations"
-        ]
+          "Providers"
+        ],
+        "summary": "Get Provider"
       }
     },
-    "/api/organizations/current/providers/{key}/config": {
+    "/api/providers/{key}/config": {
       "put": {
         "parameters": [
           {
@@ -3034,7 +2694,7 @@
             "required": true
           }
         ],
-        "operationId": "putApiOrganizationsCurrentProvidersByKeyConfig",
+        "operationId": "set_provider_config",
         "requestBody": {
           "required": true,
           "content": {
@@ -3107,14 +2767,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Organizations"
-        ]
+          "Providers"
+        ],
+        "summary": "Set Provider Config"
       },
       "delete": {
-        "operationId": "deleteApiOrganizationsCurrentProvidersByKeyConfig",
+        "operationId": "remove_provider_config",
         "parameters": [
           {
             "schema": {
@@ -3126,14 +2789,17 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Organizations"
-        ]
+          "Providers"
+        ],
+        "summary": "Remove Provider Config"
       }
     },
-    "/api/organizations/current/providers/{key}/secrets": {
+    "/api/providers/{key}/secrets": {
       "put": {
         "parameters": [
           {
@@ -3145,7 +2811,7 @@
             "required": true
           }
         ],
-        "operationId": "putApiOrganizationsCurrentProvidersByKeySecrets",
+        "operationId": "set_provider_secrets",
         "requestBody": {
           "required": true,
           "content": {
@@ -3218,14 +2884,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Organizations"
-        ]
+          "Providers"
+        ],
+        "summary": "Set Provider Secrets"
       },
       "delete": {
-        "operationId": "deleteApiOrganizationsCurrentProvidersByKeySecrets",
+        "operationId": "remove_provider_secrets",
         "parameters": [
           {
             "schema": {
@@ -3237,27 +2906,19 @@
           }
         ],
         "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Organizations"
-        ]
-      }
-    },
-    "/api/providers/organization/enabled": {
-      "get": {
-        "operationId": "getApiProvidersOrganizationEnabled",
-        "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Providers"
-        ]
+        ],
+        "summary": "Remove Provider Secrets"
       }
     },
     "/api/providers/tts/{providerKey}/voices": {
       "get": {
-        "operationId": "getApiProvidersTtsByProviderKeyVoices",
+        "operationId": "list_provider_tts_voices",
         "parameters": [
           {
             "schema": {
@@ -3269,11 +2930,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Providers"
-        ]
+        ],
+        "summary": "List Provider TTS Voices"
       }
     },
     "/api/providers/tts/{providerKey}/validate-voice": {
@@ -3288,7 +2952,7 @@
             "required": true
           }
         ],
-        "operationId": "postApiProvidersTtsByProviderKeyValidate-voice",
+        "operationId": "validate_voice_provider",
         "requestBody": {
           "required": true,
           "content": {
@@ -3361,17 +3025,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Providers"
-        ]
+        ],
+        "summary": "Validate Voice Provider"
       }
     },
     "/api/llm/chat": {
       "post": {
         "parameters": [],
-        "operationId": "postApiLlmChat",
+        "operationId": "create_llm_chat",
         "requestBody": {
           "required": true,
           "content": {
@@ -3444,17 +3111,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "LLM"
-        ]
+        ],
+        "summary": "Create LLM Chat"
       }
     },
     "/api/llm/stream": {
       "post": {
         "parameters": [],
-        "operationId": "postApiLlmStream",
+        "operationId": "stream_llm",
         "requestBody": {
           "required": true,
           "content": {
@@ -3527,26 +3197,32 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "LLM"
-        ]
+        ],
+        "summary": "Stream LLM"
       }
     },
     "/api/api-keys": {
       "get": {
-        "operationId": "getApiApi-keys",
+        "operationId": "list_api_keys",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "API Keys"
-        ]
+        ],
+        "summary": "List API Keys"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiApi-keys",
+        "operationId": "create_api_keys",
         "requestBody": {
           "required": true,
           "content": {
@@ -3619,16 +3295,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "API Keys"
-        ]
+        ],
+        "summary": "Create API Keys"
       }
     },
     "/api/api-keys/{keyId}": {
       "get": {
-        "operationId": "getApiApi-keysByKeyId",
+        "operationId": "get_api_key",
         "parameters": [
           {
             "schema": {
@@ -3640,11 +3319,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "API Keys"
-        ]
+        ],
+        "summary": "Get API Key"
       },
       "patch": {
         "parameters": [
@@ -3657,7 +3339,7 @@
             "required": true
           }
         ],
-        "operationId": "patchApiApi-keysByKeyId",
+        "operationId": "update_api_key",
         "requestBody": {
           "required": true,
           "content": {
@@ -3730,14 +3412,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "API Keys"
-        ]
+        ],
+        "summary": "Update API Key"
       },
       "delete": {
-        "operationId": "deleteApiApi-keysByKeyId",
+        "operationId": "delete_api_key",
         "parameters": [
           {
             "schema": {
@@ -3749,16 +3434,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "API Keys"
-        ]
+        ],
+        "summary": "Delete API Key"
       }
     },
     "/api/api-keys/{keyId}/rotate": {
       "post": {
-        "operationId": "postApiApi-keysByKeyIdRotate",
+        "operationId": "rotate_api_key",
         "parameters": [
           {
             "schema": {
@@ -3770,27 +3458,33 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "API Keys"
-        ]
+        ],
+        "summary": "Rotate API Key"
       }
     },
     "/api/admin/organizations": {
       "get": {
-        "operationId": "getApiAdminOrganizations",
+        "operationId": "list_admin_organizations",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "List Admin Organizations"
       }
     },
     "/api/admin/organizations/{orgId}": {
       "get": {
-        "operationId": "getApiAdminOrganizationsByOrgId",
+        "operationId": "get_admin_organization",
         "parameters": [
           {
             "schema": {
@@ -3802,16 +3496,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "Get Admin Organization"
       }
     },
     "/api/admin/organizations/{orgId}/users": {
       "get": {
-        "operationId": "getApiAdminOrganizationsByOrgIdUsers",
+        "operationId": "list_admin_organizations_users",
         "parameters": [
           {
             "schema": {
@@ -3823,16 +3520,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "List Admin Organizations Users"
       }
     },
     "/api/admin/organizations/{orgId}/roles": {
       "get": {
-        "operationId": "getApiAdminOrganizationsByOrgIdRoles",
+        "operationId": "list_admin_organizations_roles",
         "parameters": [
           {
             "schema": {
@@ -3844,11 +3544,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "List Admin Organizations Roles"
       }
     },
     "/api/admin/organizations/{orgId}/users/invite": {
@@ -3863,7 +3566,7 @@
             "required": true
           }
         ],
-        "operationId": "postApiAdminOrganizationsByOrgIdUsersInvite",
+        "operationId": "invite_admin",
         "requestBody": {
           "required": true,
           "content": {
@@ -3936,16 +3639,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "Invite Admin"
       }
     },
     "/api/admin/organizations/{orgId}/users/{userId}": {
       "delete": {
-        "operationId": "deleteApiAdminOrganizationsByOrgIdUsersByUserId",
+        "operationId": "remove_admin_user",
         "parameters": [
           {
             "schema": {
@@ -3965,11 +3671,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "Remove Admin User"
       }
     },
     "/api/admin/organizations/{orgId}/users/{userId}/roles": {
@@ -3992,7 +3701,7 @@
             "required": true
           }
         ],
-        "operationId": "putApiAdminOrganizationsByOrgIdUsersByUserIdRoles",
+        "operationId": "set_admin_organizations_users_roles",
         "requestBody": {
           "required": true,
           "content": {
@@ -4065,16 +3774,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "Set Admin Organizations Users Roles"
       }
     },
     "/api/admin/organizations/{orgId}/switch": {
       "post": {
-        "operationId": "postApiAdminOrganizationsByOrgIdSwitch",
+        "operationId": "switch_admin",
         "parameters": [
           {
             "schema": {
@@ -4086,16 +3798,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "Switch Admin"
       }
     },
     "/api/admin/organizations/{orgId}/telephony": {
       "get": {
-        "operationId": "getApiAdminOrganizationsByOrgIdTelephony",
+        "operationId": "list_admin_organizations_telephony",
         "parameters": [
           {
             "schema": {
@@ -4107,16 +3822,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "List Admin Organizations Telephony"
       }
     },
     "/api/admin/organizations/{orgId}/telephony/sync": {
       "post": {
-        "operationId": "postApiAdminOrganizationsByOrgIdTelephonySync",
+        "operationId": "sync_admin",
         "parameters": [
           {
             "schema": {
@@ -4128,39 +3846,48 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Admin"
-        ]
+        ],
+        "summary": "Sync Admin"
       }
     },
     "/api/memory/retrieve": {
       "get": {
-        "operationId": "getApiMemoryRetrieve",
+        "operationId": "list_memory_retrieve",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Memory"
-        ]
+        ],
+        "summary": "List Memory Retrieve"
       }
     },
     "/api/memory/search": {
       "get": {
-        "operationId": "getApiMemorySearch",
+        "operationId": "search_memory",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Memory"
-        ]
+        ],
+        "summary": "Search Memory"
       }
     },
     "/api/memory/profile": {
-      "post": {
+      "put": {
         "parameters": [],
-        "operationId": "postApiMemoryProfile",
+        "operationId": "set_memory_profile",
         "requestBody": {
           "required": true,
           "content": {
@@ -4233,17 +3960,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Memory"
-        ]
+        ],
+        "summary": "Set Memory Profile"
       }
     },
     "/api/memory/clear": {
-      "post": {
+      "delete": {
         "parameters": [],
-        "operationId": "postApiMemoryClear",
+        "operationId": "clear_memory",
         "requestBody": {
           "required": true,
           "content": {
@@ -4316,39 +4046,48 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Memory"
-        ]
+        ],
+        "summary": "Clear Memory"
       }
     },
     "/api/memory/phone-numbers": {
       "get": {
-        "operationId": "getApiMemoryPhone-numbers",
+        "operationId": "list_memory_phone_numbers",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Memory"
-        ]
+        ],
+        "summary": "List Memory Phone Numbers"
       }
     },
     "/api/memory/users": {
       "get": {
-        "operationId": "getApiMemoryUsers",
+        "operationId": "list_memory_users",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Memory"
-        ]
+        ],
+        "summary": "List Memory Users"
       }
     },
     "/api/memory/chunks": {
       "post": {
         "parameters": [],
-        "operationId": "postApiMemoryChunks",
+        "operationId": "create_memory_chunks",
         "requestBody": {
           "required": true,
           "content": {
@@ -4421,16 +4160,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Memory"
-        ]
+        ],
+        "summary": "Create Memory Chunks"
       }
     },
     "/api/memory/chunks/{chunkId}": {
       "delete": {
-        "operationId": "deleteApiMemoryChunksByChunkId",
+        "operationId": "remove_memory_chunk",
         "parameters": [
           {
             "schema": {
@@ -4442,14 +4184,17 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Memory"
-        ]
+        ],
+        "summary": "Remove Memory Chunk"
       },
       "patch": {
-        "operationId": "patchApiMemoryChunksByChunkId",
+        "operationId": "update_memory_chunk",
         "parameters": [
           {
             "schema": {
@@ -4461,70 +4206,61 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Memory"
-        ]
+        ],
+        "summary": "Update Memory Chunk"
       }
     },
     "/api/monitoring/snapshot": {
       "get": {
-        "operationId": "getApiMonitoringSnapshot",
+        "operationId": "list_monitoring_snapshot",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Monitoring"
-        ]
+        ],
+        "summary": "List Monitoring Snapshot"
       }
     },
     "/api/monitoring/calls/history": {
       "get": {
-        "operationId": "getApiMonitoringCallsHistory",
+        "operationId": "list_monitoring_calls_history",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Monitoring"
-        ]
+        ],
+        "summary": "List Monitoring Calls History"
       }
     },
     "/api/monitoring/calls/stats": {
       "get": {
-        "operationId": "getApiMonitoringCallsStats",
+        "operationId": "list_monitoring_calls_stats",
         "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Monitoring"
-        ]
-      }
-    },
-    "/api/monitoring/sessions/{sessionId}": {
-      "get": {
-        "operationId": "getApiMonitoringSessionsBySessionId",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "sessionId",
-            "required": true
+          "200": {
+            "description": "Successful response"
           }
-        ],
-        "responses": {
-          "200": {}
         },
         "tags": [
           "Monitoring"
-        ]
+        ],
+        "summary": "List Monitoring Calls Stats"
       }
     },
     "/api/monitoring/rooms/{roomName}/session": {
       "get": {
-        "operationId": "getApiMonitoringRoomsByRoomNameSession",
+        "operationId": "list_monitoring_rooms_session",
         "parameters": [
           {
             "schema": {
@@ -4536,16 +4272,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Monitoring"
-        ]
+        ],
+        "summary": "List Monitoring Rooms Session"
       }
     },
     "/api/monitoring/rooms/{roomName}/hangup": {
       "post": {
-        "operationId": "postApiMonitoringRoomsByRoomNameHangup",
+        "operationId": "hangup_monitoring",
         "parameters": [
           {
             "schema": {
@@ -4557,16 +4296,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Monitoring"
-        ]
+        ],
+        "summary": "Hangup Monitoring"
       }
     },
     "/api/monitoring/rooms/{roomName}/hold": {
       "post": {
-        "operationId": "postApiMonitoringRoomsByRoomNameHold",
+        "operationId": "hold_monitoring",
         "parameters": [
           {
             "schema": {
@@ -4578,16 +4320,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Monitoring"
-        ]
+        ],
+        "summary": "Hold Monitoring"
       }
     },
     "/api/monitoring/rooms/{roomName}/unhold": {
       "post": {
-        "operationId": "postApiMonitoringRoomsByRoomNameUnhold",
+        "operationId": "unhold_monitoring",
         "parameters": [
           {
             "schema": {
@@ -4599,11 +4344,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Monitoring"
-        ]
+        ],
+        "summary": "Unhold Monitoring"
       }
     },
     "/api/monitoring/rooms/{roomName}/transfer": {
@@ -4618,7 +4366,7 @@
             "required": true
           }
         ],
-        "operationId": "postApiMonitoringRoomsByRoomNameTransfer",
+        "operationId": "transfer_monitoring",
         "requestBody": {
           "required": true,
           "content": {
@@ -4691,11 +4439,14 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Monitoring"
-        ]
+        ],
+        "summary": "Transfer Monitoring"
       }
     },
     "/api/monitoring/rooms/{roomName}/dial": {
@@ -4710,7 +4461,7 @@
             "required": true
           }
         ],
-        "operationId": "postApiMonitoringRoomsByRoomNameDial",
+        "operationId": "dial_monitoring",
         "requestBody": {
           "required": true,
           "content": {
@@ -4783,14 +4534,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Monitoring"
-        ]
+        ],
+        "summary": "Dial Monitoring"
       }
     },
-    "/api/recordings/{id}/start": {
+    "/api/calls/{callId}/recording/start": {
       "post": {
         "parameters": [
           {
@@ -4798,11 +4552,11 @@
               "type": "string"
             },
             "in": "path",
-            "name": "id",
+            "name": "callId",
             "required": true
           }
         ],
-        "operationId": "postApiRecordingsByIdStart",
+        "operationId": "start_call",
         "requestBody": {
           "required": true,
           "content": {
@@ -4875,37 +4629,19 @@
           }
         },
         "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Recordings"
-        ]
-      }
-    },
-    "/api/recordings/{id}/stop": {
-      "post": {
-        "operationId": "postApiRecordingsByIdStop",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "id",
-            "required": true
+          "200": {
+            "description": "Successful response"
           }
-        ],
-        "responses": {
-          "200": {}
         },
         "tags": [
-          "Recordings"
-        ]
+          "Calls"
+        ],
+        "summary": "Start Call"
       }
     },
-    "/api/calls/{callId}/recording": {
-      "get": {
-        "operationId": "getApiCallsByCallIdRecording",
+    "/api/calls/{callId}/recording/stop": {
+      "post": {
+        "operationId": "stop_call",
         "parameters": [
           {
             "schema": {
@@ -4917,16 +4653,43 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Calls"
-        ]
+        ],
+        "summary": "Stop Call"
       }
     },
-    "/api/recordings/file/{filename}": {
+    "/api/calls/{callId}/recording": {
       "get": {
-        "operationId": "getApiRecordingsFileByFilename",
+        "operationId": "list_call_recording",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "callId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Calls"
+        ],
+        "summary": "List Call Recording"
+      }
+    },
+    "/api/calls/recording-file/{filename}": {
+      "get": {
+        "operationId": "get_call_recording_file",
         "parameters": [
           {
             "schema": {
@@ -4938,26 +4701,32 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Recordings"
-        ]
+          "Calls"
+        ],
+        "summary": "Get Call Recording File"
       }
     },
     "/api/telephony/providers": {
       "get": {
-        "operationId": "getApiTelephonyProviders",
+        "operationId": "list_telephony_providers",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "List Telephony Providers"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiTelephonyProviders",
+        "operationId": "create_telephony_providers",
         "requestBody": {
           "required": true,
           "content": {
@@ -5030,16 +4799,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Create Telephony Providers"
       }
     },
     "/api/telephony/providers/{id}/test": {
       "post": {
-        "operationId": "postApiTelephonyProvidersByIdTest",
+        "operationId": "test_telephony",
         "parameters": [
           {
             "schema": {
@@ -5051,16 +4823,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Test Telephony"
       }
     },
     "/api/telephony/providers/{id}": {
       "delete": {
-        "operationId": "deleteApiTelephonyProvidersById",
+        "operationId": "remove_telephony_provider",
         "parameters": [
           {
             "schema": {
@@ -5072,26 +4847,32 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Remove Telephony Provider"
       }
     },
     "/api/telephony/trunks": {
       "get": {
-        "operationId": "getApiTelephonyTrunks",
+        "operationId": "list_telephony_trunks",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "List Telephony Trunks"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiTelephonyTrunks",
+        "operationId": "create_telephony_trunks",
         "requestBody": {
           "required": true,
           "content": {
@@ -5164,11 +4945,14 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Create Telephony Trunks"
       }
     },
     "/api/telephony/trunks/{id}": {
@@ -5183,7 +4967,7 @@
             "required": true
           }
         ],
-        "operationId": "patchApiTelephonyTrunksById",
+        "operationId": "update_telephony_trunk",
         "requestBody": {
           "required": true,
           "content": {
@@ -5256,14 +5040,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Update Telephony Trunk"
       },
       "delete": {
-        "operationId": "deleteApiTelephonyTrunksById",
+        "operationId": "remove_telephony_trunk",
         "parameters": [
           {
             "schema": {
@@ -5275,26 +5062,32 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Remove Telephony Trunk"
       }
     },
     "/api/telephony/phone-numbers": {
       "get": {
-        "operationId": "getApiTelephonyPhone-numbers",
+        "operationId": "list_telephony_phone_numbers",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "List Telephony Phone Numbers"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiTelephonyPhone-numbers",
+        "operationId": "create_telephony_phone_numbers",
         "requestBody": {
           "required": true,
           "content": {
@@ -5367,17 +5160,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Create Telephony Phone Numbers"
       }
     },
     "/api/telephony/phone-numbers/import": {
       "post": {
         "parameters": [],
-        "operationId": "postApiTelephonyPhone-numbersImport",
+        "operationId": "import_telephony",
         "requestBody": {
           "required": true,
           "content": {
@@ -5450,11 +5246,14 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Import Telephony"
       }
     },
     "/api/telephony/phone-numbers/{id}": {
@@ -5469,7 +5268,7 @@
             "required": true
           }
         ],
-        "operationId": "patchApiTelephonyPhone-numbersById",
+        "operationId": "update_telephony_phone_number",
         "requestBody": {
           "required": true,
           "content": {
@@ -5542,14 +5341,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Update Telephony Phone Number"
       },
       "delete": {
-        "operationId": "deleteApiTelephonyPhone-numbersById",
+        "operationId": "remove_telephony_phone_number",
         "parameters": [
           {
             "schema": {
@@ -5561,26 +5363,32 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Remove Telephony Phone Number"
       }
     },
     "/api/telephony/dispatch-rules": {
       "get": {
-        "operationId": "getApiTelephonyDispatch-rules",
+        "operationId": "list_telephony_dispatch_rules",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "List Telephony Dispatch Rules"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiTelephonyDispatch-rules",
+        "operationId": "create_telephony_dispatch_rules",
         "requestBody": {
           "required": true,
           "content": {
@@ -5653,11 +5461,14 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Create Telephony Dispatch Rules"
       }
     },
     "/api/telephony/dispatch-rules/{id}": {
@@ -5672,7 +5483,7 @@
             "required": true
           }
         ],
-        "operationId": "patchApiTelephonyDispatch-rulesById",
+        "operationId": "update_telephony_dispatch_rule",
         "requestBody": {
           "required": true,
           "content": {
@@ -5745,14 +5556,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Update Telephony Dispatch Rule"
       },
       "delete": {
-        "operationId": "deleteApiTelephonyDispatch-rulesById",
+        "operationId": "remove_telephony_dispatch_rule",
         "parameters": [
           {
             "schema": {
@@ -5764,69 +5578,87 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Remove Telephony Dispatch Rule"
       }
     },
     "/api/telephony/infrastructure": {
       "get": {
-        "operationId": "getApiTelephonyInfrastructure",
+        "operationId": "list_telephony_infrastructure",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "List Telephony Infrastructure"
       }
     },
     "/api/telephony/sync/import": {
       "post": {
-        "operationId": "postApiTelephonySyncImport",
+        "operationId": "import_telephony",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Import Telephony"
       }
     },
     "/api/telephony/sync/full": {
       "post": {
-        "operationId": "postApiTelephonySyncFull",
+        "operationId": "create_telephony_sync_full",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "Create Telephony Sync Full"
       }
     },
     "/api/telephony/livekit-status": {
       "get": {
-        "operationId": "getApiTelephonyLivekit-status",
+        "operationId": "list_telephony_livekit_status",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Telephony"
-        ]
+        ],
+        "summary": "List Telephony LIVEKIT Status"
       }
     },
-    "/api/telephony/admin/global": {
+    "/api/admin/telephony/global": {
       "get": {
-        "operationId": "getApiTelephonyAdminGlobal",
+        "operationId": "list_admin_telephony_global",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Telephony"
-        ]
+          "Admin"
+        ],
+        "summary": "List Admin Telephony Global"
       }
     },
-    "/api/telephony/admin/phone-numbers/{id}/assign": {
+    "/api/admin/telephony/phone-numbers/{id}/assign": {
       "post": {
         "parameters": [
           {
@@ -5838,7 +5670,7 @@
             "required": true
           }
         ],
-        "operationId": "postApiTelephonyAdminPhone-numbersByIdAssign",
+        "operationId": "create_admin_telephony_phone_numbers_assign",
         "requestBody": {
           "required": true,
           "content": {
@@ -5911,17 +5743,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Telephony"
-        ]
+          "Admin"
+        ],
+        "summary": "Create Admin Telephony Phone Numbers Assign"
       }
     },
-    "/api/telephony/admin/phone-numbers/import": {
+    "/api/admin/telephony/phone-numbers/import": {
       "post": {
         "parameters": [],
-        "operationId": "postApiTelephonyAdminPhone-numbersImport",
+        "operationId": "import_admin",
         "requestBody": {
           "required": true,
           "content": {
@@ -5994,141 +5829,34 @@
           }
         },
         "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Telephony"
-        ]
-      }
-    },
-    "/api/telephony/admin/sync/import": {
-      "post": {
-        "operationId": "postApiTelephonyAdminSyncImport",
-        "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Telephony"
-        ]
-      }
-    },
-    "/api/calls/sessions/{sessionId}/complete": {
-      "post": {
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "sessionId",
-            "required": true
+          "200": {
+            "description": "Successful response"
           }
+        },
+        "tags": [
+          "Admin"
         ],
-        "operationId": "postApiCallsSessionsBySessionIdComplete",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "_def": {
-                  "unknownKeys": "strip",
-                  "catchall": {
-                    "_def": {
-                      "typeName": "ZodNever"
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    }
-                  },
-                  "typeName": "ZodObject"
-                },
-                "~standard": {
-                  "version": 1,
-                  "vendor": "zod"
-                },
-                "_cached": null
-              }
-            },
-            "multipart/form-data": {
-              "schema": {
-                "_def": {
-                  "unknownKeys": "strip",
-                  "catchall": {
-                    "_def": {
-                      "typeName": "ZodNever"
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    }
-                  },
-                  "typeName": "ZodObject"
-                },
-                "~standard": {
-                  "version": 1,
-                  "vendor": "zod"
-                },
-                "_cached": null
-              }
-            },
-            "text/plain": {
-              "schema": {
-                "_def": {
-                  "unknownKeys": "strip",
-                  "catchall": {
-                    "_def": {
-                      "typeName": "ZodNever"
-                    },
-                    "~standard": {
-                      "version": 1,
-                      "vendor": "zod"
-                    }
-                  },
-                  "typeName": "ZodObject"
-                },
-                "~standard": {
-                  "version": 1,
-                  "vendor": "zod"
-                },
-                "_cached": null
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {}
-        },
-        "tags": [
-          "Calls"
-        ]
+        "summary": "Import Admin"
       }
     },
-    "/api/calls/sessions/{sessionId}/tts-done": {
+    "/api/admin/telephony/sync/import": {
       "post": {
-        "operationId": "postApiCallsSessionsBySessionIdTts-done",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "sessionId",
-            "required": true
-          }
-        ],
+        "operationId": "import_admin",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Calls"
-        ]
+          "Admin"
+        ],
+        "summary": "Import Admin"
       }
     },
     "/api/calls/invite": {
       "post": {
         "parameters": [],
-        "operationId": "postApiCallsInvite",
+        "operationId": "invite_call",
         "requestBody": {
           "required": true,
           "content": {
@@ -6201,17 +5929,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Calls"
-        ]
+        ],
+        "summary": "Invite Call"
       }
     },
     "/api/calls/bridge": {
       "post": {
         "parameters": [],
-        "operationId": "postApiCallsBridge",
+        "operationId": "bridge_call",
         "requestBody": {
           "required": true,
           "content": {
@@ -6284,16 +6015,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Calls"
-        ]
+        ],
+        "summary": "Bridge Call"
       }
     },
     "/api/calls/rooms/{roomName}/participants": {
       "get": {
-        "operationId": "getApiCallsRoomsByRoomNameParticipants",
+        "operationId": "list_call_rooms_participants",
         "parameters": [
           {
             "schema": {
@@ -6305,27 +6039,33 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Calls"
-        ]
+        ],
+        "summary": "List Call Rooms Participants"
       }
     },
     "/api/calls/notifications/pending": {
       "get": {
-        "operationId": "getApiCallsNotificationsPending",
+        "operationId": "list_call_notifications_pending",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Calls"
-        ]
+        ],
+        "summary": "List Call Notifications Pending"
       }
     },
     "/api/calls/notifications/{notificationId}/accept": {
       "post": {
-        "operationId": "postApiCallsNotificationsByNotificationIdAccept",
+        "operationId": "accept_call",
         "parameters": [
           {
             "schema": {
@@ -6337,16 +6077,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Calls"
-        ]
+        ],
+        "summary": "Accept Call"
       }
     },
     "/api/calls/notifications/{notificationId}/decline": {
       "post": {
-        "operationId": "postApiCallsNotificationsByNotificationIdDecline",
+        "operationId": "decline_call",
         "parameters": [
           {
             "schema": {
@@ -6358,26 +6101,101 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Calls"
-        ]
+        ],
+        "summary": "Decline Call"
       }
     },
-    "/api/channels/routes": {
+    "/api/sessions/{sessionId}": {
       "get": {
-        "operationId": "getApiChannelsRoutes",
+        "operationId": "get_session",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Channels"
-        ]
-      },
+          "Monitoring"
+        ],
+        "summary": "Get Session"
+      }
+    },
+    "/api/sessions/{sessionId}/end": {
       "post": {
-        "parameters": [],
-        "operationId": "postApiChannelsRoutes",
+        "operationId": "end_session",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "End Session"
+      }
+    },
+    "/api/sessions/{sessionId}/monitor": {
+      "post": {
+        "operationId": "monitor_session",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "Monitor Session"
+      }
+    },
+    "/api/sessions/{sessionId}/child-return": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "operationId": "create_session_child_return",
         "requestBody": {
           "required": true,
           "content": {
@@ -6450,16 +6268,236 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "Create Session Child Return"
+      }
+    },
+    "/api/sessions/{sessionId}/complete": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "operationId": "create_session_complete",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "Create Session Complete"
+      }
+    },
+    "/api/sessions/{sessionId}/tts-done": {
+      "post": {
+        "operationId": "create_session_tts_done",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "Create Session TTS Done"
+      }
+    },
+    "/api/channels/routes": {
+      "get": {
+        "operationId": "list_channel_routes",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Channels"
-        ]
+        ],
+        "summary": "List Channel Routes"
+      },
+      "post": {
+        "parameters": [],
+        "operationId": "create_channel_routes",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Channels"
+        ],
+        "summary": "Create Channel Routes"
       }
     },
     "/api/channels/routes/{routeId}": {
       "get": {
-        "operationId": "getApiChannelsRoutesByRouteId",
+        "operationId": "get_channel_route",
         "parameters": [
           {
             "schema": {
@@ -6471,11 +6509,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Channels"
-        ]
+        ],
+        "summary": "Get Channel Route"
       },
       "patch": {
         "parameters": [
@@ -6488,7 +6529,7 @@
             "required": true
           }
         ],
-        "operationId": "patchApiChannelsRoutesByRouteId",
+        "operationId": "update_channel_route",
         "requestBody": {
           "required": true,
           "content": {
@@ -6561,14 +6602,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Channels"
-        ]
+        ],
+        "summary": "Update Channel Route"
       },
       "delete": {
-        "operationId": "deleteApiChannelsRoutesByRouteId",
+        "operationId": "remove_channel_route",
         "parameters": [
           {
             "schema": {
@@ -6580,36 +6624,45 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Channels"
-        ]
+        ],
+        "summary": "Remove Channel Route"
       }
     },
     "/api/uploads/avatar": {
       "post": {
-        "operationId": "postApiUploadsAvatar",
+        "operationId": "create_upload_avatar",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Uploads"
-        ]
+          "System"
+        ],
+        "summary": "Create Upload Avatar"
       },
       "delete": {
-        "operationId": "deleteApiUploadsAvatar",
+        "operationId": "remove_upload_avatar",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Uploads"
-        ]
+          "System"
+        ],
+        "summary": "Remove Upload Avatar"
       }
     },
     "/api/uploads/file/{key}": {
       "get": {
-        "operationId": "getApiUploadsFileByKey",
+        "operationId": "get_upload_file",
         "parameters": [
           {
             "schema": {
@@ -6621,17 +6674,20 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Uploads"
-        ]
+          "System"
+        ],
+        "summary": "Get Upload File"
       }
     },
     "/api/tools/import/curl": {
       "post": {
         "parameters": [],
-        "operationId": "postApiToolsImportCurl",
+        "operationId": "create_tool_import_curl",
         "requestBody": {
           "required": true,
           "content": {
@@ -6704,17 +6760,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Create Tool Import Curl"
       }
     },
     "/api/tools/import/openapi": {
       "post": {
         "parameters": [],
-        "operationId": "postApiToolsImportOpenapi",
+        "operationId": "create_tool_import_openapi",
         "requestBody": {
           "required": true,
           "content": {
@@ -6787,17 +6846,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Create Tool Import Openapi"
       }
     },
     "/api/tools/mcp/discover": {
       "post": {
         "parameters": [],
-        "operationId": "postApiToolsMcpDiscover",
+        "operationId": "discover_tool",
         "requestBody": {
           "required": true,
           "content": {
@@ -6870,17 +6932,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Discover Tool"
       }
     },
     "/api/tools/mcp/test": {
       "post": {
         "parameters": [],
-        "operationId": "postApiToolsMcpTest",
+        "operationId": "test_tool",
         "requestBody": {
           "required": true,
           "content": {
@@ -6953,17 +7018,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Tools"
-        ]
+        ],
+        "summary": "Test Tool"
       }
     },
     "/api/ai/command": {
       "post": {
         "parameters": [],
-        "operationId": "postApiAiCommand",
+        "operationId": "create_ai_command",
         "requestBody": {
           "required": true,
           "content": {
@@ -7036,26 +7104,32 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "AI"
-        ]
+          "LLM"
+        ],
+        "summary": "Create AI Command"
       }
     },
     "/api/knowledge/bases": {
       "get": {
-        "operationId": "getApiKnowledgeBases",
+        "operationId": "list_knowledge_bases",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "List Knowledge Bases"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiKnowledgeBases",
+        "operationId": "create_knowledge_bases",
         "requestBody": {
           "required": true,
           "content": {
@@ -7128,16 +7202,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "Create Knowledge Bases"
       }
     },
     "/api/knowledge/bases/{id}": {
       "get": {
-        "operationId": "getApiKnowledgeBasesById",
+        "operationId": "get_knowledge_bas",
         "parameters": [
           {
             "schema": {
@@ -7149,11 +7226,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "Get Knowledge Bas"
       },
       "put": {
         "parameters": [
@@ -7166,7 +7246,7 @@
             "required": true
           }
         ],
-        "operationId": "putApiKnowledgeBasesById",
+        "operationId": "set_knowledge_bas",
         "requestBody": {
           "required": true,
           "content": {
@@ -7239,14 +7319,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "Set Knowledge Bas"
       },
       "delete": {
-        "operationId": "deleteApiKnowledgeBasesById",
+        "operationId": "remove_knowledge_bas",
         "parameters": [
           {
             "schema": {
@@ -7258,16 +7341,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "Remove Knowledge Bas"
       }
     },
     "/api/knowledge/bases/{id}/documents": {
       "get": {
-        "operationId": "getApiKnowledgeBasesByIdDocuments",
+        "operationId": "list_knowledge_bases_documents",
         "parameters": [
           {
             "schema": {
@@ -7279,11 +7365,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "List Knowledge Bases Documents"
       },
       "post": {
         "parameters": [
@@ -7296,7 +7385,7 @@
             "required": true
           }
         ],
-        "operationId": "postApiKnowledgeBasesByIdDocuments",
+        "operationId": "create_knowledge_bases_documents",
         "requestBody": {
           "required": true,
           "content": {
@@ -7507,16 +7596,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "Create Knowledge Bases Documents"
       }
     },
     "/api/knowledge/documents/{docId}": {
       "get": {
-        "operationId": "getApiKnowledgeDocumentsByDocId",
+        "operationId": "get_knowledge_document",
         "parameters": [
           {
             "schema": {
@@ -7528,14 +7620,17 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "Get Knowledge Document"
       },
       "delete": {
-        "operationId": "deleteApiKnowledgeDocumentsByDocId",
+        "operationId": "remove_knowledge_document",
         "parameters": [
           {
             "schema": {
@@ -7547,17 +7642,20 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "Remove Knowledge Document"
       }
     },
     "/api/knowledge/analyze": {
       "post": {
         "parameters": [],
-        "operationId": "postApiKnowledgeAnalyze",
+        "operationId": "create_knowledge_analyze",
         "requestBody": {
           "required": true,
           "content": {
@@ -7654,17 +7752,20 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "Create Knowledge Analyze"
       }
     },
     "/api/knowledge/search": {
       "post": {
         "parameters": [],
-        "operationId": "postApiKnowledgeSearch",
+        "operationId": "search_knowledge",
         "requestBody": {
           "required": true,
           "content": {
@@ -7737,59 +7838,74 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Knowledge"
-        ]
+        ],
+        "summary": "Search Knowledge"
       }
     },
     "/api/events/stream": {
       "get": {
-        "operationId": "getApiEventsStream",
+        "operationId": "stream_event",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
-          "Events"
-        ]
+          "System"
+        ],
+        "summary": "Stream Event"
       }
     },
     "/api/reporting/usage": {
       "get": {
-        "operationId": "getApiReportingUsage",
+        "operationId": "list_reporting_usage",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Reporting"
-        ]
+        ],
+        "summary": "List Reporting Usage"
       }
     },
     "/api/reporting/usage/sessions": {
       "get": {
-        "operationId": "getApiReportingUsageSessions",
+        "operationId": "list_reporting_usage_sessions",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Reporting"
-        ]
+        ],
+        "summary": "List Reporting Usage Sessions"
       }
     },
     "/api/whatsapp/accounts": {
       "get": {
-        "operationId": "getApiWhatsappAccounts",
+        "operationId": "list_whatsapp_accounts",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Whatsapp"
-        ]
+        ],
+        "summary": "List Whatsapp Accounts"
       },
       "post": {
         "parameters": [],
-        "operationId": "postApiWhatsappAccounts",
+        "operationId": "create_whatsapp_accounts",
         "requestBody": {
           "required": true,
           "content": {
@@ -7862,16 +7978,19 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Whatsapp"
-        ]
+        ],
+        "summary": "Create Whatsapp Accounts"
       }
     },
     "/api/whatsapp/accounts/{id}": {
       "get": {
-        "operationId": "getApiWhatsappAccountsById",
+        "operationId": "get_whatsapp_account",
         "parameters": [
           {
             "schema": {
@@ -7883,11 +8002,14 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Whatsapp"
-        ]
+        ],
+        "summary": "Get Whatsapp Account"
       },
       "patch": {
         "parameters": [
@@ -7900,7 +8022,7 @@
             "required": true
           }
         ],
-        "operationId": "patchApiWhatsappAccountsById",
+        "operationId": "update_whatsapp_account",
         "requestBody": {
           "required": true,
           "content": {
@@ -7973,14 +8095,17 @@
           }
         },
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Whatsapp"
-        ]
+        ],
+        "summary": "Update Whatsapp Account"
       },
       "delete": {
-        "operationId": "deleteApiWhatsappAccountsById",
+        "operationId": "remove_whatsapp_account",
         "parameters": [
           {
             "schema": {
@@ -7992,16 +8117,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Whatsapp"
-        ]
+        ],
+        "summary": "Remove Whatsapp Account"
       }
     },
     "/api/whatsapp/accounts/{id}/sync": {
       "post": {
-        "operationId": "postApiWhatsappAccountsByIdSync",
+        "operationId": "sync_whatsapp",
         "parameters": [
           {
             "schema": {
@@ -8013,16 +8141,19 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Whatsapp"
-        ]
+        ],
+        "summary": "Sync Whatsapp"
       }
     },
     "/api/whatsapp/accounts/{id}/test": {
       "post": {
-        "operationId": "postApiWhatsappAccountsByIdTest",
+        "operationId": "test_whatsapp",
         "parameters": [
           {
             "schema": {
@@ -8034,40 +8165,46 @@
           }
         ],
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Whatsapp"
-        ]
+        ],
+        "summary": "Test Whatsapp"
       }
     },
     "/api/whatsapp/phone-numbers": {
       "get": {
-        "operationId": "getApiWhatsappPhone-numbers",
+        "operationId": "list_whatsapp_phone_numbers",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Whatsapp"
-        ]
+        ],
+        "summary": "List Whatsapp Phone Numbers"
       }
     },
     "/api/whatsapp/infrastructure": {
       "get": {
-        "operationId": "getApiWhatsappInfrastructure",
+        "operationId": "list_whatsapp_infrastructure",
         "responses": {
-          "200": {}
+          "200": {
+            "description": "Successful response"
+          }
         },
         "tags": [
           "Whatsapp"
-        ]
+        ],
+        "summary": "List Whatsapp Infrastructure"
       }
     }
   },
   "tags": [
-    {
-      "name": "AI"
-    },
     {
       "name": "API Keys"
     },
@@ -8081,25 +8218,13 @@
       "name": "Channels"
     },
     {
-      "name": "Config"
-    },
-    {
-      "name": "Events"
-    },
-    {
       "name": "Favorites"
     },
     {
       "name": "Flows"
     },
     {
-      "name": "Invitations"
-    },
-    {
       "name": "Knowledge"
-    },
-    {
-      "name": "LIVEKIT"
     },
     {
       "name": "LLM"
@@ -8117,16 +8242,7 @@
       "name": "Providers"
     },
     {
-      "name": "Recordings"
-    },
-    {
       "name": "Reporting"
-    },
-    {
-      "name": "Schema"
-    },
-    {
-      "name": "Sessions"
     },
     {
       "name": "System"
@@ -8136,9 +8252,6 @@
     },
     {
       "name": "Tools"
-    },
-    {
-      "name": "Uploads"
     },
     {
       "name": "Whatsapp"
