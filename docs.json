@@ -25,6 +25,17 @@
 						"pages": ["introduction"]
 					},
 					{
+						"group": "Platform",
+						"pages": [
+							"platform/overview",
+							"platform/architecture",
+							"platform/flows",
+							"platform/providers",
+							"platform/deployment",
+							"platform/security"
+						]
+					},
+					{
 						"group": "Connectors",
 						"pages": [
 							"connectors/introduction",

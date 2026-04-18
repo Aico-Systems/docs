@@ -1,0 +1,204 @@
+---
+title: Architecture
+description: "Services, data flow, communication boundaries"
+---
+
+## Runtime topology
+
+```mermaid
+flowchart TB
+    FE["Frontend<br/>Svelte 5 · Vite · XYFlow"]
+
+    subgraph Backend["Backend (Bun · Elysia · Drizzle)"]
+        API["HTTP API"]
+        EX["Flow Executor"]
+        PR["Provider Registry"]
+        MEM["Memory / RAG"]
+    end
+
+    PG[("PostgreSQL 17<br/>+ pgvector")]
+    RD[("Redis 7")]
+    LG["Logto<br/>(OAuth2/OIDC)"]
+
+    subgraph LiveKit["LiveKit cluster"]
+        LK["livekit (SFU)"]
+        SIP["livekit-sip"]
+        EG["livekit-egress"]
+    end
+
+    AGT["Agent worker<br/>Python · Silero VAD"]
+
+    subgraph AI["AI providers"]
+        STT["STT service<br/>qwen / cohere / whisper / vosk"]
+        TTS["TTS service<br/>voxcpm / qwen / cosyvoice / ...  "]
+        LLM["LLM<br/>Ollama · OpenAI · Anthropic · ..."]
+    end
+
+    FE -- HTTPS --> API
+    API --> EX
+    API --> PR
+    API --> MEM
+    API --> PG
+    API --> RD
+    API --> LG
+    API --> LK
+    LK <-- WebRTC / SIP --> AGT
+    SIP <-- SIP trunk --> Telnyx[("Telnyx")]
+    EG -. records .-> EG_VOL[("aico-recordings")]
+    AGT -- M2M HTTPS --> API
+    AGT -- WS audio --> STT
+    AGT -- HTTP text --> TTS
+    AGT -- HTTP / SDK --> LLM
+```
+
+Containers that ship in the dev compose: `postgres`, `redis`, `livekit`,
+`livekit-sip`, `livekit-egress`, `ollama`, `stt`, `tts`, `agent`,
+`backend`, `frontend`. The ROCm overlay swaps `stt`, `tts`, `ollama` to
+ROCm variants pinned with `HSA_OVERRIDE_GFX_VERSION=11.0.0` for RDNA3.
+
+## Session lifecycle
+
+From a trigger (phone call, WhatsApp, HTTP) to an active conversation:
+
+```mermaid
+sequenceDiagram
+    participant Ext as External trigger
+    participant BE as Backend
+    participant LK as LiveKit
+    participant AGT as Agent worker
+    participant STT as STT svc
+    participant TTS as TTS svc
+    participant LLM as LLM provider
+
+    Ext->>BE: Trigger flow
+    BE->>BE: Validate provider secrets<br/>(fail-fast 412 if missing)
+    BE->>LK: Create room + agent dispatch
+    LK->>AGT: Spawn worker in room
+    AGT->>BE: GET /flows/:id/providers/effective
+    BE-->>AGT: Merged {stt, tts, llm} config
+    AGT->>STT: Open WS /ws/transcribe/{engine}<br/>event=config (endpointingMs, ...)
+    AGT->>LK: Announce ready
+    loop Per user utterance
+        LK-->>AGT: Audio frames
+        AGT->>STT: Forward WS bytes
+        STT-->>AGT: partial → partial → final
+        AGT->>BE: Turn transcript
+        BE->>LLM: Agentic decision
+        LLM-->>BE: Route + tokens
+        BE-->>AGT: Speak event (streaming text)
+        AGT->>TTS: POST /api/tts/{engine}
+        TTS-->>AGT: PCM stream
+        AGT->>LK: Audio frames
+    end
+```
+
+## Components
+
+### Frontend
+
+Svelte 5 SPA. Talks to the backend only — never directly to providers,
+STT, TTS, or LiveKit. Authentication via Logto's browser SDK. The flow
+builder uses XYFlow for graph rendering.
+
+### Backend
+
+Single Bun process, single PostgreSQL instance. Surface for every
+domain: flow CRUD, execution orchestration, provider definitions,
+organization secrets, telephony, channels, memory, knowledge, reporting.
+Route policies are enforced at request ingress
+(`backend/src/routes/middleware/policies.ts`); missing entries crash
+startup.
+
+### Agent worker
+
+One Python process per concurrent voice session, spawned by LiveKit on
+agent dispatch. Holds no persistent state — fetches everything from the
+backend at session start.
+
+- Audio I/O via LiveKit WebRTC / SIP
+- Silero VAD → start/end-of-speech, barge-in
+- Turn detector (multilingual) → when to commit transcripts to the LLM
+- Streams transcripts and tool results over M2M HTTPS
+
+### STT service (FastAPI)
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/stt/{engine}` | File transcription, specific engine |
+| `WS /ws/transcribe/{engine}` | Streaming transcription |
+| `GET /providers/schema` | Runtime + request schemas |
+| `POST /providers/{name}/enable\|disable\|config` | Operator runtime controls |
+| `GET /gpu` | VRAM per device |
+
+Engines: Qwen3-ASR, Cohere Transcribe, faster-whisper, Vosk.
+
+### TTS service (FastAPI)
+
+Same shape. Adds:
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /voices`, `POST /voices`, `DELETE /voices/{id}` | Shared voice-clone store |
+
+Engines: VoxCPM2, Qwen3-TTS, CosyVoice2, F5-TTS, Orpheus, Kokoro, Piper.
+
+### LiveKit
+
+Three containers: `livekit` (SFU), `livekit-sip` (SIP ↔ WebRTC), and
+`livekit-egress` (recording). Rooms are provisioned on demand by the
+backend using the LiveKit server SDK.
+
+### Databases
+
+- **PostgreSQL 17 + pgvector** — every domain entity plus embedding
+  vectors for RAG and episodic memory.
+- **Redis** — provider-config cache (5 min TTL), live monitoring
+  state, rate limiting.
+
+## Inter-service communication
+
+| From → To | Protocol | Auth |
+|---|---|---|
+| Frontend → Backend | HTTPS (Eden Treaty) | Logto user token |
+| Agent worker → Backend | HTTPS REST | Logto M2M (client_credentials) |
+| Backend → LiveKit | LiveKit SDK | API key / secret |
+| Agent worker ↔ LiveKit | WebRTC | Room-scoped JWT from backend |
+| Agent worker → STT / TTS | WebSocket / HTTP | **none (internal network)** |
+| Backend → Logto | HTTPS admin API | M2M token |
+| Backend → Nango | HTTPS | `NANGO_SECRET_KEY` |
+| Backend → Telnyx | HTTPS | per-org API key from DB |
+
+<Warning>
+	STT and TTS services currently run without authentication. They are
+	only reachable on the internal Docker network. Running them across an
+	untrusted network requires adding an auth layer.
+</Warning>
+
+## Configuration pipeline
+
+```mermaid
+flowchart LR
+    D["Doppler<br/>(secrets)"] --> E1["/.env.dev/"]
+    NS["infra/env.nonsecret.json<br/>(non-secret app config)"] --> GEN
+    PJ["infra/ports.json<br/>(ports + URLs)"] --> GEN
+    GEN["infra/scripts/generate.py<br/>&lt;env&gt;"] --> E2["/.env.&lt;env&gt;.generated/"]
+    GEN --> CF["deploy/Caddyfile"]
+    GEN --> CC["docker-compose.*.yml"]
+    E1 --> SVC(["Services"])
+    E2 --> SVC
+```
+
+Three environments: `dev`, `lab`, `sandbox`, `prod`. Doppler always wins
+over `env.nonsecret.json` at runtime — **never duplicate keys between
+them**.
+
+## Hot reload in development
+
+| Service | Mechanism |
+|---|---|
+| `backend` | Bun `--watch` |
+| `frontend` | Vite HMR |
+| `agent` | `watchmedo auto-restart` on `.py` |
+| `stt`, `tts` | `uvicorn --reload` gated by `STT_DEV_RELOAD=1` / `TTS_DEV_RELOAD=1` |
+
+No service needs a manual restart for code changes in dev.

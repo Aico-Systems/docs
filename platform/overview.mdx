@@ -1,0 +1,39 @@
+---
+title: Overview
+description: "What AICO is and how the pieces connect"
+---
+
+AICO is a voice-agent runtime. It orchestrates conversations over WebRTC,
+SIP, or WhatsApp through a DAG-based flow executor that calls swappable
+STT, TTS, and LLM providers.
+
+## Stack
+
+| Layer | Implementation |
+|---|---|
+| Frontend | Svelte 5 · Vite · XYFlow (flow builder) |
+| Backend | Bun · TypeScript · Elysia · Drizzle ORM |
+| Database | PostgreSQL 17 + pgvector |
+| Cache | Redis 7 |
+| Media | LiveKit 1.9.8 (WebRTC + SIP) · LiveKit Egress (recording) |
+| Agent worker | Python · LiveKit Agents SDK · Silero VAD |
+| STT service | FastAPI, Python, runs local STT engines |
+| TTS service | FastAPI, Python, runs local TTS engines |
+| LLM (local) | Ollama (AMD ROCm or NVIDIA CUDA) |
+| Auth | Logto (OAuth2 / OIDC) |
+| Embeddings | Ollama embeddinggemma (768-dim) |
+
+## Containers in a dev / single-host deployment
+
+`postgres`, `redis`, `livekit`, `livekit-sip`, `livekit-egress`, `ollama`,
+`stt`, `tts`, `agent`, `backend`, `frontend`. The ROCm compose overlay
+swaps `stt`, `tts`, `ollama` to their ROCm variants with
+`HSA_OVERRIDE_GFX_VERSION=11.0.0` for RDNA3 GPUs.
+
+## Pages in this section
+
+- [Architecture](/platform/architecture) — services, data flow, communication boundaries
+- [Flow Execution](/platform/flows) — DAG engine, node types, storage
+- [Provider Ecosystem](/platform/providers) — STT / TTS / LLM catalog and per-flow config
+- [Deployment](/platform/deployment) — topology options and hardware sizing
+- [Security](/platform/security) — auth, tenant model, honest limitations
