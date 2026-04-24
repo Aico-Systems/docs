@@ -34,9 +34,14 @@ flowchart TB
     AGT --> OL
 ```
 
-Everything in one `docker compose up`. Makefile auto-detects `/dev/kfd`
-+ `rocminfo` and layers in `docker-compose.rocm.yml` when a ROCm GPU is
-present.
+Everything in one Kubernetes cluster (lab or cloud). The `make bootstrap-lab`
+entrypoint provisions 6 Incus VMs as a HA k3s cluster and applies the full
+stack via Argo CD + Kustomize. See `SCALE.md` and `FINETUNE.md` in the repo
+root for the multi-target roadmap (lab → Hetzner → Fly.io).
+
+GPU acceleration for STT/TTS (Orpheus, CosyVoice, Qwen) requires AMD ROCm
+or NVIDIA CUDA on a dedicated worker node — not yet wired in the lab (see
+FINETUNE.md Sprint 5).
 
 ### Split (GPU + control plane)
 
@@ -206,14 +211,13 @@ and via the TTS / STT CLIs on the host (`cd stt && ./cli.py` /
 
 ```mermaid
 flowchart LR
-    DP["Doppler<br/>(secrets)"] --> ED["/.env.dev/"]
-    NS["env.nonsecret.json"] --> GEN
-    PJ["ports.json"] --> GEN
-    GEN["generate.py &lt;env&gt;"] --> EG["/.env.<env>.generated/"]
-    GEN --> CF["Caddyfile"]
-    GEN --> CC["docker-compose.*.yml"]
-    ED --> SVC[/Services/]
-    EG --> SVC
+    DP["Doppler<br/>(secrets)"] --> ESO["External Secrets<br/>Operator"]
+    NS["infrastructure/config/<br/>env.nonsecret.json"] --> GEN
+    PJ["infrastructure/config/<br/>ports.json"] --> GEN
+    GEN["gen-configmaps.py &lt;env&gt;"] --> CM["Kubernetes<br/>ConfigMaps"]
+    ESO --> SEC["Kubernetes Secrets"]
+    CM --> POD[/Pods (envFrom)/]
+    SEC --> POD
 ```
 
 Doppler wins over `env.nonsecret.json` at runtime. **Never duplicate
