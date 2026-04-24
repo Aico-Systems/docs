@@ -178,19 +178,19 @@ backend using the LiveKit server SDK.
 
 ```mermaid
 flowchart LR
-    D["Doppler<br/>(secrets)"] --> E1["/.env.dev/"]
-    NS["infra/env.nonsecret.json<br/>(non-secret app config)"] --> GEN
-    PJ["infra/ports.json<br/>(ports + URLs)"] --> GEN
-    GEN["infra/scripts/generate.py<br/>&lt;env&gt;"] --> E2["/.env.&lt;env&gt;.generated/"]
-    GEN --> CF["deploy/Caddyfile"]
-    GEN --> CC["docker-compose.*.yml"]
-    E1 --> SVC(["Services"])
-    E2 --> SVC
+    D["Doppler<br/>(secrets)"] --> ESO["External Secrets<br/>Operator"]
+    NS["infrastructure/config/<br/>env.nonsecret.json"] --> GEN
+    PJ["infrastructure/config/<br/>ports.json"] --> GEN
+    GEN["gen-configmaps.py<br/>&lt;env&gt;"] --> CM["Kubernetes<br/>ConfigMaps"]
+    ESO --> SEC["Kubernetes<br/>Secrets"]
+    CM --> POD(["Pods (envFrom)"])
+    SEC --> POD
 ```
 
-Three environments: `dev`, `lab`, `sandbox`, `prod`. Doppler always wins
-over `env.nonsecret.json` at runtime — **never duplicate keys between
-them**.
+Environments: `lab` (local k3s), `hetzner-prod`, `fly`. Source of truth for
+non-secret config is `infrastructure/config/*.json`; secrets live in Doppler
+and are synced into Kubernetes Secrets by ESO. **Never duplicate keys
+between the two** — Doppler wins at runtime if a conflict occurs.
 
 ## Hot reload in development
 
