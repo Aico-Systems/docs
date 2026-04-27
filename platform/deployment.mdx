@@ -13,10 +13,10 @@ flowchart TB
         direction TB
         FE["frontend"]
         BE["backend"]
-        PG[("postgres")]
-        RD[("redis")]
+        PG[("aico-db (CNPG)")]
+        VK[("valkey 8")]
         LK["livekit · livekit-sip · livekit-egress"]
-        AGT["agent (1 proc per session)"]
+        AGT["agent-worker (KEDA-scaled)"]
         STT["stt"]
         TTS["tts"]
         OL["ollama"]
@@ -26,7 +26,7 @@ flowchart TB
     User --> LK
     FE --> BE
     BE --> PG
-    BE --> RD
+    BE --> VK
     BE --> LK
     AGT --> BE
     AGT --> STT
@@ -34,7 +34,7 @@ flowchart TB
     AGT --> OL
 ```
 
-Everything in one Kubernetes cluster (lab or cloud). The `make bootstrap-lab`
+Everything in one Kubernetes cluster (lab or cloud). The `make lab-up`
 entrypoint provisions 6 Incus VMs as a HA k3s cluster and applies the full
 stack via Argo CD + Kustomize. See `SCALE.md` and `FINETUNE.md` in the repo
 root for the multi-target roadmap (lab → Hetzner → Fly.io).
@@ -51,8 +51,8 @@ flowchart TB
         direction TB
         FE["frontend"]
         BE["backend"]
-        PG[("postgres")]
-        RD[("redis")]
+        PG[("aico-db (CNPG)")]
+        VK[("valkey 8")]
         LK["livekit · livekit-sip · livekit-egress"]
     end
 
@@ -68,7 +68,7 @@ flowchart TB
     User --> LK
     FE --> BE
     BE --> PG
-    BE --> RD
+    BE --> VK
     BE --> LK
     AGT --> BE
     LK -. WebRTC .- AGT
@@ -86,18 +86,21 @@ flowchart TB
 	reachable by anything that can route to them.
 </Warning>
 
-### Deployment environments
+### Deployment overlays
 
-| Branch | Environment | Doppler config |
-|---|---|---|
-| `dev` | Dev | `dev` |
-| `sandbox` | Sandbox | `stg` |
-| `main` | Production | `prd` |
-| `lab` | Optional local-VM | inherits `dev` |
+| Overlay | Branch → Doppler | Seed strategy | Cluster |
+|---|---|---|---|
+| `lab` | `dev` → `dev` | `demo` profile, `fresh` (truncate + reseed) | local Incus k3s |
+| `sandbox` | `sandbox` → `stg` | `demo` profile, `upsert` | aicoflow.xyz |
+| `prod` (hetzner-prod) | `main` → `prd` | `default` profile, `once` | aicoyo.com |
+| `partner` | partner-owned | `default` profile, `once` | on-prem (forked repo) |
 
-Webhook-based CD (CI builds images → GHCR → webhook POST → server pulls
-+ restarts). Server provisioning via cloud-init
-(`deploy/cloud-init/aico-server.yml`).
+Argo CD continuously syncs `deploy/k8s/overlays/<overlay>` from git. CI
+pushes images to GHCR (or the partner's registry); the next Argo sync
+rolls them. The single source of truth that distinguishes overlays is
+the `ENV_TRUTH` table in `infrastructure/lab/gen-configmaps.py` — every
+downstream env knob (NODE_ENV, SEED_PROFILE/STRATEGY, LOGTO_ENVIRONMENT,
+DOPPLER_CONFIG) is derived from the overlay name.
 
 ## Hardware sizing
 
@@ -209,16 +212,8 @@ and via the TTS / STT CLIs on the host (`cd stt && ./cli.py` /
 
 ## Configuration pipeline
 
-```mermaid
-flowchart LR
-    DP["Doppler<br/>(secrets)"] --> ESO["External Secrets<br/>Operator"]
-    NS["infrastructure/config/<br/>env.nonsecret.json"] --> GEN
-    PJ["infrastructure/config/<br/>ports.json"] --> GEN
-    GEN["gen-configmaps.py &lt;env&gt;"] --> CM["Kubernetes<br/>ConfigMaps"]
-    ESO --> SEC["Kubernetes Secrets"]
-    CM --> POD[/Pods (envFrom)/]
-    SEC --> POD
-```
+See [Architecture › Configuration pipeline](/platform/architecture#configuration-pipeline) for the full diagram. Summary:
 
-Doppler wins over `env.nonsecret.json` at runtime. **Never duplicate
-keys between them.**
+- Doppler (or partner-owned secret store) → ESO → k8s Secrets
+- `infrastructure/config/{env.nonsecret,ports}.json` + `ENV_TRUTH` → `make config OVERLAY=<name>` → ConfigMaps + ClusterSecretStore
+- Pods consume both via `envFrom`. Doppler wins on conflict (Secret listed after ConfigMap).

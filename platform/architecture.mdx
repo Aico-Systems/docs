@@ -16,8 +16,8 @@ flowchart TB
         MEM["Memory / RAG"]
     end
 
-    PG[("PostgreSQL 17<br/>+ pgvector")]
-    RD[("Redis 7")]
+    PG[("PostgreSQL 17<br/>+ pgvector (CNPG)")]
+    RD[("Valkey 8")]
     LG["Logto<br/>(OAuth2/OIDC)"]
 
     subgraph LiveKit["LiveKit cluster"]
@@ -51,10 +51,11 @@ flowchart TB
     AGT -- HTTP / SDK --> LLM
 ```
 
-Containers that ship in the dev compose: `postgres`, `redis`, `livekit`,
-`livekit-sip`, `livekit-egress`, `ollama`, `stt`, `tts`, `agent`,
-`backend`, `frontend`. The ROCm overlay swaps `stt`, `tts`, `ollama` to
-ROCm variants pinned with `HSA_OVERRIDE_GFX_VERSION=11.0.0` for RDNA3.
+Deployed as k8s workloads across `aico` (app tier), `aico-data` (CNPG
+Postgres + Valkey), `aico-media` (LiveKit cluster + STUNner), and
+`aico-auth` (Logto). ROCm-variant STT/TTS pods are node-selected onto
+workers that expose `/dev/kfd` with `HSA_OVERRIDE_GFX_VERSION=11.0.0`
+for RDNA3; other nodes run the CPU fallback images.
 
 ## Session lifecycle
 
@@ -150,10 +151,11 @@ backend using the LiveKit server SDK.
 
 ### Databases
 
-- **PostgreSQL 17 + pgvector** — every domain entity plus embedding
-  vectors for RAG and episodic memory.
-- **Redis** — provider-config cache (5 min TTL), live monitoring
-  state, rate limiting.
+- **PostgreSQL 17 + pgvector** — managed by CloudNativePG; every domain
+  entity plus embedding vectors for RAG and episodic memory. A separate
+  CNPG cluster (`logto-db` in `aico-auth`) holds Logto's own schema.
+- **Valkey 8** — provider-config cache (5 min TTL), live monitoring
+  state, rate limiting. API-compatible Redis replacement.
 
 ## Inter-service communication
 
@@ -169,36 +171,50 @@ backend using the LiveKit server SDK.
 | Backend → Telnyx | HTTPS | per-org API key from DB |
 
 <Warning>
-	STT and TTS services currently run without authentication. They are
-	only reachable on the internal Docker network. Running them across an
-	untrusted network requires adding an auth layer.
+	STT and TTS services currently run without authentication. Inside
+	the cluster they're only reachable via ClusterIP (no Gateway route),
+	and CiliumNetworkPolicy restricts ingress to the `aico` namespace.
+	Exposing them across an untrusted network requires adding an auth
+	layer.
 </Warning>
 
 ## Configuration pipeline
 
 ```mermaid
 flowchart LR
-    D["Doppler<br/>(secrets)"] --> ESO["External Secrets<br/>Operator"]
+    D["Doppler<br/>project: aico<br/>config: dev|stg|prd"] --> ESO["External Secrets<br/>Operator"]
     NS["infrastructure/config/<br/>env.nonsecret.json"] --> GEN
     PJ["infrastructure/config/<br/>ports.json"] --> GEN
-    GEN["gen-configmaps.py<br/>&lt;env&gt;"] --> CM["Kubernetes<br/>ConfigMaps"]
-    ESO --> SEC["Kubernetes<br/>Secrets"]
+    ET["gen-configmaps.py<br/>ENV_TRUTH[overlay]"] --> GEN
+    GEN["make config<br/>OVERLAY=lab|sandbox|prod|partner"] --> CM["ConfigMaps<br/>aico-shared + aico-urls"]
+    GEN --> CSS["ClusterSecretStore<br/>doppler-aico"]
+    CSS --> ESO
+    ESO --> SEC["Secrets<br/>aico-secrets · logto-secrets · livekit-secrets"]
     CM --> POD(["Pods (envFrom)"])
     SEC --> POD
 ```
 
-Environments: `lab` (local k3s), `hetzner-prod`, `fly`. Source of truth for
-non-secret config is `infrastructure/config/*.json`; secrets live in Doppler
-and are synced into Kubernetes Secrets by ESO. **Never duplicate keys
-between the two** — Doppler wins at runtime if a conflict occurs.
+Overlays: `lab` (local k3s), `sandbox` (aicoflow.xyz), `hetzner-prod`
+(aicoyo.com), `partner` (on-prem template). Source of truth for
+per-overlay distinction is the `ENV_TRUTH` table in
+`gen-configmaps.py`; per-install SMTP/landing URLs live in
+`env.nonsecret.json`. Secrets live in Doppler (or a partner's equivalent)
+and reach pods as k8s Secrets via ESO. **Never duplicate keys between
+ConfigMap and Doppler** — Doppler wins at runtime via envFrom ordering.
 
 ## Hot reload in development
 
+Under `make dev` (Tilt):
+
 | Service | Mechanism |
 |---|---|
-| `backend` | Bun `--watch` |
-| `frontend` | Vite HMR |
-| `agent` | `watchmedo auto-restart` on `.py` |
-| `stt`, `tts` | `uvicorn --reload` gated by `STT_DEV_RELOAD=1` / `TTS_DEV_RELOAD=1` |
+| `backend` | Bun `--watch` re-executes on every src/seeds edit |
+| `frontend` | Vite HMR over WebSocket |
+| `agent-worker` | `docker_build_with_restart` sends SIGTERM on sync; Tilt relaunches |
+| `stt`, `tts`, `logto` | Not live-reloaded — edit via `make <svc>-build` then `make <svc>-restart` |
 
-No service needs a manual restart for code changes in dev.
+Tilt owns backend/frontend/agent during `make dev`; Argo CD will try to
+revert the hot-reload image tags, so pause sync for those three
+Deployments before starting. `mirrord` provides a secondary path — run
+the service LOCALLY with the pod's network + env (see
+`.mirrord/*.json`).

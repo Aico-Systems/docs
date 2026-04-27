@@ -13,8 +13,8 @@ STT, TTS, and LLM providers.
 |---|---|
 | Frontend | Svelte 5 · Vite · XYFlow (flow builder) |
 | Backend | Bun · TypeScript · Elysia · Drizzle ORM |
-| Database | PostgreSQL 17 + pgvector |
-| Cache | Redis 7 |
+| Database | PostgreSQL 17 + pgvector (managed by CloudNativePG) |
+| Cache | Valkey 8 |
 | Media | LiveKit 1.9.8 (WebRTC + SIP) · LiveKit Egress (recording) |
 | Agent worker | Python · LiveKit Agents SDK · Silero VAD |
 | STT service | FastAPI, Python, runs local STT engines |
@@ -23,12 +23,20 @@ STT, TTS, and LLM providers.
 | Auth | Logto (OAuth2 / OIDC) |
 | Embeddings | Ollama embeddinggemma (768-dim) |
 
-## Containers in a dev / single-host deployment
+## Services on the lab k3s cluster
 
-`postgres`, `redis`, `livekit`, `livekit-sip`, `livekit-egress`, `ollama`,
-`stt`, `tts`, `agent`, `backend`, `frontend`. The ROCm compose overlay
-swaps `stt`, `tts`, `ollama` to their ROCm variants with
-`HSA_OVERRIDE_GFX_VERSION=11.0.0` for RDNA3 GPUs.
+| Namespace | Workload |
+|---|---|
+| `aico` | `backend`, `frontend`, `agent-worker`, `stt`, `tts`, `ollama` |
+| `aico-data` | `aico-db` (CNPG Postgres), `valkey` |
+| `aico-media` | `livekit`, `livekit-sip`, `livekit-egress`, STUNner UDP Gateway |
+| `aico-auth` | AICO-branded `logto` + `logto-db` (CNPG) |
+| `aico-system` | Cilium Gateway, cert-manager, shared ClusterSecretStore |
+
+Local ROCm workloads (STT/TTS on RDNA3 GPUs with
+`HSA_OVERRIDE_GFX_VERSION=11.0.0`) are selected via node labels on the
+worker nodes that expose `/dev/kfd`. The same overlay runs on CPU-only
+nodes by falling back to Piper/Vosk — no image swap needed.
 
 ## Pages in this section
 
