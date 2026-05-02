@@ -34,14 +34,21 @@ flowchart TB
     AGT --> OL
 ```
 
-Everything in one Kubernetes cluster (lab or cloud). The `make lab-up`
-entrypoint provisions 6 Incus VMs as a HA k3s cluster and applies the full
-stack via Argo CD + Kustomize. See `SCALE.md` and `FINETUNE.md` in the repo
-root for the multi-target roadmap (lab → Hetzner → Fly.io).
+Everything in one Kubernetes cluster (lab or cloud). The `just lab-up`
+entrypoint provisions 6 Incus VMs as a HA k3s cluster and applies the
+full stack — k8s manifests are synthesised by **CDK8s** from
+`infrastructure/cdk8s/src/values/<env>.ts` into `dist/<env>/`, applied
+directly in lab and reconciled by Argo CD in sandbox / prod. See
+`SCALE.md` and `FINETUNE.md` in the repo root for the multi-target
+roadmap.
 
-GPU acceleration for STT/TTS (Orpheus, CosyVoice, Qwen) requires AMD ROCm
-or NVIDIA CUDA on a dedicated worker node — not yet wired in the lab (see
-FINETUNE.md Sprint 5).
+GPU acceleration for STT / TTS / LLM (Qwen, CosyVoice, Orpheus, vLLM
+Ling-2.6, …) builds against AMD ROCm or NVIDIA CUDA base images. The
+inference matrix at `infrastructure/cdk8s/src/lib/inference-matrix.ts`
+declares which providers ship for which hardware variant; per-provider
+Docker images (`aico-stt-whisper:rocm`, `aico-llm-ling-2.6-flash:cuda`,
+…) are built by CI and pulled by node-selected pods. Lab runs CPU
+variants by default.
 
 ### Split (GPU + control plane)
 
@@ -91,16 +98,18 @@ flowchart TB
 | Overlay | Branch → Doppler | Seed strategy | Cluster |
 |---|---|---|---|
 | `lab` | `dev` → `dev` | `demo` profile, `fresh` (truncate + reseed) | local Incus k3s |
-| `sandbox` | `sandbox` → `stg` | `demo` profile, `upsert` | aicoflow.xyz |
-| `prod` (hetzner-prod) | `main` → `prd` | `default` profile, `once` | aicoyo.com |
+| `sandbox` | `sandbox` → `stg` | `demo` profile, `upsert` | `aicoflow.xyz` |
+| `prod` | `main` → `prd` | `default` profile, `once` | `aicoflow.com` |
 | `partner` | partner-owned | `default` profile, `once` | on-prem (forked repo) |
 
-Argo CD continuously syncs `deploy/k8s/overlays/<overlay>` from git. CI
-pushes images to GHCR (or the partner's registry); the next Argo sync
-rolls them. The single source of truth that distinguishes overlays is
-the `ENV_TRUTH` table in `infrastructure/lab/gen-configmaps.py` — every
-downstream env knob (NODE_ENV, SEED_PROFILE/STRATEGY, LOGTO_ENVIRONMENT,
-DOPPLER_CONFIG) is derived from the overlay name.
+Argo CD continuously syncs `infrastructure/cdk8s/dist/<overlay>` from
+git. CI pushes images to GHCR (or the partner's registry); the next
+Argo sync rolls them. The single source of truth that distinguishes
+overlays is `configShared` in each
+`infrastructure/cdk8s/src/values/<env>.ts` file — every downstream env
+knob (`NODE_ENV`, `SEED_PROFILE` / `STRATEGY`, `LOGTO_ENVIRONMENT`,
+`DOPPLER_CONFIG`, `IMAGE_TAG`) is set there and reaches pods through
+the synthesized `aico-shared` ConfigMap.
 
 ## Hardware sizing
 
@@ -214,6 +223,6 @@ and via the TTS / STT CLIs on the host (`cd stt && ./cli.py` /
 
 See [Architecture › Configuration pipeline](/platform/architecture#configuration-pipeline) for the full diagram. Summary:
 
-- Doppler (or partner-owned secret store) → ESO → k8s Secrets
-- `infrastructure/config/{env.nonsecret,ports}.json` + `ENV_TRUTH` → `make config OVERLAY=<name>` → ConfigMaps + ClusterSecretStore
-- Pods consume both via `envFrom`. Doppler wins on conflict (Secret listed after ConfigMap).
+- Doppler (or partner-owned secret store) → ESO → k8s Secrets (`aico-secrets`, `livekit-secrets`, `logto-secrets`).
+- `configShared` + `configUrls` in `infrastructure/cdk8s/src/values/<env>.ts` → `just synth` → `dist/<env>/` ConfigMaps (`aico-shared`, `aico-urls`).
+- Pods consume both via `envFrom`. Doppler wins on conflict — Secrets are listed after ConfigMaps so the Secret value takes precedence at runtime.

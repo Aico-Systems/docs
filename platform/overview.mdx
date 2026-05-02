@@ -27,16 +27,18 @@ STT, TTS, and LLM providers.
 
 | Namespace | Workload |
 |---|---|
-| `aico` | `backend`, `frontend`, `agent-worker`, `stt`, `tts`, `ollama` |
+| `aico` | `backend`, `frontend`, `agent-worker`, `stt-router` + per-provider workers (`stt-vosk`, `stt-whisper`, …), `tts-router` + per-provider workers (`tts-piper`, `tts-kokoro`, …), `ollama` (StatefulSet) |
 | `aico-data` | `aico-db` (CNPG Postgres), `valkey` |
 | `aico-media` | `livekit`, `livekit-sip`, `livekit-egress`, STUNner UDP Gateway |
 | `aico-auth` | AICO-branded `logto` + `logto-db` (CNPG) |
 | `aico-system` | Cilium Gateway, cert-manager, shared ClusterSecretStore |
 
-Local ROCm workloads (STT/TTS on RDNA3 GPUs with
-`HSA_OVERRIDE_GFX_VERSION=11.0.0`) are selected via node labels on the
-worker nodes that expose `/dev/kfd`. The same overlay runs on CPU-only
-nodes by falling back to Piper/Vosk — no image swap needed.
+Per-provider STT / TTS workers are pinned to one engine each (`STT_PROVIDER_NAME`,
+`TTS_PROVIDER_NAME`); the router dispatches by name. Hardware variant
+(`cpu` / `rocm` / `cuda`) is picked per provider per cluster — ROCm
+pods need `/dev/kfd` + `HSA_OVERRIDE_GFX_VERSION=11.0.0` on RDNA3, so
+they're node-selected onto workers with that label. The full matrix
+lives at `infrastructure/cdk8s/src/lib/inference-matrix.ts`.
 
 ## Pages in this section
 

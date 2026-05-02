@@ -180,41 +180,71 @@ backend using the LiveKit server SDK.
 
 ## Configuration pipeline
 
+Three layers feed every pod's environment. Two come from typed values
+(`infrastructure/cdk8s/src/values/<env>.ts`) and synthesize into
+ConfigMaps; the third comes from Doppler (or a partner-equivalent secret
+store) via External Secrets Operator.
+
 ```mermaid
 flowchart LR
-    D["Doppler<br/>project: aico<br/>config: dev|stg|prd"] --> ESO["External Secrets<br/>Operator"]
-    NS["infrastructure/config/<br/>env.nonsecret.json"] --> GEN
-    PJ["infrastructure/config/<br/>ports.json"] --> GEN
-    ET["gen-configmaps.py<br/>ENV_TRUTH[overlay]"] --> GEN
-    GEN["make config<br/>OVERLAY=lab|sandbox|prod|partner"] --> CM["ConfigMaps<br/>aico-shared + aico-urls"]
-    GEN --> CSS["ClusterSecretStore<br/>doppler-aico"]
-    CSS --> ESO
-    ESO --> SEC["Secrets<br/>aico-secrets · logto-secrets · livekit-secrets"]
-    CM --> POD(["Pods (envFrom)"])
+    subgraph TS["infrastructure/cdk8s/src/values/&lt;env&gt;.ts"]
+        direction TB
+        CSH["configShared<br/>(AICO_ENV, NODE_ENV, SEED_*, …)"]
+        CURL["configUrls<br/>(BACKEND_URL, FRONTEND_URL, …)"]
+    end
+    SYNTH["just synth (cdk8s)<br/>OVERLAY=lab|sandbox|prod|partner"]
+    CM_S["ConfigMap<br/>aico-shared"]
+    CM_U["ConfigMap<br/>aico-urls"]
+
+    DOP["Doppler project: aico<br/>config: dev | stg | prd"]
+    CSS["ClusterSecretStore<br/>doppler-aico"]
+    ESO["External Secrets<br/>Operator"]
+    SEC["Secrets<br/>aico-secrets · livekit-secrets · logto-secrets"]
+
+    POD(["Pods (envFrom)"])
+
+    CSH --> SYNTH
+    CURL --> SYNTH
+    SYNTH --> CM_S
+    SYNTH --> CM_U
+    DOP --> CSS --> ESO --> SEC
+    CM_S --> POD
+    CM_U --> POD
     SEC --> POD
 ```
 
-Overlays: `lab` (local k3s), `sandbox` (aicoflow.xyz), `hetzner-prod`
-(aicoyo.com), `partner` (on-prem template). Source of truth for
-per-overlay distinction is the `ENV_TRUTH` table in
-`gen-configmaps.py`; per-install SMTP/landing URLs live in
-`env.nonsecret.json`. Secrets live in Doppler (or a partner's equivalent)
-and reach pods as k8s Secrets via ESO. **Never duplicate keys between
-ConfigMap and Doppler** — Doppler wins at runtime via envFrom ordering.
+Overlays: `lab` (local Incus k3s, `aico.local`), `sandbox`
+(`aicoflow.xyz`), `prod` (`aicoflow.com`), `partner` (on-prem template).
+Source of truth for per-overlay distinction is `configShared` in each
+values file — `AICO_ENV`, `NODE_ENV`, `DOPPLER_CONFIG`, `SEED_PROFILE`,
+`SEED_STRATEGY`, `LOGTO_ENVIRONMENT`. **Never duplicate keys between
+ConfigMap and Doppler** — Doppler wins at runtime via envFrom ordering
+(Secret applied after ConfigMap).
 
 ## Hot reload in development
 
-Under `make dev` (Tilt):
+Two dev modes:
+
+- **`just dev`** (host mode, default) — host-Docker stateful services
+  (postgres, valkey, logto, livekit, livekit-sip, ollama) on localhost;
+  `backend`, `frontend`, `agent-worker` run **natively** with their own
+  watchers (`bun --watch`, Vite HMR, LiveKit Agents `dev`). No Tilt, no
+  k3s, ~30 s boot. Best for application iteration.
+- **`just dev-cluster`** (cluster mode) — Tilt against the Incus k3s
+  lab. Use when changes touch HTTPRoute / NetworkPolicy / sync-wave /
+  ESO contracts.
+
+Cluster-mode hot-reload mechanics:
 
 | Service | Mechanism |
 |---|---|
 | `backend` | Bun `--watch` re-executes on every src/seeds edit |
 | `frontend` | Vite HMR over WebSocket |
 | `agent-worker` | `docker_build_with_restart` sends SIGTERM on sync; Tilt relaunches |
-| `stt`, `tts`, `logto` | Not live-reloaded — edit via `make <svc>-build` then `make <svc>-restart` |
+| `stt-*`, `tts-*`, `logto` | Not live-reloaded — `just <svc>-build` then `just restart <svc>` |
 
-Tilt owns backend/frontend/agent during `make dev`; Argo CD will try to
-revert the hot-reload image tags, so pause sync for those three
-Deployments before starting. `mirrord` provides a secondary path — run
-the service LOCALLY with the pod's network + env (see
-`.mirrord/*.json`).
+Tilt owns backend/frontend/agent during `just dev-cluster`; Argo CD will
+try to revert the hot-reload image tags, so pause sync for those three
+Deployments before starting. `just mirrord <svc> "<cmd>"` provides a
+secondary path — run the service LOCALLY with the pod's network + env
+(see `.mirrord/*.json`).
