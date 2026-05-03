@@ -1,6 +1,6 @@
 ---
 title: Security
-description: "Auth, tenancy, what is and is not enforced"
+description: "Auth, roles, scopes, tenant model"
 ---
 
 ## Auth flow
@@ -15,26 +15,25 @@ sequenceDiagram
     U->>LG: OIDC flow (password / SSO / MFA)
     LG-->>U: user JWT (scopes + org roles)
     U->>BE: API call + Bearer token
-    BE->>BE: verify JWT<br/>(issuer, audience, scopes)
-    BE-->>U: scoped response
+    BE->>BE: Verify JWT (issuer, audience, scopes)
+    BE-->>U: Scoped response
 
     Note over AGT,BE: At session start
     AGT->>LG: client_credentials (M2M)
     LG-->>AGT: M2M JWT
-    AGT->>BE: GET /flows/:id/providers/effective
-    BE-->>AGT: resolved provider config + secrets
+    AGT->>BE: Fetch effective providers
+    BE-->>AGT: Resolved provider config
 ```
 
-Users sign in through Logto (OAuth2 / OIDC). The agent worker uses M2M
-`client_credentials` for backend calls. Every request carries a JWT the
-backend verifies on ingress.
+Users sign in through Logto (OAuth2 / OIDC). The agent worker uses
+machine-to-machine `client_credentials` for backend calls. Every
+request carries a JWT the backend verifies on ingress.
 
 ## Role model
 
 ```mermaid
 flowchart TB
     SA["Super Admin<br/>(host-level)"]
-    SA --- note["JWT claim is_super_admin<br/>bypasses all scope checks"]:::note
 
     subgraph OrgA["Organization A"]
         OA["Owner"]
@@ -53,11 +52,9 @@ flowchart TB
 
     SA -. can switch into .-> OrgA
     SA -. can switch into .-> OrgB
-
-    classDef note fill:none,stroke:none,color:#888,font-size:11px
 ```
 
-### Organization roles (from `scripts/logto/organization-roles.json`)
+### Organization roles
 
 | Role | API scopes | Org permissions |
 |---|---|---|
@@ -70,146 +67,62 @@ flowchart TB
 
 ### Host role
 
-| Role | Claim | Capabilities |
-|---|---|---|
-| **Super Admin** | JWT claim `is_super_admin` (or `super_admin` / `all:organizations` scope) | Bypasses all scope checks (`backend/src/utils/authorization.ts:43`); switch into any org; only path to runtime infrastructure controls |
+| Role | Capabilities |
+|---|---|
+| **Super Admin** | Bypasses scope checks; can switch into any organization; the only path to operator-level runtime infrastructure controls (model selection, voice store management, GPU allocation). |
 
-Super Admin is **host-level**. Tenant admins are **Owners**, not super
+Super Admin is **host-level** — held by the deployment operator, not
+by tenant users. Tenant administrators are **Owners**, not super
 admins.
 
 ## Scope enforcement
 
 ```mermaid
 flowchart LR
-    R["Request"] --> P["Route policy lookup<br/>middleware/policies.ts"]
-    P -- "policy missing" --> C["CRASH at startup"]:::error
-    P --> S["requireScopes(ctx, [...])<br/>requireOrgPermissions(...)"]
-    S -- "ctx.isSuperAdmin" --> A["✔ allowed"]:::ok
+    R["Request"] --> P["Route policy"]
+    P --> S["Scope + permission check"]
+    S -- "is super admin" --> A["✔ allowed"]
     S -- "has all required" --> A
-    S -- "missing" --> D["403 with reason"]:::error
-
-    classDef error fill:#4a2020,stroke:#f77,color:#fff
-    classDef ok fill:#204a20,stroke:#7f7,color:#fff
+    S -- "missing" --> D["403 with reason"]
 ```
 
-- **Route policies** live in `backend/src/routes/middleware/policies.ts`.
-  Every route must have a policy entry — startup crashes otherwise.
-- **Scope constants** — single source of truth in
-  `backend/entity-schema/src/scopes.ts` (`S.FLOWS_READ`, `S.ORG_WRITE`,
-  `S.SUPER_ADMIN`, etc.).
+- **Route policies** are mandatory — every route declares the scopes
+  + organization permissions it requires. Missing policies are caught
+  at startup, not in production.
 - **Wildcard matching** — `flows:*` grants every `flows:*` scope.
-- **Super admin bypass** — all scope checks short-circuit when
-  `ctx.isSuperAdmin`.
+- **Super admin bypass** — all scope checks short-circuit for the
+  host role.
 
 ## Tenant isolation
 
-<Warning>
-	Application-level filtering only. PostgreSQL row-level security
-	(RLS) **is not used today**. Only the backend connects to the
-	database; if shared DB access across tenants is ever needed
-	(direct SQL, external tools), RLS must be added.
-</Warning>
-
-Every entity carries an `organizationId` column; repository helpers
-enforce it on every query. The `TenantContext` is derived from the JWT
-and the active organization at request ingress.
-
-## Two-tier configuration
-
-```mermaid
-flowchart TB
-    subgraph RT["Runtime (operator-only)"]
-        direction LR
-        R1["Model paths"]
-        R2["Device · dtype"]
-        R3["Attn backend"]
-        R4["JIT / TRT / vLLM"]
-        R5["trust_remote_code"]
-        R6["ref_audio (raw FS)"]
-    end
-
-    subgraph PR["Per-request (per-flow)"]
-        direction LR
-        P1["Language"]
-        P2["Voice ID"]
-        P3["Endpointing"]
-        P4["Temperature"]
-        P5["Emotion / speed"]
-    end
-
-    ORG["Org admin"] -. blocked .-> RT
-    ORG --> PR
-    SADM["Super admin"] --> RT
-    SADM --> PR
-
-    style RT fill:#3b2a2a,stroke:#d55,color:#fff
-    style PR fill:#2a3b2a,stroke:#5d5,color:#fff
-```
-
-Runtime fields are defined in `runtime_schema()` on each STT / TTS
-engine. They are never exposed in the per-flow UI or API. An org admin
-cannot set a model path or change `trust_remote_code`, regardless of
-role.
+Every multi-tenant entity is scoped by an `organizationId` column,
+enforced on every read and write at the repository layer. The tenant
+context is derived from the JWT and the active organization at
+request ingress; cross-tenant access requires the host-level Super
+Admin claim.
 
 ## Fail-fast secret validation
 
 At flow trigger, every effective provider is validated against its
-`secretsSchema.required`. Missing keys raise HTTP 412 before the agent
-worker is dispatched — prevents opaque SDK-side 401s mid-call.
+required secrets. Missing keys raise HTTP 412 before the agent worker
+is dispatched — preventing opaque vendor 401s mid-call.
 
-## Secrets
+## Audit + retention
 
-| Aspect | Implementation |
-|---|---|
-| Storage | `organization_secrets.secrets` (JSONB) |
-| **At-rest encryption** | **Not applied at the app layer.** Configure at PostgreSQL / disk-volume level if required. |
-| In transit | TLS to providers; M2M HTTPS to the agent worker |
-| Frontend exposure | Redacted in every response |
-| Rotation | `PUT /api/providers/:key/secrets` writes a new value; M2M client keys via `POST /api/api-keys/:id/rotate` |
-
-## Audit
-
-- **Call history** — `execution_sessions` + `call_history` — every
-  session's metadata, variable state, tool calls, final status.
-  Queryable via `/api/monitoring/calls/history`.
+- **Call history** — every session's metadata, variable state, tool
+  calls, and final status is persisted and queryable through the
+  monitoring API.
 - **Session recordings** — LiveKit Egress, opt-in per flow. Default
-  output: Opus OGG audio-only on the `aico-recordings` volume. S3 config
-  exists in code (`ARCHIVAL_STORAGE_TYPE`, `ARCHIVAL_PATH`) but the S3
-  storage backend is **not implemented**.
-- **Flow versioning** — versions stored in `flow_versions` (app-level).
-  No Git integration.
+  output is audio-only on the cluster's recording volume.
+- **Flow versioning** — every save creates a new version row;
+  versions are inspectable and restorable.
 
-## Channel status
+## Compliance posture
 
-| Channel | Status |
-|---|---|
-| Phone (SIP via LiveKit SIP + Telnyx) | implemented |
-| WhatsApp (Meta Cloud API) | implemented |
-| Web widget | not implemented |
-| Twilio / Vonage | schema present, no runtime adapter |
-
-## Integrations status
-
-Nango client (`backend/src/services/nango/nangoService.ts`) is wired to
-the shared ops Nango instance. **No default providers are pre-wired** —
-each organization enables integrations as needed; AICO discovers them
-via the Nango action registry
-(`GET /api/integrations/actions`).
-
-## What is NOT provided
-
-<Warning>
-	To avoid compliance theater, here is what AICO does **not** have today:
-
-	- No SOC 2 / ISO 27001 / HIPAA BAA certification
-	- No right-to-erasure tooling beyond per-user delete through the
-	  existing member-management routes
-	- No customer-managed keys (CMK) for at-rest encryption
-	- No DLP / PII redaction pre-processor
-	- No multi-region replication
-	- No audit-log immutability (append-only storage)
-
-	If a deployment needs any of the above, it must be added on top —
-	at the infrastructure layer (encrypted volumes, KMS) or as
-	additional backend features.
-</Warning>
+AICO covers the working surface of authentication, authorization, and
+tenant isolation listed above. For specific certifications (SOC 2,
+ISO 27001, HIPAA BAA), compliance add-ons (CMK, DLP, audit-log
+immutability, multi-region replication, regional data residency), or
+deployment-specific risk reviews, contact
+[support@aicoflow.com](mailto:support@aicoflow.com) — detailed
+compliance documentation is available under NDA.

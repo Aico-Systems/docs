@@ -1,113 +1,81 @@
 ---
 title: Provider Ecosystem
-description: "STT / TTS / LLM catalog, factory dispatch, per-flow config"
+description: "STT / TTS / LLM catalog and per-flow config"
 ---
 
-Three catalogs in `backend/src/providers/definitions/` — `stt.ts`,
-`tts.ts`, `llm.ts`. Each provider has a `configSchema` (per-flow fields),
-a `secretsSchema` (per-org), and a unique key. The agent-worker factory
-(`agent-worker/providers/factory.py`) instantiates them at session start.
+AICO ships with cloud and self-hosted speech and language providers.
+Each provider has a per-flow config schema, a per-org secrets schema,
+and a unique key. Selection happens per flow; resolution merges
+defaults → organization → flow.
 
 ## Provider resolution
 
 ```mermaid
 flowchart LR
-    D["Provider defaults<br/>(from definition)"] --> M
+    D["Provider defaults"] --> M
     O["Organization config<br/>+ secrets"] --> M
-    F["Flow-level override"] --> M
+    F["Flow override"] --> M
     M["Resolved provider<br/>(per-session)"] --> AGT["Agent worker"]
-
     style F stroke-width:3px
 ```
 
-Priority: **flow > organization > default**. All three are merged into
-a single `EffectiveProviderConfig` with a `validation` field attached so
-the UI can flag missing required secrets without failing the request.
+Priority: **flow > organization > default**. Required secrets are
+validated at flow trigger; missing keys raise HTTP 412 before the
+agent worker starts — preventing opaque mid-call SDK errors.
 
 ## STT providers (9)
 
-| Key | Hosting | Instantiation |
-|---|---|---|
-| `deepgram` | Cloud | LiveKit `deepgram.STT` |
-| `gladia` | Cloud | LiveKit `gladia.STT` |
-| `openai-stt` | Cloud | LiveKit `openai.STT` |
-| `microsoft-speech` | Cloud | LiveKit `azure.STT` |
-| `groq-stt` | Cloud | LiveKit `openai.STT.with_groq` |
-| `local-stt-qwen` | Self-hosted | WS → `/ws/transcribe/qwen` (Qwen3-ASR-1.7B) |
-| `local-stt-cohere` | Self-hosted | WS → `/ws/transcribe/cohere` (cohere-transcribe-03-2026) |
-| `local-stt-whisper` | Self-hosted | WS → `/ws/transcribe/whisper` (faster-whisper) |
-| `local-stt-vosk` | Self-hosted | WS → `/ws/transcribe/vosk` |
-
-All 9 have factory handlers.
+| Key | Hosting |
+|---|---|
+| `deepgram` | Cloud |
+| `gladia` | Cloud |
+| `openai-stt` | Cloud |
+| `microsoft-speech` | Cloud |
+| `groq-stt` | Cloud |
+| `local-stt-qwen` | Self-hosted (Qwen3-ASR-1.7B) |
+| `local-stt-cohere` | Self-hosted (Cohere Transcribe) |
+| `local-stt-whisper` | Self-hosted (faster-whisper) |
+| `local-stt-vosk` | Self-hosted (Vosk) |
 
 ## TTS providers (11)
 
-| Key | Hosting | Instantiation |
-|---|---|---|
-| `elevenlabs` | Cloud | LiveKit `elevenlabs.TTS` |
-| `cartesia` | Cloud | LiveKit `cartesia.TTS` |
-| `openai-tts` | Cloud | LiveKit `openai.TTS` |
-| `deepgram-tts` | Cloud | LiveKit `deepgram.TTS` (Aura-2) |
-| `local-tts-voxcpm` | Self-hosted | HTTP → `/api/tts/voxcpm` |
-| `local-tts-qwen` | Self-hosted | HTTP → `/api/tts/qwen` |
-| `local-tts-cosyvoice` | Self-hosted | HTTP → `/api/tts/cosyvoice` |
-| `local-tts-f5tts` | Self-hosted | HTTP → `/api/tts/f5tts` |
-| `local-tts-orpheus` | Self-hosted | HTTP → `/api/tts/orpheus` |
-| `local-tts-kokoro` | Self-hosted | HTTP → `/api/tts/kokoro` |
-| `local-tts-piper` | Self-hosted | Piper gateway |
-
-All 11 have factory handlers.
+| Key | Hosting |
+|---|---|
+| `elevenlabs` | Cloud |
+| `cartesia` | Cloud |
+| `openai-tts` | Cloud |
+| `deepgram-tts` | Cloud (Aura-2) |
+| `local-tts-voxcpm` | Self-hosted, voice cloning |
+| `local-tts-qwen` | Self-hosted (Qwen3-TTS), voice cloning |
+| `local-tts-cosyvoice` | Self-hosted (CosyVoice2), voice cloning |
+| `local-tts-f5tts` | Self-hosted (F5-TTS), voice cloning |
+| `local-tts-orpheus` | Self-hosted, preset voices |
+| `local-tts-kokoro` | Self-hosted, preset voices |
+| `local-tts-piper` | Self-hosted, preset voices |
 
 ### Voice store
 
-```mermaid
-flowchart LR
-    OP["Operator<br/>(super admin)"] --> UP["POST /api/admin/runtime/tts/voices"]
-    UP --> VS[("/models/voices/<br/>{voice_id}/<br/>reference.wav<br/>metadata.json")]
-    VS --> E1["VoxCPM2"]
-    VS --> E2["Qwen3-TTS<br/>(base variant)"]
-    VS --> E3["CosyVoice2"]
-    VS --> E4["F5-TTS"]
+Cloning-capable engines (`voxcpm`, `qwen`, `cosyvoice`, `f5tts`) share
+a voice library: upload a reference clip once, use the resulting
+`voice_id` from any cloning engine. Preset-only engines (`orpheus`,
+`kokoro`, `piper`) ignore the store.
 
-    NC["Orpheus · Kokoro · Piper"]:::nocloning
-
-    classDef nocloning fill:#444,stroke:#888,color:#aaa
-```
-
-- **Cloning-capable** (consume the store): `voxcpm`, `qwen`, `cosyvoice`, `f5tts`
-- **Preset-only** (ignore the store): `orpheus`, `kokoro`, `piper`
-
-Provider definitions carry
-`voiceManagement.voicesFromStore: true | false` so the frontend voice
-picker auto-hides for preset-only engines.
-
-<Warning>
-	The store is **not tenant-scoped** — every voice is visible to every
-	organization that picks a local TTS engine. Upload / delete is
-	operator-only.
-</Warning>
+The frontend voice picker auto-hides for preset-only engines based on
+each provider's declared capabilities.
 
 ## LLM providers (10)
 
-Keys: `openai`, `anthropic`, `google`, `groq`, `azure-openai`,
-`cerebras`, `deepinfra`, `fireworks`, `qwen`, `cli-proxy`.
+Cloud: `openai`, `anthropic`, `google`, `groq`, `azure-openai`,
+`cerebras`, `deepinfra`, `fireworks`. Self-hosted: `qwen` (Ollama-
+compatible), `cli-proxy` (vendor CLIs as OpenAI-shaped proxies).
 
-Local Ollama is reached via the `qwen` or `cli-proxy` provider pointed at
-`http://ollama:11434`. The operator picks the specific model per flow.
+Local Ollama is reached via the `qwen` or `cli-proxy` provider; the
+operator picks the specific model per flow.
 
 ## Configuration tiers
 
 ```mermaid
 flowchart TB
-    subgraph RT["Runtime (operator-only)"]
-        direction LR
-        MP["Model paths"]
-        DV["Device / dtype"]
-        AB["Attention backend"]
-        JT["JIT / TRT / vLLM"]
-        RA["ref_audio (raw FS)"]
-    end
-
     subgraph PR["Per-request (per-flow)"]
         direction LR
         LG["Language"]
@@ -116,77 +84,58 @@ flowchart TB
         TMP["Temperature"]
         ST["Style / emotion"]
     end
-
-    SAP["SuperAdminPanel<br/>/ TUI"] --> RT
     FC["Flow config UI"] --> PR
-
-    style RT fill:#3b2e2e,stroke:#f44
-    style PR fill:#2e3b2e,stroke:#4f4
 ```
 
-Runtime fields live in each engine's `runtime_schema()` and never surface
-in the per-flow UI. Per-request fields live in `request_schema()`. The
-split is enforced at the service boundary — the per-flow API will reject
-runtime fields.
+Per-flow fields cover everything an org admin tunes: language, voice,
+endpointing, temperature, style. Engine-internal settings (model
+paths, GPU device, attention backend) are operator-only and stay out
+of the per-flow UI — the API will reject them on a per-flow call
+regardless of caller role.
 
 ## Endpointing (self-hosted STT)
 
-Qwen, Cohere, and Whisper emit `FINAL_TRANSCRIPT` via server-side RMS
-silence detection. Exposed per flow:
+Self-hosted streaming STT engines emit a final transcript via
+server-side silence detection. Two per-flow knobs:
 
 | Field | Default | Range | Purpose |
 |---|---|---|---|
 | `endpointingMs` | 600 | 100 – 5000 | silence after speech before emitting final |
 | `silenceThreshold` | 0.015 | 0 – 0.5 | RMS level below which audio counts as silence |
 
-Cloud STTs expose their own vendor equivalents
-(Deepgram: `endpointingMs`, Gladia: `endpointing` in seconds). Vosk uses
-its native `endpointer_mode` (runtime-level).
-
-<Note>
-	LiveKit's `commit_user_turn` does **not** push silence frames into the
-	STT in live voice sessions (`audio_detached=False`). The STT must
-	self-endpoint — the `commit_user_turn` silence fallback only fires
-	when `audio_detached=True` (text-mode harness).
-</Note>
+Cloud STTs expose their own vendor equivalents (Deepgram:
+`endpointingMs`; Gladia: `endpointing` in seconds).
 
 ## Secrets handling
 
 | Aspect | Implementation |
 |---|---|
-| Storage | `organization_secrets.secrets` JSONB |
-| At-rest encryption | **Not applied at the app layer** — configure at disk/PostgreSQL level if required |
-| In transit | TLS between backend and providers; M2M HTTPS to agent worker |
+| Storage | Encrypted at the database / volume layer (operator-configured) |
+| In transit | TLS to providers; M2M HTTPS to the agent worker |
 | Frontend exposure | Redacted in every API response |
-| Rotation | `PUT /api/providers/:key/secrets` — writes a new value |
+| Rotation | Single API call writes a new value |
 
 ## Fail-fast validation
 
-At flow trigger (`flowTriggerService.ts`), every effective provider is
-validated against `secretsSchema.required`. Missing keys raise HTTP 412
-before the agent worker is dispatched, with a structured list of
-misconfigured providers — preventing opaque SDK-side 401s inside a live
-call.
+At flow trigger every effective provider is validated against its
+required secrets. Missing keys raise HTTP 412 with a structured list
+of misconfigured providers — preventing opaque vendor 401s mid-call.
 
 ```mermaid
 sequenceDiagram
     participant C as Caller
-    participant BE as Backend trigger
-    participant V as secretsValidation
+    participant BE as Backend
     participant AW as Agent worker
 
-    C->>BE: POST /flows/:id/trigger
-    BE->>V: assertProvidersUsable([stt, tts, llm])
+    C->>BE: Trigger flow
+    BE->>BE: Validate provider secrets
     alt any required secret missing
-        V-->>BE: throw HttpError(412, { providers: [...] })
         BE-->>C: 412 + structured list
     else all valid
-        V-->>BE: ok
         BE->>AW: dispatch
         AW->>C: audio stream
     end
 ```
 
-Dashboard reads also receive the `validation: { valid, missingSecrets[] }`
-field so the UI can flag misconfigured providers without failing the
-request.
+Dashboard reads also receive a `validation` field so the UI can flag
+misconfigured providers without failing the request.

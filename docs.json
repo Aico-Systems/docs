@@ -28,10 +28,10 @@
 						"group": "Platform",
 						"pages": [
 							"platform/overview",
-							"platform/architecture",
+							"platform/concepts",
 							"platform/flows",
 							"platform/providers",
-							"platform/deployment",
+							"platform/sizing",
 							"platform/security"
 						]
 					},

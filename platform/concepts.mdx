@@ -1,0 +1,97 @@
+---
+title: Concepts
+description: How AICO orchestrates a voice or chat conversation.
+---
+
+AICO is a voice-agent runtime. A trigger (phone call, WhatsApp message,
+HTTP request) starts a session; a flow runs to completion, calling
+swappable speech and language providers as it goes.
+
+## The pieces
+
+| Component | What it does |
+|---|---|
+| **Backend** | REST + WebSocket API. Runs the flow executor, resolves providers, persists every session. The single domain surface every other component talks to. |
+| **Frontend** | Dashboard — flow builder, monitoring, organization + provider management. Talks only to the backend. |
+| **Agent worker** | One short-lived process per active voice session. Streams audio between the caller, the STT service, the LLM, and the TTS service. |
+| **STT, TTS, LLM providers** | Pluggable. Cloud (Deepgram, ElevenLabs, OpenAI, …) or self-hosted (Whisper, Vosk, Piper, Kokoro, Ollama, vLLM). Selected per flow. |
+| **PostgreSQL + pgvector** | Source of truth for flows, sessions, organizations, secrets, embeddings, transcripts. |
+| **Logto** | OIDC identity provider for users + machine-to-machine tokens. |
+| **LiveKit** | WebRTC + SIP transport for voice. |
+
+## Session lifecycle
+
+From a trigger to an active conversation:
+
+```mermaid
+sequenceDiagram
+    participant Ext as Trigger (call / WA / HTTP)
+    participant BE as Backend
+    participant LK as LiveKit
+    participant AGT as Agent worker
+    participant Prov as STT / TTS / LLM
+
+    Ext->>BE: Trigger flow
+    BE->>BE: Validate provider secrets<br/>(fail-fast 412 if missing)
+    BE->>LK: Create room + dispatch agent
+    LK->>AGT: Spawn worker in room
+    AGT->>BE: GET effective providers for flow
+    BE-->>AGT: Merged STT / TTS / LLM config
+    loop Per user utterance
+        LK-->>AGT: Audio frames
+        AGT->>Prov: STT transcribe
+        Prov-->>AGT: partial → final
+        AGT->>BE: Turn transcript
+        BE->>Prov: LLM decision
+        Prov-->>BE: Route + tokens
+        BE-->>AGT: Speak event
+        AGT->>Prov: TTS synthesize
+        Prov-->>AGT: PCM audio
+        AGT->>LK: Audio frames
+    end
+```
+
+The flow executor is **stateless per request** — every invocation
+reconstructs state from PostgreSQL. A long conversation runs as many
+short executor calls, driven by inbound events (transcripts, tool
+callbacks, child-flow completions).
+
+## Provider resolution
+
+Three layers merge into a single resolved config per session:
+
+```mermaid
+flowchart LR
+    D["Provider defaults"] --> M
+    O["Organization config<br/>+ secrets"] --> M
+    F["Flow override"] --> M
+    M["Resolved provider"] --> AGT["Agent worker"]
+    style F stroke-width:3px
+```
+
+Priority: **flow > organization > default**. Missing required secrets
+fail the trigger with HTTP 412 before the agent worker is dispatched
+— preventing opaque mid-call SDK errors.
+
+## Channels
+
+| Channel | Transport | Status |
+|---|---|---|
+| Phone | SIP via LiveKit SIP + telephony provider (Telnyx / Twilio) | implemented |
+| WhatsApp | Meta Cloud API | implemented |
+| Web widget | — | not implemented |
+
+Channel-specific prompt hints are injected into the LLM context so a
+voice flow gets SSML / inline-tag guidance and a chat flow gets
+markdown guidance — same flow definition, different rendering hint.
+
+## Memory
+
+Three layers, all backed by pgvector:
+
+- **Episodic memory** — long-term semantic chunks of user turns.
+  Searchable by user / cluster.
+- **Persistent user facts** — extracted after each turn (`role`,
+  `type`, `value`). Newer extractions supersede older ones.
+- **Knowledge bases** — per-org document collections, retrievable
+  through the `rag` flow node.
