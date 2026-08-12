@@ -1,0 +1,88 @@
+---
+title: Channels
+description: "Every conversation surface, its capabilities, and how sessions move between them"
+---
+
+A **channel** is the surface a conversation runs over. Channels are
+implemented as plugins behind one registry — each plugin declares its
+capabilities, session window, and webhook adapter, so new channels can
+be added without changes to the data model or the flow engine. A flow
+is channel-agnostic: the same definition answers a phone call, a
+WhatsApp message, or a widget visitor.
+
+## Channel inventory
+
+| Channel | Transport | Modality | Direction | Status |
+|---|---|---|---|---|
+| `voice` | SIP telephony via LiveKit SIP (Telnyx / Twilio carriers) | Voice | Inbound + outbound | Available |
+| `web` | Embeddable widget — HTTPS text chat (streamed) **and** WebRTC voice | Text + voice | Visitor-initiated | Available |
+| `whatsapp` | Meta Cloud API | Text, media, buttons, lists | Inbound + outbound | Available |
+| `sms` | Twilio | Text | Inbound + outbound | Available |
+| `api` | HTTP trigger endpoint | Text / headless | Outbound-capable | Available |
+| `clip` | Store-and-forward audio upload (transcribed, then run as one turn) | Async voice → text | Inbound | Available |
+| `invoke` | Internal — parent flow spawns a child flow | Inherits child transport | Internal | Available |
+| `telegram` | Bot API | Text | — | Planned |
+
+`web` is the only channel that is both text and voice: the widget
+starts in chat and can upgrade to a live voice conversation using the
+same media pipeline as a phone call.
+
+`clip` is designed for offline capture (e.g. wearable devices in
+network-poor environments): audio is recorded on the device, uploaded
+when connectivity returns, transcribed, and executed as a complete
+flow turn. Uploads are idempotent — a clip is processed at most once
+even if the upload retries.
+
+## Channel capabilities
+
+Each channel plugin declares three capabilities the runtime uses for
+routing decisions:
+
+| Capability | Meaning | Channels with it |
+|---|---|---|
+| **Addressable** | An external address (phone number, chat identity) can be routed to a flow | voice, web, sms, whatsapp, telegram, api |
+| **Persistent** | The conversation thread survives between turns without a live connection | web, sms, whatsapp, telegram |
+| **Outbound-initiate** | AICO can start a conversation on this channel | voice, sms, whatsapp, telegram, api |
+
+## Reachability windows
+
+Persistent channels have a window inside which the session can be
+resumed by the next inbound message:
+
+| Channel | Window | Source |
+|---|---|---|
+| WhatsApp | 24 h | Meta customer-service window (platform-mandated) |
+| SMS | 24 h | AICO default |
+| Telegram | 7 days | AICO default |
+| Web widget | 30 min | Tab-idle timeout |
+| Voice | — | Bound to the live call, no window |
+
+## Channel routing
+
+Inbound addresses are bound to flows through **channel routes**: a
+phone number, WhatsApp business number, or API key is mapped to the
+flow that should answer it. Routes are managed per organization
+through the dashboard or the API.
+
+## Cross-channel operations
+
+Flows can move across channels mid-conversation:
+
+- **Side-channel messages** — a `message` node can deliver on a
+  different channel than the session (e.g. text a confirmation link by
+  SMS during a voice call). A reply to that message starts its own
+  session via the channel route.
+- **Re-establishing contact** — the `reach` node re-establishes
+  reachability after a `disconnect`: on voice it dials the user back
+  into the same room; on messaging channels it validates the
+  reachability window before sending.
+- **Session migration** — a live session can be moved to another
+  channel; the next inbound turn on the new channel resumes the same
+  session with full state.
+
+## Rendering hints
+
+Channel-specific prompt hints are injected into the LLM context:
+voice flows get speech-rendering guidance (no markdown, spoken-form
+numbers), chat flows get markdown and button/list affordances — same
+flow definition, different rendering.

@@ -3,18 +3,22 @@ title: Introduction
 description: "AICO documentation index"
 ---
 
-AICO is a voice-agent runtime. Conversations happen over WebRTC, SIP, or
-WhatsApp; the backend runs a DAG flow executor that calls pluggable STT,
+AICO is a voice- and chat-agent runtime. Conversations run over phone
+(SIP), WhatsApp, SMS, the embeddable web widget, and native clients;
+the backend runs a graph-based flow executor that calls pluggable STT,
 TTS, and LLM providers.
 
 ## Platform
 
 - [Overview](/platform/overview) — stack at a glance
 - [Concepts](/platform/concepts) — how a session runs end-to-end
-- [Flow Execution](/platform/flows) — DAG engine, node types, memory, tools
+- [Channels](/platform/channels) — every conversation surface and its capabilities
+- [Flow Triggering](/platform/triggers) — every way a conversation starts, and how each is authenticated
+- [Client Surfaces](/platform/clients) — widget, extension, native apps, and the two access tiers
+- [Flow Execution](/platform/flows) — graph engine, node types, memory, tools
 - [Provider Ecosystem](/platform/providers) — STT / TTS / LLM catalog and per-flow config
 - [Hardware sizing](/platform/sizing) — VRAM / GPU tiers / topology
-- [Security](/platform/security) — auth, roles, tenant model
+- [Security](/platform/security) — auth, roles, tenant model, audit
 
 ## Connectors
 

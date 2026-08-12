@@ -4,114 +4,155 @@ description: "STT / TTS / LLM catalog and per-flow config"
 ---
 
 AICO ships with cloud and self-hosted speech and language providers.
-Each provider has a per-flow config schema, a per-org secrets schema,
-and a unique key. Selection happens per flow; resolution merges
-defaults → organization → flow.
+Cloud providers are part of the platform catalog; self-hosted
+providers are published dynamically by the inference services actually
+deployed with your instance — so the local catalog always reflects
+what your deployment can really run.
 
 ## Provider resolution
+
+Each flow **selects** its STT, TTS, and LLM provider. Configuration
+for the selected provider merges three layers:
 
 ```mermaid
 flowchart LR
     D["Provider defaults"] --> M
     O["Organization config<br/>+ secrets"] --> M
-    F["Flow override"] --> M
+    F["Flow config"] --> M
     M["Resolved provider<br/>(per-session)"] --> AGT["Agent worker"]
     style F stroke-width:3px
 ```
 
-Priority: **flow > organization > default**. Required secrets are
-validated at flow trigger; missing keys raise HTTP 412 before the
-agent worker starts — preventing opaque mid-call SDK errors.
+Config precedence: **flow > organization > provider defaults**. The
+organization supplies credentials and shared defaults; the flow picks
+the provider and tunes it per use case. Required secrets are validated
+at flow trigger; missing keys raise HTTP 412 before the agent worker
+starts — preventing opaque mid-call SDK errors.
 
-## STT providers (9)
+## STT providers
 
-| Key | Hosting |
-|---|---|
-| `deepgram` | Cloud |
-| `gladia` | Cloud |
-| `openai-stt` | Cloud |
-| `microsoft-speech` | Cloud |
-| `groq-stt` | Cloud |
-| `local-stt-qwen` | Self-hosted (Qwen3-ASR-1.7B) |
-| `local-stt-cohere` | Self-hosted (Cohere Transcribe) |
-| `local-stt-whisper` | Self-hosted (faster-whisper) |
-| `local-stt-vosk` | Self-hosted (Vosk) |
+### Cloud
 
-## TTS providers (11)
+| Key | Vendor | Notes |
+|---|---|---|
+| `deepgram` | Deepgram | Nova-3 family; diarization, PII redaction, key terms |
+| `gladia` | Gladia | Solaria-1; 100+ languages, code-switching, live translation |
+| `openai-stt` | OpenAI | gpt-4o-transcribe family, whisper-1 |
+| `microsoft-speech` | Azure Speech | Includes phoneme-level pronunciation assessment |
+| `groq-stt` | Groq | whisper-large-v3-turbo / v3 |
 
-| Key | Hosting |
-|---|---|
-| `elevenlabs` | Cloud |
-| `cartesia` | Cloud |
-| `openai-tts` | Cloud |
-| `deepgram-tts` | Cloud (Aura-2) |
-| `local-tts-voxcpm` | Self-hosted, voice cloning |
-| `local-tts-qwen` | Self-hosted (Qwen3-TTS), voice cloning |
-| `local-tts-cosyvoice` | Self-hosted (CosyVoice2), voice cloning |
-| `local-tts-f5tts` | Self-hosted (F5-TTS), voice cloning |
-| `local-tts-orpheus` | Self-hosted, preset voices |
-| `local-tts-kokoro` | Self-hosted, preset voices |
-| `local-tts-piper` | Self-hosted, preset voices |
+### Self-hosted
 
-### Voice store
+Self-hosted models appear as `local-stt-<model>` providers, published
+by the deployed STT service. The current engine catalog:
 
-Cloning-capable engines (`voxcpm`, `qwen`, `cosyvoice`, `f5tts`) share
-a voice library: upload a reference clip once, use the resulting
-`voice_id` from any cloning engine. Preset-only engines (`orpheus`,
-`kokoro`, `piper`) ignore the store.
+| Engine | Models | Notes |
+|---|---|---|
+| Whisper (faster-whisper) | `whisper-large-v3` (default), `whisper-distil-large-v3`, `whisper-tiny` | Multi-language; the distil variant is English-only and ~6× faster |
+| Qwen3-ASR | `qwen3-asr-1.7b` | Streaming, 52 languages, automatic language detection |
+| Cohere Transcribe | `cohere-transcribe` | 14 languages, long-form chunking |
+| Vosk | `vosk-de` | CPU-only, fully offline, streaming |
+| emotion2vec | `emotion2vec-base`, `emotion2vec-large` | **Paralinguistic sidecar** — emotion + sentiment per utterance, runs alongside a transcribing engine |
 
-The frontend voice picker auto-hides for preset-only engines based on
-each provider's declared capabilities.
+Which models are available depends on the deployment: each instance
+enables the models its hardware supports (CPU, CUDA, or ROCm builds).
 
-## LLM providers (10)
+## TTS providers
 
-Cloud: `openai`, `anthropic`, `google`, `groq`, `azure-openai`,
-`cerebras`, `deepinfra`, `fireworks`. Self-hosted: `qwen` (Ollama-
-compatible), `cli-proxy` (vendor CLIs as OpenAI-shaped proxies).
+### Cloud
 
-Local Ollama is reached via the `qwen` or `cli-proxy` provider; the
-operator picks the specific model per flow.
+| Key | Vendor | Notes |
+|---|---|---|
+| `elevenlabs` | ElevenLabs | Live voice catalog |
+| `cartesia` | Cartesia | Live voice catalog |
+| `openai-tts` | OpenAI | Preset voices |
+| `deepgram-tts` | Deepgram | Aura-2 |
 
-## Configuration tiers
+### Self-hosted
 
-```mermaid
-flowchart TB
-    subgraph PR["Per-request (per-flow)"]
-        direction LR
-        LG["Language"]
-        VID["Voice ID"]
-        EP["Endpointing"]
-        TMP["Temperature"]
-        ST["Style / emotion"]
-    end
-    FC["Flow config UI"] --> PR
-```
+Published as `local-tts-<model>`:
 
-Per-flow fields cover everything an org admin tunes: language, voice,
-endpointing, temperature, style. Engine-internal settings (model
-paths, GPU device, attention backend) are operator-only and stay out
-of the per-flow UI — the API will reject them on a per-flow call
-regardless of caller role.
+| Engine | Model | Voice cloning |
+|---|---|---|
+| Piper | `piper-de` | No (preset, CPU-only) |
+| Kokoro | `kokoro` | No (presets, CPU-friendly) |
+| Qwen3-TTS | `qwen3-tts` | Yes |
+| Orpheus | `orpheus-3b` | No (presets, style control) |
+| CosyVoice2 | `cosyvoice2` | Yes, with instruction control |
+| F5-TTS | `f5tts` | Yes |
+| VoxCPM | `voxcpm-2b` | Yes, plus voice design, 48 kHz |
 
-## Endpointing (self-hosted STT)
+### Voices
 
-Self-hosted streaming STT engines emit a final transcript via
-server-side silence detection. Two per-flow knobs:
+Cloning-capable engines synthesize with a `voice_id` referencing a
+reference recording provisioned on the instance. The voice library is
+managed at the deployment level by the operator — treat cloned voices
+as operator-managed assets, not per-flow uploads. Preset engines
+expose their built-in voices directly in the flow config.
+
+## LLM providers
+
+### Cloud
+
+`openai`, `anthropic`, `google`, `groq`, `azure-openai`, `cerebras`,
+`deepinfra`, `fireworks`, `qwen` (Alibaba Cloud), `ollama` (bring
+your own Ollama endpoint), and `cli-proxy` (vendor CLIs exposed as an
+OpenAI-shaped proxy). Model catalogs per provider are maintained in
+the platform and selectable per flow.
+
+### Self-hosted
+
+The LLM inference plane runs **vLLM** with a per-model catalog,
+published as `local-llm-<model>`. Current catalog includes
+Ling-2.6-flash (full, FP8, and INT4 quantizations), Gemma 3
+(27B / 12B / 4B), Qwen3 (30B-A3B, 8B), GPT-OSS-20B, and Llama-4
+Scout. All local models speak the OpenAI-compatible chat API with
+streaming and tool calling.
+
+## Conversation tuning (voice)
+
+Two layers of tuning govern voice turn-taking:
+
+### Flow-level voice settings
+
+Per-flow controls for the live voice pipeline, all optional with
+sensible defaults:
+
+- **Turn detection** — semantic turn-detector threshold, minimum and
+  maximum endpointing delay.
+- **Voice activity detection** — activation threshold, minimum
+  speech / silence durations, padding.
+- **Interruptions** — allow/deny barge-in, minimum interruption
+  duration and word count, false-interruption recovery.
+- **Behavior** — preemptive response generation, user-away timeout,
+  TTS streaming granularity (token or sentence).
+
+### Engine-level endpointing (self-hosted STT)
+
+Streaming self-hosted STT engines (Whisper, Qwen3-ASR, Cohere) also
+emit finals via server-side silence detection:
 
 | Field | Default | Range | Purpose |
 |---|---|---|---|
-| `endpointingMs` | 600 | 100 – 5000 | silence after speech before emitting final |
-| `silenceThreshold` | 0.015 | 0 – 0.5 | RMS level below which audio counts as silence |
+| `endpointingMs` | 600 | 100 – 5000 | silence after speech before emitting a final |
+| `silenceThreshold` | 0.015 | 0 – 0.5 | level below which audio counts as silence |
 
-Cloud STTs expose their own vendor equivalents (Deepgram:
-`endpointingMs`; Gladia: `endpointing` in seconds).
+Cloud STTs expose their own vendor equivalents.
+
+## Configuration tiers
+
+Per-flow fields cover everything an organization admin tunes:
+language, voice, endpointing, temperature, style. Engine-internal
+settings (model paths, GPU device, backend selection) are
+operator-only and never appear in the per-flow UI — the API rejects
+them on per-flow calls regardless of caller role.
 
 ## Secrets handling
 
 | Aspect | Implementation |
 |---|---|
 | Storage | Encrypted at the database / volume layer (operator-configured) |
-| In transit | TLS to providers; M2M HTTPS to the agent worker |
+| In transit | TLS to providers; authenticated HTTPS between services |
 | Frontend exposure | Redacted in every API response |
 | Rotation | Single API call writes a new value |
 

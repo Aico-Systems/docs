@@ -3,29 +3,31 @@ title: Concepts
 description: How AICO orchestrates a voice or chat conversation.
 ---
 
-AICO is a voice-agent runtime. A trigger (phone call, WhatsApp message,
-HTTP request) starts a session; a flow runs to completion, calling
-swappable speech and language providers as it goes.
+AICO is a voice- and chat-agent runtime. A trigger (phone call,
+WhatsApp or SMS message, widget visitor, API request) starts a
+session; a flow runs to completion, calling swappable speech and
+language providers as it goes.
 
 ## The pieces
 
 | Component | What it does |
 |---|---|
-| **Backend** | REST + WebSocket API. Runs the flow executor, resolves providers, persists every session. The single domain surface every other component talks to. |
+| **Backend** | REST + streaming API. Runs the flow executor, resolves providers, persists every session. The single domain surface every other component talks to. |
 | **Frontend** | Dashboard — flow builder, monitoring, organization + provider management. Talks only to the backend. |
 | **Agent worker** | One short-lived process per active voice session. Streams audio between the caller, the STT service, the LLM, and the TTS service. |
-| **STT, TTS, LLM providers** | Pluggable. Cloud (Deepgram, ElevenLabs, OpenAI, …) or self-hosted (Whisper, Vosk, Piper, Kokoro, Ollama, vLLM). Selected per flow. |
+| **STT, TTS, LLM providers** | Pluggable. Cloud (Deepgram, ElevenLabs, OpenAI, Anthropic, …) or self-hosted (Whisper, Qwen, Piper, CosyVoice, vLLM, Ollama). Selected per flow. |
+| **Channel adapters** | Plugin per channel (voice, web, WhatsApp, SMS, …) that normalises inbound webhooks and outbound delivery. |
 | **PostgreSQL + pgvector** | Source of truth for flows, sessions, organizations, secrets, embeddings, transcripts. |
 | **Logto** | OIDC identity provider for users + machine-to-machine tokens. |
 | **LiveKit** | WebRTC + SIP transport for voice. |
 
 ## Session lifecycle
 
-From a trigger to an active conversation:
+From a trigger to an active voice conversation:
 
 ```mermaid
 sequenceDiagram
-    participant Ext as Trigger (call / WA / HTTP)
+    participant Ext as Trigger (call / message / API)
     participant BE as Backend
     participant LK as LiveKit
     participant AGT as Agent worker
@@ -51,6 +53,11 @@ sequenceDiagram
     end
 ```
 
+Text channels (WhatsApp, SMS, widget chat) skip the media path: the
+inbound message is handed to the flow executor directly and the reply
+is delivered through the channel adapter. The flow definition is the
+same either way.
+
 The flow executor is **stateless per request** — every invocation
 reconstructs state from PostgreSQL. A long conversation runs as many
 short executor calls, driven by inbound events (transcripts, tool
@@ -58,40 +65,49 @@ callbacks, child-flow completions).
 
 ## Provider resolution
 
-Three layers merge into a single resolved config per session:
+Each flow **selects** its STT, TTS, and LLM providers. Configuration
+for the selected provider merges three layers:
 
 ```mermaid
 flowchart LR
     D["Provider defaults"] --> M
     O["Organization config<br/>+ secrets"] --> M
-    F["Flow override"] --> M
+    F["Flow config"] --> M
     M["Resolved provider"] --> AGT["Agent worker"]
     style F stroke-width:3px
 ```
 
-Priority: **flow > organization > default**. Missing required secrets
-fail the trigger with HTTP 412 before the agent worker is dispatched
-— preventing opaque mid-call SDK errors.
+Config precedence: **flow > organization > provider defaults**. The
+organization supplies credentials (API keys) and shared defaults; the
+flow picks the provider and overrides tuning per use case. Missing
+required secrets fail the trigger with HTTP 412 before the agent
+worker is dispatched — preventing opaque mid-call SDK errors.
 
 ## Channels
 
-| Channel | Transport | Status |
-|---|---|---|
-| Phone | SIP via LiveKit SIP + telephony provider (Telnyx / Twilio) | implemented |
-| WhatsApp | Meta Cloud API | implemented |
-| Web widget | — | not implemented |
+Conversations run over eight channel types — phone (SIP), web widget
+(text + voice), WhatsApp, SMS, API, store-and-forward audio clips,
+child-flow sessions, and Telegram (planned). Each channel declares its
+capabilities (addressability, persistence, outbound initiation) and
+its reachability window. Full detail: [Channels](/platform/channels).
 
 Channel-specific prompt hints are injected into the LLM context so a
-voice flow gets SSML / inline-tag guidance and a chat flow gets
+voice flow gets speech-rendering guidance and a chat flow gets
 markdown guidance — same flow definition, different rendering hint.
 
 ## Memory
 
 Three layers, all backed by pgvector:
 
-- **Episodic memory** — long-term semantic chunks of user turns.
-  Searchable by user / cluster.
-- **Persistent user facts** — extracted after each turn (`role`,
-  `type`, `value`). Newer extractions supersede older ones.
-- **Knowledge bases** — per-org document collections, retrievable
-  through the `rag` flow node.
+- **Episodic memory** — long-term semantic chunks of user turns,
+  facts, preferences, and observations. Extracted automatically at
+  session end. Searchable by user.
+- **Persistent variables** — flow variables marked as persistent
+  survive across sessions for the same user.
+- **Knowledge bases** — per-organization document collections,
+  retrievable through the `rag` flow node.
+
+Identity is unified across channels: a caller's phone number and a
+messaging identity on the same number converge on one memory profile,
+and an anonymous web visitor's memory is merged into their verified
+identity once they are identified.

@@ -1,11 +1,11 @@
 ---
 title: Flow Execution
-description: "DAG engine, node types, memory"
+description: "Graph engine, node types, memory, tools"
 ---
 
-Flows are directed acyclic graphs of typed nodes. The flow executor
-runs the graph, streams events to the agent worker over LiveKit data
-channels, and persists session state in PostgreSQL.
+Flows are directed graphs of typed nodes. The flow executor runs the
+graph, streams events to the conversation surface, and persists
+session state in PostgreSQL.
 
 ## Execution model
 
@@ -13,167 +13,191 @@ channels, and persists session state in PostgreSQL.
 stateDiagram-v2
     [*] --> Triggered
     Triggered --> SecretsValidated: validate provider secrets
-    SecretsValidated --> SessionCreated: dispatch agent
-    SessionCreated --> Running: agent joins room
-    Running --> Listening: listen / agentic node awaits user
-    Listening --> Running: transcript received
+    SecretsValidated --> SessionCreated: dispatch agent / open channel
+    SessionCreated --> Running: session active
+    Running --> AwaitingUser: agentic node awaits user turn
+    AwaitingUser --> Running: transcript / message received
     Running --> ToolCall: tool / integration / rag
-    ToolCall --> Running: result merged into vars
+    ToolCall --> Running: result merged into variables
     Running --> Invoked: invoke node → child flow
-    Invoked --> Running: child completes
-    Running --> Speaking: speak node → TTS
-    Speaking --> Running: tts done
-    Running --> [*]: end / return / disconnect
+    Invoked --> Running: child returns
+    Running --> [*]: end / return
 ```
 
 The executor is **stateless per request** — every invocation
 reconstructs state from PostgreSQL. A long conversation runs as many
 short executor calls, driven by inbound events (transcripts, tool
 callbacks, child-flow completions). This makes scale-out
-straightforward: any backend pod can pick up the next event.
+straightforward: any backend instance can pick up the next event.
 
 ## Node types
 
-16 node types organised by purpose:
+15 node types organised by purpose:
 
 <AccordionGroup>
-  <Accordion title="Core (3)">
+  <Accordion title="Core (9)">
     | Node | Purpose |
     |---|---|
-    | `start` | Entry point, initial variable bindings |
-    | `end` | Terminal node, completes the session |
-    | `message` | Non-spoken log entry in the transcript |
+    | `start` | Entry point; declares the flow's typed input contract (caller-supplied, channel-derived, or auto-generated inputs) |
+    | `end` | Terminates the flow; archives the transcript and persists variables |
+    | `message` | Sends output to the user — a static template with variable interpolation, or LLM-generated. Can deliver on a side channel (e.g. text a link during a voice call) |
+    | `condition` | Branches on an expression, or N labelled branches |
+    | `wait` | Fixed delay with an optional filler message; auto-cancels when a parallel sibling starts responding |
+    | `pause` | Puts the user on hold (hold music on voice, waiting state in chat) |
+    | `disconnect` | Drops the user from the channel while the flow continues headless; can keep the room open for a later re-attach |
+    | `reach` | Re-establishes contact after a disconnect — dials the user back on voice, validates the messaging window on chat channels. Ports: connected / no answer / rejected / error |
+    | `handoff` | Hands the conversation to another party (phone number, SIP URI, or a person in the organization); the flow continues headless |
   </Accordion>
-  <Accordion title="Audio I/O (2)">
+  <Accordion title="LLM (1)">
     | Node | Purpose |
     |---|---|
-    | `speak` | Sends text through TTS to the caller |
-    | `listen` | Awaits user utterance; captures transcript into a variable |
+    | `agentic` | The conversational engine: routing, variable extraction, and response generation in one LLM-driven node. Awaits user turns, extracts typed variables, and picks the next route |
   </Accordion>
-  <Accordion title="Control flow (4)">
+  <Accordion title="Tools & knowledge (3)">
     | Node | Purpose |
     |---|---|
-    | `condition` | Branches on guard expressions over variables |
-    | `wait` | Delay-based pause |
-    | `pause` | Explicit pause awaiting operator resume |
-    | `disconnect` | Terminates the call |
+    | `toolExecutor` | Invokes a configured tool with parameter bindings from flow variables |
+    | `integration` | Calls an external integration action (CRM, calendar, …) through the authenticated integration proxy |
+    | `rag` | Hybrid retrieval (vector + keyword + fuzzy, rank-fused) over the organization's knowledge bases. Ports: found / not found |
   </Accordion>
-  <Accordion title="LLM / tools (3)">
+  <Accordion title="Composition (2)">
     | Node | Purpose |
     |---|---|
-    | `agentic` | LLM-driven multi-route decision node |
-    | `llm` | Single-shot LLM call (non-agentic) |
-    | `toolExecutor` | Invokes a configured tool (HTTP / webhook / MCP) |
-  </Accordion>
-  <Accordion title="External (4)">
-    | Node | Purpose |
-    |---|---|
-    | `integration` | Calls a Nango-backed integration action |
-    | `rag` | Retrieval-augmented search over a knowledge base |
-    | `handoff` | Transfers the call (bridge to another number) |
-    | `invoke` | Invokes a sub-flow in a child room; parent suspends |
-    | `return` | Returns a value to the parent flow after invocation |
+    | `invoke` | Spawns a child flow in its own room; can ring people, hold the caller, and narrate progress |
+    | `return` | Completes a child flow back to its parent — return a value, bridge the caller to the consulted party, or hand off externally |
   </Accordion>
 </AccordionGroup>
 
-## Parallel branches
+## Variables
 
-`branch` nodes split execution into N concurrent branches within one
-executor call. Branches can signal one another within the request;
-state doesn't cross request boundaries.
+The `agentic` node extracts typed variables from the conversation:
+`string`, `number`, `boolean`, `date`, `phone`, `email`, and `image`.
+
+- **Asked vs derived** — a variable with a prompt is asked of the
+  user; a variable marked *derived* is authored by the assistant from
+  context and never asked (e.g. a ticket subject line).
+- **Image variables** are filled by the runtime from media the user
+  sends — never by the LLM.
+- **Persistent variables** survive across sessions for the same user.
+- Whether a variable is required is decided per edge: an edge can
+  require variables (or a photo on the current turn) before it can be
+  traversed.
+
+## Parallel execution
+
+Parallelism is expressed on the graph itself: multiple edges leaving
+the same port, marked parallel, fan out into concurrent branches. The
+engine computes where the branches reconverge and merges their
+results.
 
 ```mermaid
 flowchart LR
-    A["agentic"] --> B["branch"]
-    B --> C1["speak · listen"]
-    B --> C2["tool · rag"]
-    B --> C3["llm"]
-    C1 --> J["join"]
-    C2 --> J
-    C3 --> J
-    J --> D["end"]
+    A["agentic"] -- parallel --> C1["message"]
+    A -- parallel --> C2["toolExecutor · rag"]
+    A -- parallel --> C3["integration"]
+    C1 --> D["condition (convergence)"]
+    C2 --> D
+    C3 --> D
+    D --> E["end"]
 ```
 
-## Invoke → return (sub-flows)
+Branches coordinate at runtime: only one branch speaks to the user at
+a time (the first to produce output wins the voice), and `wait` nodes
+in sibling branches cancel automatically when another branch starts
+responding.
 
-A parent flow can invoke a child flow, suspending until the child
-completes:
+## Invoke → return (child flows)
+
+A parent flow can invoke a child flow — the pattern behind
+consultations, relays, and warm transfers:
 
 ```mermaid
 sequenceDiagram
+    participant Caller as Caller (held)
     participant P as Parent flow
-    participant BE as Backend
-    participant LK as LiveKit
     participant C as Child flow
+    participant T as Consulted party
 
-    P->>BE: invoke node
-    BE->>LK: Create child room
-    LK->>C: Spawn child agent
-    P-->>P: suspended
-    Note over C: Runs to completion
-    C->>BE: return value
-    BE->>P: resume with return value
-    P->>P: continue after invoke
+    P->>C: invoke — child room created
+    C->>T: ring (in-app + phone, first answer wins)
+    Caller-->>Caller: hold message / music,<br/>progress narration
+    T->>C: answers, converses
+    C->>P: return (value | bridge | handoff)
+    P->>Caller: parent resumes with the result
 ```
 
-Useful for: pre-screening / qualification flows, hand-offs to a
-specialised assistant, retry-with-different-model patterns.
-
-## Storage + versioning
-
-Flows are stored as JSON, schema-validated at write time. Versioning is
-application-level — every save creates a new version row. Flows can be
-exported via the API for Git-tracked operator workflows.
-
-## Channels
-
-| Channel | Transport | Status |
-|---|---|---|
-| Phone | SIP via LiveKit SIP + telephony provider | implemented |
-| WhatsApp | Meta Cloud API | implemented |
-| Web widget | — | not implemented |
-
-Channel-specific prompt hints are injected into the LLM context. Voice
-flows get SSML / inline-tag guidance; chat flows get markdown
-guidance — same flow definition, different rendering hint.
+- **Ringing** — a dial target is a *person*, not a device: ringing
+  reaches all their endpoints (in-app notification on every signed-in
+  device + their phone number); the first answer wins. Multiple
+  targets can ring in parallel or sequentially.
+- **Hold + narration** — the original caller can be held with a
+  message or music, and the parent can narrate child progress
+  ("I'm reaching your advisor now…") driven by child lifecycle
+  events.
+- **Completion types** — `return` (the agent comes back to the caller
+  with a result), `bridge` (the caller is connected directly to the
+  consulted party), or `handoff` (external transfer).
+- **Keep-alive** — a child can be kept alive after returning, so a
+  follow-up invoke reconnects the same consulted party without
+  ringing again.
 
 ## Tools
 
-The `toolExecutor` node supports:
+The `toolExecutor` node runs configured tools:
 
-| Type | How it's authored |
+| Type | What it is |
 |---|---|
-| Custom TypeScript handlers | Registered in the tool registry |
-| cURL import | Paste a cURL command; AICO infers the schema |
-| OpenAPI import | Point at an OpenAPI spec |
-| MCP discovery + test | Register an MCP server, browse its tools |
-| Webhook callback | HMAC-signed callback for asynchronous tools |
+| HTTP | Declarative HTTP call with bearer / basic / API-key auth, secret interpolation, and response mapping |
+| Code | A sandboxed handler executed in an isolated worker |
+| MCP | Tools discovered from a registered MCP server (SSE or streamable HTTP) |
+| Built-in | Platform-provided actions |
+| Pipeline | Composition of other tools |
 
-Tool secrets are scoped per organization, injected at invocation time.
+Tools are authored directly, imported from a **cURL command**, or
+imported from an **OpenAPI spec**. Tool secrets are scoped per
+organization and injected at invocation time — flow definitions never
+contain credentials.
+
+**Asynchronous tools**: a tool that reports async completion either
+routes the flow onward immediately on a *pending* port or parks the
+session; your system resumes it later by calling a single-use,
+HMAC-signed callback URL.
 
 ## Memory
 
-Three layers, all backed by pgvector cosine similarity:
+Three layers, all backed by pgvector:
 
 ```mermaid
 flowchart LR
-    UT["User utterance<br/>+ transcript"] --> EP["Episodic chunks<br/>(semantic long-term)"]
-    UT --> FX["Fact extractor<br/>(LLM)"]
-    FX --> FC["Persistent facts<br/>{role, type, value}"]
+    UT["Session transcript"] --> FX["Fact extractor<br/>(at session end)"]
+    FX --> EP["Episodic memory<br/>(facts · preferences · observations)"]
+    PV["Persistent variables"] --> NS["Next session"]
     KB["Knowledge bases<br/>(per-org docs)"]
-    EP -.query.-> RAG["rag node"]
-    FC -.query.-> AGC["agentic context"]
-    KB -.query.-> RAG
+    EP -.recall.-> AGC["agentic context"]
+    KB -.query.-> RAG["rag node"]
 ```
 
-- **Episodic memory** — long-term semantic chunks of user turns. Each
-  turn can be chunked, embedded, and stored with a TTL and optional
-  cluster tag.
-- **Persistent user facts** — extracted after each turn. Newer
-  extractions supersede older ones.
-- **Knowledge bases** — per-org document collections; ingestion
-  chunks + embeds, retrieval through the `rag` node. Queries
-  parallelise across sub-queries.
+- **Episodic memory** — at session end, an extraction pass turns the
+  transcript into individually embedded facts, preferences, and
+  observations, recalled in later conversations.
+- **Persistent variables** — flow variables marked persistent are
+  restored at the start of the user's next session.
+- **Knowledge bases** — per-organization document collections;
+  ingestion chunks and embeds, retrieval through the `rag` node.
+
+Identity is unified across channels — the same phone number on voice,
+SMS, and WhatsApp maps to one memory profile, and anonymous web
+memory is merged into the verified identity once the visitor is
+identified.
+
+## Storage + versioning
+
+Flows are stored as JSON and schema-validated at write time. Every
+save appends an immutable version snapshot with author and optional
+release notes; version numbers are gapless per flow. Rollback writes
+the selected snapshot back as a *new* version — history is never
+mutated. Flows can be exported via the API for Git-tracked operator
+workflows.
 
 ## Sessions
 

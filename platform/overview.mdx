@@ -3,9 +3,10 @@ title: Overview
 description: "What AICO is and how the pieces connect"
 ---
 
-AICO is a voice-agent runtime. It orchestrates conversations over phone
-(SIP), WhatsApp, and web (WebRTC) through a DAG-based flow executor
-that calls swappable STT, TTS, and LLM providers.
+AICO is a voice- and chat-agent runtime. It orchestrates conversations
+over phone (SIP), WhatsApp, SMS, an embeddable web widget, and native
+clients through a graph-based flow executor that calls swappable STT,
+TTS, and LLM providers.
 
 ## Stack
 
@@ -16,16 +17,35 @@ that calls swappable STT, TTS, and LLM providers.
 | Database | PostgreSQL + pgvector |
 | Cache | Valkey 8 |
 | Media | LiveKit (WebRTC + SIP) + LiveKit Egress (recording) |
-| Agent worker | Python · LiveKit Agents SDK · Silero VAD |
-| Speech (self-hosted) | FastAPI services running pluggable STT / TTS engines |
-| LLM (self-hosted) | Ollama, vLLM (CUDA / ROCm) |
+| Agent worker | Python · LiveKit Agents SDK · Silero VAD · multilingual turn detector |
+| Speech (self-hosted) | Multi-engine STT / TTS services with a per-model catalog (CPU / CUDA / ROCm builds) |
+| LLM (self-hosted) | vLLM inference plane with a per-model catalog; Ollama supported |
 | Auth | Logto (OAuth2 / OIDC) |
 | Embeddings | embeddinggemma (768-dim) |
+| Client surfaces | Embeddable web widget, browser extension, Android (Wear OS + wearable scanner), desktop |
+| Observability | OpenTelemetry export (optional) |
+
+## Deployment shapes
+
+AICO ships the same application in three shapes:
+
+- **Cloud (multi-tenant SaaS)** — Kubernetes charts, GitOps-managed.
+- **Dedicated instance** — the full platform on a single host as a
+  self-contained container bundle, on our infrastructure or yours
+  (on-prem). Includes a guided update script and restore runbook.
+- **Customer Kubernetes** — the same charts with partner-supplied
+  values for customers who run their own clusters.
+
+All shapes are generated from one manifest pipeline, so a dedicated
+instance runs the same services and versions as the cloud product.
 
 ## Pages in this section
 
 - [Concepts](/platform/concepts) — how a session runs end-to-end
-- [Flow Execution](/platform/flows) — DAG engine, node types, memory
+- [Channels](/platform/channels) — conversation surfaces and their capabilities
+- [Flow Triggering](/platform/triggers) — every way a conversation starts
+- [Client Surfaces](/platform/clients) — widget, extension, native apps, access tiers
+- [Flow Execution](/platform/flows) — graph engine, node types, memory
 - [Provider Ecosystem](/platform/providers) — STT / TTS / LLM catalog, per-flow config
 - [Hardware sizing](/platform/sizing) — VRAM / GPU tiers / topology
-- [Security](/platform/security) — auth, roles, tenant model
+- [Security](/platform/security) — auth, roles, tenant model, audit

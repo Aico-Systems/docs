@@ -29,6 +29,9 @@
 						"pages": [
 							"platform/overview",
 							"platform/concepts",
+							"platform/channels",
+							"platform/triggers",
+							"platform/clients",
 							"platform/flows",
 							"platform/providers",
 							"platform/sizing",

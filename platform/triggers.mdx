@@ -1,0 +1,93 @@
+---
+title: Flow Triggering
+description: "Every way a conversation starts, and how each entry point is authenticated"
+---
+
+Every session starts through one of the entry points below. Each is
+gated by an explicit route policy — the authentication tier of every
+trigger is fixed at the API layer, and at trigger time every effective
+provider is validated against its required secrets (missing
+credentials fail with HTTP 412 before any call or agent starts).
+
+## Inbound triggers
+
+Started by the outside world reaching an address you routed to a flow.
+
+| Trigger | How it arrives | Authentication |
+|---|---|---|
+| **Phone call** | Carrier delivers the call over SIP; the routed number selects the flow; the agent joins the call | Media-server webhook, signature-verified |
+| **WhatsApp message** | Meta Cloud API webhook | Per-adapter signature verification |
+| **SMS** | Twilio webhook | Per-adapter signature verification |
+| **Web widget — chat** | `POST /api/web/flows/:flowId/messages` (streamed reply) | Public, gated by per-flow enablement + origin allowlist + rate limits |
+| **Web widget — voice** | `POST /api/web/flows/:flowId/voice-token` → WebRTC room | Public, same gate as chat |
+| **Audio clip** | `POST /api/flows/:flowId/clips` — offline-recorded audio, transcribed and run as one turn | Authenticated, organization-scoped |
+
+The widget's public endpoints never expose organization data: an
+anonymous visitor can only talk to a flow that was explicitly enabled
+for web embedding, from an origin on that flow's allowlist, within
+rate limits. See [Client Surfaces](/platform/clients) for the
+anonymous identity model.
+
+## API triggers
+
+Server-to-server and programmatic starts.
+
+### `POST /api/flows/:flowId/trigger`
+
+The general-purpose trigger. Accepts a user JWT **or** an AICO API
+key. Modes:
+
+- **Headless** — runs the flow without any live conversation surface
+  (data processing, notifications, side effects).
+- **Outbound call** — with a `destination` phone number, AICO dials
+  out and connects the answered call to the flow.
+- **Synchronous** — waits for completion and returns the flow's
+  return value in the response.
+- **Callback** — with a `webhookUrl`, the result is POSTed to your
+  endpoint when the flow completes.
+
+<Info>
+  AICO has no built-in scheduler by design. Recurring or scheduled
+  runs are driven from your side — cron, n8n, Zapier, or any job
+  runner calling the trigger endpoint with an API key.
+</Info>
+
+### `POST /api/flows/:flowId/start`
+
+The authenticated conversation start used by the dashboard flow
+tester and the native clients (watch, wearable scanner, desktop).
+Requires an organization-scoped token; starts a chat or voice session
+attributed to the calling user.
+
+## Flow-internal triggers
+
+Started by a running flow or the runtime itself:
+
+- **Child flows** — an `invoke` node spawns a child flow in its own
+  room and can ring one or more people (in-app ring + phone dial-out,
+  first answer wins) while the original caller is held with progress
+  narration.
+- **Child completion** — the child's `return` node wakes the parent
+  flow, which continues from the invoke node.
+- **Async tool callbacks** — a tool that reports asynchronous
+  completion parks or forks the flow; your system later calls a
+  single-use, HMAC-signed callback URL to resume it.
+- **Silence follow-up** — a per-flow policy re-engages the user after
+  configurable silence, on voice and text channels.
+
+## Direct calls (no flow)
+
+Signed-in organization members can call each other directly:
+device-to-device rooms with ring, accept, decline, and cancel — used
+by the native clients for coworker calling and for inviting a person
+into a running flow's conversation (consult / handoff). Direct calls
+are plain calls, not flow sessions: no flow runs, and nothing is
+attributed to a flow's history.
+
+## Start-node input contract
+
+A flow's start node declares a typed **input contract**: which inputs
+the flow requires, and where each comes from — supplied by the
+caller, derived from the channel (e.g. the caller's phone number), or
+auto-generated. Triggers that don't satisfy the contract are refused
+up front, so a flow can never start with missing inputs.

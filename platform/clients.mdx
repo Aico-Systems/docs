@@ -1,0 +1,74 @@
+---
+title: Client Surfaces
+description: "Widget, extension, native apps — and the two access tiers behind them"
+---
+
+Every client surface reaches flows through one of two access tiers.
+Keeping them distinct is central to AICO's security model.
+
+## The two tiers
+
+|  | **Anonymous public embed** | **Authenticated client** |
+|---|---|---|
+| Who | An anonymous visitor on your website | A signed-in user of your organization |
+| Surfaces | Embeddable widget, browser extension | Dashboard, watch app, wearable scanner app, desktop app |
+| Endpoints | `/api/web/*` | `POST /api/flows/:id/start` and the full API |
+| Authentication | None — gated by per-flow enablement, origin allowlist, and rate limits | OIDC (Logto) organization-scoped token |
+| Identity | Per-tab session, optional pseudonym, or a signed identity from your backend | The user's verified identity, with role-based access control |
+| Memory | Session-scoped, upgradeable (see below) | Persistent per-user memory |
+
+## Anonymous embed — the widget
+
+The `<aico-flow>` web component embeds a flow on any site: text chat
+with streamed replies, file attachments, and an in-place upgrade to a
+live voice conversation. The browser extension packages the same
+widget for use on any page.
+
+Anonymous identity is a three-step ladder:
+
+1. **Per-tab session** (default) — an opaque session ID scoped to the
+   browser tab. Nothing persists after the tab closes.
+2. **Persistent pseudonym** (opt-in per flow) — a client-stored
+   anonymous ID so returning visitors continue with context. Off by
+   default (shared-terminal safety); intended to be tied to your
+   cookie-consent flow.
+3. **Signed identity** — your backend signs the visitor's user ID
+   with a per-organization secret (HMAC); the widget forwards the
+   token, and AICO verifies it. This names *your* user without any
+   AICO login. When a signed identity appears, memory accumulated
+   under the pseudonym is merged into it.
+
+The embed is protected server-side: web access must be explicitly
+enabled per flow, requests are checked against the flow's origin
+allowlist, and per-visitor and per-IP rate limits apply.
+
+## Authenticated clients
+
+| Surface | Platform | Sign-in |
+|---|---|---|
+| **Dashboard** | Browser SPA | OIDC authorization code + PKCE |
+| **Watch app** | Wear OS / Android | OAuth 2.0 Device Authorization Grant |
+| **Wearable scanner app** | Android on an industrial wearable (glove-mounted scanner with mic, display, and buttons) | Device Authorization Grant |
+| **Desktop app** | Rust-based desktop client | Device Authorization Grant (or anonymous mode) |
+
+Native clients authenticate once via the device grant (type a short
+code in any browser), then hold an organization-scoped token. Signed-in
+clients get:
+
+- Flow sessions attributed to the user, with persistent memory
+- **Coworker calling** — a directory of callable colleagues,
+  device-to-device calls with ring / accept / decline on every surface
+  including the wearable's display
+- **Call invitations** — a running flow can ring a person (consult,
+  relay, handoff) and the invitation appears on all their devices;
+  first answer wins
+- **Offline clips** — audio captured without connectivity uploads in
+  the background and runs as flow turns when the network returns
+
+## Server-to-server
+
+For backends and integrations, **API keys** replace user login:
+self-contained signed tokens, scoped to an organization and a set of
+permissions, with optional expiry, one-call rotation, and revocation.
+Use them for the trigger endpoint, scheduled runs, and CI. See
+[Security](/platform/security) for details.
