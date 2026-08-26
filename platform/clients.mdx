@@ -4,7 +4,7 @@ description: "Widget, extension, native apps — and the two access tiers behind
 ---
 
 Every client surface reaches flows through one of two access tiers.
-Keeping them distinct is central to AICO's security model.
+Keeping them distinct is central to Mandy's security model.
 
 ## The two tiers
 
@@ -34,8 +34,8 @@ Anonymous identity is a three-step ladder:
    cookie-consent flow.
 3. **Signed identity** — your backend signs the visitor's user ID
    with a per-organization secret (HMAC); the widget forwards the
-   token, and AICO verifies it. This names *your* user without any
-   AICO login. When a signed identity appears, memory accumulated
+   token, and Mandy verifies it. This names *your* user without any
+   Mandy login. When a signed identity appears, memory accumulated
    under the pseudonym is merged into it.
 
 The embed is protected server-side: web access must be explicitly

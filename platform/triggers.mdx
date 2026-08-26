@@ -34,12 +34,12 @@ Server-to-server and programmatic starts.
 
 ### `POST /api/flows/:flowId/trigger`
 
-The general-purpose trigger. Accepts a user JWT **or** an AICO API
+The general-purpose trigger. Accepts a user JWT **or** a Mandy API
 key. Modes:
 
 - **Headless** — runs the flow without any live conversation surface
   (data processing, notifications, side effects).
-- **Outbound call** — with a `destination` phone number, AICO dials
+- **Outbound call** — with a `destination` phone number, Mandy dials
   out and connects the answered call to the flow.
 - **Synchronous** — waits for completion and returns the flow's
   return value in the response.
@@ -47,7 +47,7 @@ key. Modes:
   endpoint when the flow completes.
 
 <Info>
-  AICO has no built-in scheduler by design. Recurring or scheduled
+  Mandy has no built-in scheduler by design. Recurring or scheduled
   runs are driven from your side — cron, n8n, Zapier, or any job
   runner calling the trigger endpoint with an API key.
 </Info>

@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "AICO API",
+    "title": "Mandy API",
     "description": "API for managing AI-powered voice agents, flows, tools, telephony, and more.",
     "version": "1.0.0"
   },

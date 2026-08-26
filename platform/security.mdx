@@ -13,7 +13,7 @@ Every API request carries a token the backend verifies on ingress.
 | Dashboard user | OIDC authorization code + PKCE in the browser; organization-scoped JWT for org APIs |
 | Native clients (watch, wearable, desktop) | OAuth 2.0 Device Authorization Grant, then organization-scoped tokens |
 | Agent worker | Machine-to-machine `client_credentials` with a fixed minimal scope set |
-| Server-to-server | AICO API keys (see below) |
+| Server-to-server | Mandy API keys (see below) |
 | Organization invitations | Single-use invitation tokens embedded in magic links |
 | Anonymous web visitors | No credential — a separate public tier with its own gates (see below) |
 
@@ -51,7 +51,7 @@ provider per deployment. Contact us for SSO onboarding.
 
 ## API keys
 
-For server-to-server access, AICO issues self-contained signed API
+For server-to-server access, Mandy issues self-contained signed API
 keys:
 
 - Signed tokens carrying the organization, granted scopes, and
@@ -160,7 +160,7 @@ surface:
 - No organization data is reachable: the anonymous tier can only
   converse with the enabled flow.
 - Optional **signed identity**: your backend vouches for a visitor
-  with an HMAC-signed token; AICO verifies it against a
+  with an HMAC-signed token; Mandy verifies it against a
   per-organization secret.
 
 ## Audit and retention
@@ -190,7 +190,7 @@ is dispatched — preventing opaque vendor 401s mid-call.
 
 ## Compliance posture
 
-AICO covers the working surface of authentication, authorization,
+Mandy covers the working surface of authentication, authorization,
 tenant isolation, and auditability described above. For specific
 certifications (SOC 2, ISO 27001, HIPAA BAA), compliance add-ons
 (CMK, DLP, audit-log immutability, multi-region replication, regional

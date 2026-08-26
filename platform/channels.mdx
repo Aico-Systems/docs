@@ -42,7 +42,7 @@ routing decisions:
 |---|---|---|
 | **Addressable** | An external address (phone number, chat identity) can be routed to a flow | voice, web, sms, whatsapp, telegram, api |
 | **Persistent** | The conversation thread survives between turns without a live connection | web, sms, whatsapp, telegram |
-| **Outbound-initiate** | AICO can start a conversation on this channel | voice, sms, whatsapp, telegram, api |
+| **Outbound-initiate** | Mandy can start a conversation on this channel | voice, sms, whatsapp, telegram, api |
 
 ## Reachability windows
 
@@ -52,8 +52,8 @@ resumed by the next inbound message:
 | Channel | Window | Source |
 |---|---|---|
 | WhatsApp | 24 h | Meta customer-service window (platform-mandated) |
-| SMS | 24 h | AICO default |
-| Telegram | 7 days | AICO default |
+| SMS | 24 h | Mandy default |
+| Telegram | 7 days | Mandy default |
 | Web widget | 30 min | Tab-idle timeout |
 | Voice | — | Bound to the live call, no window |
 
