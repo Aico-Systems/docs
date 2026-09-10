@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Mandy API",
+    "title": "AICO API",
     "description": "API for managing AI-powered voice agents, flows, tools, telephony, and more.",
     "version": "1.0.0"
   },
@@ -191,7 +191,7 @@
         ],
         "summary": "Get Flow"
       },
-      "put": {
+      "patch": {
         "parameters": [
           {
             "schema": {
@@ -592,6 +592,94 @@
         "summary": "Start Flow"
       }
     },
+    "/api/flows/{flowId}/entry": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "userIdentifier",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "lang",
+            "required": false
+          }
+        ],
+        "operationId": "list_flow_entry",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Flows"
+        ],
+        "summary": "List Flow Entry"
+      }
+    },
+    "/api/flows/{flowId}/intents/top": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "days",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "operationId": "list_flow_intents_top",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Flows"
+        ],
+        "summary": "List Flow Intents Top"
+      }
+    },
     "/api/flows/{flowId}/providers": {
       "get": {
         "operationId": "list_flow_providers",
@@ -665,7 +753,7 @@
       }
     },
     "/api/flows/{flowId}/providers/{type}": {
-      "put": {
+      "patch": {
         "parameters": [
           {
             "schema": {
@@ -684,7 +772,7 @@
             "required": true
           }
         ],
-        "operationId": "set_flow_provider",
+        "operationId": "update_flow_provider",
         "requestBody": {
           "required": true,
           "content": {
@@ -764,7 +852,7 @@
         "tags": [
           "Flows"
         ],
-        "summary": "Set Flow Provider"
+        "summary": "Update Flow Provider"
       },
       "delete": {
         "operationId": "remove_flow_provider",
@@ -946,9 +1034,9 @@
         ],
         "summary": "List Tool Secrets"
       },
-      "put": {
+      "patch": {
         "parameters": [],
-        "operationId": "set_tool_secrets",
+        "operationId": "update_tool_secrets",
         "requestBody": {
           "required": true,
           "content": {
@@ -1028,7 +1116,7 @@
         "tags": [
           "Tools"
         ],
-        "summary": "Set Tool Secrets"
+        "summary": "Update Tool Secrets"
       }
     },
     "/api/tools/secrets/{secretKey}": {
@@ -1485,6 +1573,20 @@
         "summary": "Publish Tool"
       }
     },
+    "/api/tools/sources": {
+      "get": {
+        "operationId": "list_tool_sources",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Tools"
+        ],
+        "summary": "List Tool Sources"
+      }
+    },
     "/api/tools/import/curl": {
       "post": {
         "parameters": [],
@@ -1882,7 +1984,7 @@
       }
     },
     "/api/providers/{key}/config": {
-      "put": {
+      "patch": {
         "parameters": [
           {
             "schema": {
@@ -1893,7 +1995,7 @@
             "required": true
           }
         ],
-        "operationId": "set_provider_config",
+        "operationId": "update_provider_config",
         "requestBody": {
           "required": true,
           "content": {
@@ -1973,7 +2075,7 @@
         "tags": [
           "Providers"
         ],
-        "summary": "Set Provider Config"
+        "summary": "Update Provider Config"
       },
       "delete": {
         "operationId": "remove_provider_config",
@@ -1999,7 +2101,7 @@
       }
     },
     "/api/providers/{key}/secrets": {
-      "put": {
+      "patch": {
         "parameters": [
           {
             "schema": {
@@ -2010,7 +2112,7 @@
             "required": true
           }
         ],
-        "operationId": "set_provider_secrets",
+        "operationId": "update_provider_secrets",
         "requestBody": {
           "required": true,
           "content": {
@@ -2090,7 +2192,7 @@
         "tags": [
           "Providers"
         ],
-        "summary": "Set Provider Secrets"
+        "summary": "Update Provider Secrets"
       },
       "delete": {
         "operationId": "remove_provider_secrets",
@@ -2998,6 +3100,54 @@
         "summary": "Create Knowledge Bases Documents"
       }
     },
+    "/api/knowledge/bases/{id}/map": {
+      "get": {
+        "operationId": "list_knowledge_bases_map",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Knowledge"
+        ],
+        "summary": "List Knowledge Bases Map"
+      }
+    },
+    "/api/knowledge/bases/{id}/chunks": {
+      "get": {
+        "operationId": "list_knowledge_bases_chunks",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Knowledge"
+        ],
+        "summary": "List Knowledge Bases Chunks"
+      }
+    },
     "/api/knowledge/documents/{docId}": {
       "get": {
         "operationId": "get_knowledge_document",
@@ -3254,6 +3404,20 @@
         "summary": "List Memory Retrieve"
       }
     },
+    "/api/memory/intents": {
+      "get": {
+        "operationId": "list_memory_intents",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Memory"
+        ],
+        "summary": "List Memory Intents"
+      }
+    },
     "/api/memory/search": {
       "get": {
         "operationId": "search_memory",
@@ -3269,9 +3433,9 @@
       }
     },
     "/api/memory/profile": {
-      "put": {
+      "patch": {
         "parameters": [],
-        "operationId": "set_memory_profile",
+        "operationId": "update_memory_profile",
         "requestBody": {
           "required": true,
           "content": {
@@ -3351,7 +3515,7 @@
         "tags": [
           "Memory"
         ],
-        "summary": "Set Memory Profile"
+        "summary": "Update Memory Profile"
       }
     },
     "/api/memory/clear": {
@@ -3655,6 +3819,20 @@
           "Memory"
         ],
         "summary": "Update Memory Chunk"
+      }
+    },
+    "/api/sessions/search": {
+      "get": {
+        "operationId": "search_session",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "Search Session"
       }
     },
     "/api/sessions/{sessionId}": {
@@ -4139,6 +4317,130 @@
         "summary": "Invite Call"
       }
     },
+    "/api/calls/targets": {
+      "get": {
+        "operationId": "list_call_targets",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Calls"
+        ],
+        "summary": "List Call Targets"
+      }
+    },
+    "/api/calls/direct": {
+      "post": {
+        "parameters": [],
+        "operationId": "create_call_direct",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Calls"
+        ],
+        "summary": "Create Call Direct"
+      }
+    },
+    "/api/calls/direct/{notificationId}/cancel": {
+      "post": {
+        "operationId": "create_call_direct_cancel",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "notificationId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Calls"
+        ],
+        "summary": "Create Call Direct Cancel"
+      }
+    },
     "/api/calls/bridge": {
       "post": {
         "parameters": [],
@@ -4532,6 +4834,90 @@
           "Monitoring"
         ],
         "summary": "List Monitoring Calls Stats"
+      }
+    },
+    "/api/monitoring/calls/series": {
+      "get": {
+        "operationId": "list_monitoring_calls_series",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "List Monitoring Calls Series"
+      }
+    },
+    "/api/monitoring/calls/breakdown": {
+      "get": {
+        "operationId": "list_monitoring_calls_breakdown",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "List Monitoring Calls Breakdown"
+      }
+    },
+    "/api/monitoring/calls/percentiles": {
+      "get": {
+        "operationId": "list_monitoring_calls_percentiles",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "List Monitoring Calls Percentiles"
+      }
+    },
+    "/api/monitoring/sentiment/series": {
+      "get": {
+        "operationId": "list_monitoring_sentiment_series",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "List Monitoring Sentiment Series"
+      }
+    },
+    "/api/monitoring/intents/top": {
+      "get": {
+        "operationId": "list_monitoring_intents_top",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "List Monitoring Intents Top"
+      }
+    },
+    "/api/monitoring/nodes/errors": {
+      "get": {
+        "operationId": "list_monitoring_nodes_errors",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Monitoring"
+        ],
+        "summary": "List Monitoring Nodes Errors"
       }
     },
     "/api/monitoring/rooms/{roomName}/session": {
@@ -5962,6 +6348,20 @@
         "summary": "Import Admin"
       }
     },
+    "/api/channels/plugins": {
+      "get": {
+        "operationId": "list_channel_plugins",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Channels"
+        ],
+        "summary": "List Channel Plugins"
+      }
+    },
     "/api/channels/routes": {
       "get": {
         "operationId": "list_channel_routes",
@@ -6512,6 +6912,710 @@
         "summary": "List Channel Whatsapp Infrastructure"
       }
     },
+    "/api/web/flows/resolve": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "in": "query",
+            "name": "org",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "in": "query",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "operationId": "list_web_flows_resolve",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Web"
+        ],
+        "summary": "List Web Flows Resolve"
+      }
+    },
+    "/api/web/flows/{flowId}/entry": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "in": "query",
+            "name": "sessionId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "in": "query",
+            "name": "signedIdentity",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            },
+            "in": "query",
+            "name": "anonymousId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 32
+            },
+            "in": "query",
+            "name": "lang",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 3
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "operationId": "list_web_flows_entry",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Web"
+        ],
+        "summary": "List Web Flows Entry"
+      }
+    },
+    "/api/web/flows/{flowId}/messages": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          }
+        ],
+        "operationId": "create_web_flows_messages",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId",
+                  "message"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "message": {
+                    "maxLength": 10000,
+                    "type": "string"
+                  },
+                  "actionId": {
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "signedIdentity": {
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "anonymousId": {
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "surface": {
+                    "type": "object",
+                    "properties": {
+                      "media": {
+                        "anyOf": [
+                          {
+                            "const": "none",
+                            "type": "string"
+                          },
+                          {
+                            "const": "attach",
+                            "type": "string"
+                          },
+                          {
+                            "const": "capture",
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "attachments": {
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "url",
+                        "mimeType"
+                      ],
+                      "properties": {
+                        "url": {
+                          "maxLength": 2048,
+                          "type": "string"
+                        },
+                        "mimeType": {
+                          "maxLength": 128,
+                          "type": "string"
+                        },
+                        "caption": {
+                          "maxLength": 500,
+                          "type": "string"
+                        },
+                        "filename": {
+                          "maxLength": 255,
+                          "type": "string"
+                        },
+                        "bytes": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId",
+                  "message"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "message": {
+                    "maxLength": 10000,
+                    "type": "string"
+                  },
+                  "actionId": {
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "signedIdentity": {
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "anonymousId": {
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "surface": {
+                    "type": "object",
+                    "properties": {
+                      "media": {
+                        "anyOf": [
+                          {
+                            "const": "none",
+                            "type": "string"
+                          },
+                          {
+                            "const": "attach",
+                            "type": "string"
+                          },
+                          {
+                            "const": "capture",
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "attachments": {
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "url",
+                        "mimeType"
+                      ],
+                      "properties": {
+                        "url": {
+                          "maxLength": 2048,
+                          "type": "string"
+                        },
+                        "mimeType": {
+                          "maxLength": 128,
+                          "type": "string"
+                        },
+                        "caption": {
+                          "maxLength": 500,
+                          "type": "string"
+                        },
+                        "filename": {
+                          "maxLength": 255,
+                          "type": "string"
+                        },
+                        "bytes": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId",
+                  "message"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "message": {
+                    "maxLength": 10000,
+                    "type": "string"
+                  },
+                  "actionId": {
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "signedIdentity": {
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "anonymousId": {
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "surface": {
+                    "type": "object",
+                    "properties": {
+                      "media": {
+                        "anyOf": [
+                          {
+                            "const": "none",
+                            "type": "string"
+                          },
+                          {
+                            "const": "attach",
+                            "type": "string"
+                          },
+                          {
+                            "const": "capture",
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "attachments": {
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "url",
+                        "mimeType"
+                      ],
+                      "properties": {
+                        "url": {
+                          "maxLength": 2048,
+                          "type": "string"
+                        },
+                        "mimeType": {
+                          "maxLength": 128,
+                          "type": "string"
+                        },
+                        "caption": {
+                          "maxLength": 500,
+                          "type": "string"
+                        },
+                        "filename": {
+                          "maxLength": 255,
+                          "type": "string"
+                        },
+                        "bytes": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Web"
+        ],
+        "summary": "Create Web Flows Messages"
+      }
+    },
+    "/api/web/flows/{flowId}/attachments": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          }
+        ],
+        "operationId": "create_web_flows_attachments",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Web"
+        ],
+        "summary": "Create Web Flows Attachments"
+      }
+    },
+    "/api/web/flows/{flowId}/voice-token": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          }
+        ],
+        "operationId": "create_web_flows_voice_token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "signedIdentity": {
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "anonymousId": {
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "surface": {
+                    "type": "object",
+                    "properties": {
+                      "media": {
+                        "anyOf": [
+                          {
+                            "const": "none",
+                            "type": "string"
+                          },
+                          {
+                            "const": "attach",
+                            "type": "string"
+                          },
+                          {
+                            "const": "capture",
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "components": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^(.*)$": {}
+                    }
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "signedIdentity": {
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "anonymousId": {
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "surface": {
+                    "type": "object",
+                    "properties": {
+                      "media": {
+                        "anyOf": [
+                          {
+                            "const": "none",
+                            "type": "string"
+                          },
+                          {
+                            "const": "attach",
+                            "type": "string"
+                          },
+                          {
+                            "const": "capture",
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "components": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^(.*)$": {}
+                    }
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "minLength": 1,
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "signedIdentity": {
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "anonymousId": {
+                    "maxLength": 128,
+                    "type": "string"
+                  },
+                  "surface": {
+                    "type": "object",
+                    "properties": {
+                      "media": {
+                        "anyOf": [
+                          {
+                            "const": "none",
+                            "type": "string"
+                          },
+                          {
+                            "const": "attach",
+                            "type": "string"
+                          },
+                          {
+                            "const": "capture",
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "components": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^(.*)$": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Web"
+        ],
+        "summary": "Create Web Flows Voice Token"
+      }
+    },
+    "/api/flows/{flowId}/clips": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          }
+        ],
+        "operationId": "create_flow_clips",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "clipId",
+                  "capturedAt"
+                ],
+                "properties": {
+                  "file": {
+                    "default": "File",
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "clipId": {
+                    "type": "string"
+                  },
+                  "capturedAt": {
+                    "type": "string"
+                  },
+                  "durationMs": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "clipId",
+                  "capturedAt"
+                ],
+                "properties": {
+                  "file": {
+                    "default": "File",
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "clipId": {
+                    "type": "string"
+                  },
+                  "capturedAt": {
+                    "type": "string"
+                  },
+                  "durationMs": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "clipId",
+                  "capturedAt"
+                ],
+                "properties": {
+                  "file": {
+                    "default": "File",
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "clipId": {
+                    "type": "string"
+                  },
+                  "capturedAt": {
+                    "type": "string"
+                  },
+                  "durationMs": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Flows"
+        ],
+        "summary": "Create Flow Clips"
+      }
+    },
     "/api/integrations/": {
       "get": {
         "operationId": "list_integrations",
@@ -6524,20 +7628,6 @@
           "Integrations"
         ],
         "summary": "List Integrations"
-      }
-    },
-    "/api/integrations/actions": {
-      "get": {
-        "operationId": "list_integration_actions",
-        "responses": {
-          "200": {
-            "description": "Successful response"
-          }
-        },
-        "tags": [
-          "Integrations"
-        ],
-        "summary": "List Integration Actions"
       }
     },
     "/api/integrations/connections": {
@@ -6555,28 +7645,6 @@
       }
     },
     "/api/integrations/connections/{provider}": {
-      "get": {
-        "operationId": "get_integration_connection",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "name": "provider",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response"
-          }
-        },
-        "tags": [
-          "Integrations"
-        ],
-        "summary": "Get Integration Connection"
-      },
       "delete": {
         "operationId": "remove_integration_connection",
         "parameters": [
@@ -6657,6 +7725,418 @@
           "Integrations"
         ],
         "summary": "Create Integration Connect Session"
+      }
+    },
+    "/api/billing/contract": {
+      "get": {
+        "operationId": "list_billing_contract",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Billing"
+        ],
+        "summary": "List Billing Contract"
+      }
+    },
+    "/api/billing/usage": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "from",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "to",
+            "required": false
+          }
+        ],
+        "operationId": "list_billing_usage",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Billing"
+        ],
+        "summary": "List Billing Usage"
+      }
+    },
+    "/api/billing/invoices": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "operationId": "list_billing_invoices",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Billing"
+        ],
+        "summary": "List Billing Invoices"
+      }
+    },
+    "/api/billing/portal": {
+      "post": {
+        "operationId": "create_billing_portal",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Create Billing Portal"
+      }
+    },
+    "/api/billing/checkout": {
+      "post": {
+        "parameters": [],
+        "operationId": "create_billing_checkout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "planKey",
+                  "currency",
+                  "successUrl",
+                  "cancelUrl"
+                ],
+                "properties": {
+                  "planKey": {
+                    "type": "string"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "successUrl": {
+                    "type": "string"
+                  },
+                  "cancelUrl": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "planKey",
+                  "currency",
+                  "successUrl",
+                  "cancelUrl"
+                ],
+                "properties": {
+                  "planKey": {
+                    "type": "string"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "successUrl": {
+                    "type": "string"
+                  },
+                  "cancelUrl": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "planKey",
+                  "currency",
+                  "successUrl",
+                  "cancelUrl"
+                ],
+                "properties": {
+                  "planKey": {
+                    "type": "string"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "successUrl": {
+                    "type": "string"
+                  },
+                  "cancelUrl": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Create Billing Checkout"
+      }
+    },
+    "/api/billing/rollover/dry-run": {
+      "post": {
+        "parameters": [],
+        "operationId": "create_billing_rollover_dry_run",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Create Billing Rollover Dry Run"
+      }
+    },
+    "/api/partner-heartbeat": {
+      "post": {
+        "parameters": [],
+        "operationId": "create_partner_heartbeat",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "patternProperties": {
+                  "^(.*)$": {}
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "patternProperties": {
+                  "^(.*)$": {}
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "patternProperties": {
+                  "^(.*)$": {}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Partner Heartbeat"
+        ],
+        "summary": "Create Partner Heartbeat"
+      }
+    },
+    "/api/partner-customer-report": {
+      "post": {
+        "parameters": [],
+        "operationId": "create_partner_customer_report",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "patternProperties": {
+                  "^(.*)$": {}
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "patternProperties": {
+                  "^(.*)$": {}
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "patternProperties": {
+                  "^(.*)$": {}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Partner Customer Report"
+        ],
+        "summary": "Create Partner Customer Report"
+      }
+    },
+    "/api/demo/flows/{slug}/messages": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "slug",
+            "required": true
+          }
+        ],
+        "operationId": "create_demo_flows_messages",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "message"
+                ],
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "locale": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "message"
+                ],
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "locale": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "message"
+                ],
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string"
+                  },
+                  "locale": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Demo"
+        ],
+        "summary": "Create Demo Flows Messages"
       }
     },
     "/api/organizations": {
@@ -6882,8 +8362,8 @@
       }
     },
     "/api/organizations/current/config": {
-      "put": {
-        "operationId": "set_organization_current_config",
+      "patch": {
+        "operationId": "update_organization_current_config",
         "responses": {
           "200": {
             "description": "Successful response"
@@ -6892,7 +8372,7 @@
         "tags": [
           "Organizations"
         ],
-        "summary": "Set Organization Current Config"
+        "summary": "Update Organization Current Config"
       }
     },
     "/api/organizations/current/leave": {
@@ -7092,9 +8572,9 @@
         ],
         "summary": "Create Organization Current JIT Email Domains"
       },
-      "put": {
+      "patch": {
         "parameters": [],
-        "operationId": "set_organization_current_jit_email_domains",
+        "operationId": "update_organization_current_jit_email_domains",
         "requestBody": {
           "required": true,
           "content": {
@@ -7174,7 +8654,7 @@
         "tags": [
           "Organizations"
         ],
-        "summary": "Set Organization Current JIT Email Domains"
+        "summary": "Update Organization Current JIT Email Domains"
       }
     },
     "/api/organizations/current/jit/email-domains/{emailDomain}": {
@@ -7214,9 +8694,9 @@
         ],
         "summary": "List Organization Current JIT Roles"
       },
-      "put": {
+      "patch": {
         "parameters": [],
-        "operationId": "set_organization_current_jit_roles",
+        "operationId": "update_organization_current_jit_roles",
         "requestBody": {
           "required": true,
           "content": {
@@ -7296,7 +8776,7 @@
         "tags": [
           "Organizations"
         ],
-        "summary": "Set Organization Current JIT Roles"
+        "summary": "Update Organization Current JIT Roles"
       }
     },
     "/api/organizations/current/users": {
@@ -7586,7 +9066,7 @@
       }
     },
     "/api/organizations/current/users/{userId}/roles": {
-      "put": {
+      "patch": {
         "parameters": [
           {
             "schema": {
@@ -7597,7 +9077,7 @@
             "required": true
           }
         ],
-        "operationId": "set_organization_current_users_roles",
+        "operationId": "update_organization_current_users_roles",
         "requestBody": {
           "required": true,
           "content": {
@@ -7677,7 +9157,7 @@
         "tags": [
           "Organizations"
         ],
-        "summary": "Set Organization Current Users Roles"
+        "summary": "Update Organization Current Users Roles"
       }
     },
     "/api/invitations/{invitationId}": {
@@ -7740,6 +9220,20 @@
           "Admin"
         ],
         "summary": "List Admin Organizations"
+      }
+    },
+    "/api/admin/impersonate": {
+      "post": {
+        "operationId": "create_admin_impersonate",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create Admin Impersonate"
       }
     },
     "/api/admin/organizations/{orgId}": {
@@ -7942,7 +9436,7 @@
       }
     },
     "/api/admin/organizations/{orgId}/users/{userId}/roles": {
-      "put": {
+      "patch": {
         "parameters": [
           {
             "schema": {
@@ -7961,7 +9455,7 @@
             "required": true
           }
         ],
-        "operationId": "set_admin_organizations_users_roles",
+        "operationId": "update_admin_organizations_users_roles",
         "requestBody": {
           "required": true,
           "content": {
@@ -8041,7 +9535,7 @@
         "tags": [
           "Admin"
         ],
-        "summary": "Set Admin Organizations Users Roles"
+        "summary": "Update Admin Organizations Users Roles"
       }
     },
     "/api/admin/organizations/{orgId}/switch": {
@@ -8139,7 +9633,7 @@
         ],
         "summary": "List Admin Organizations Secrets"
       },
-      "put": {
+      "patch": {
         "parameters": [
           {
             "schema": {
@@ -8150,7 +9644,7 @@
             "required": true
           }
         ],
-        "operationId": "set_admin_organizations_secrets",
+        "operationId": "update_admin_organizations_secrets",
         "requestBody": {
           "required": true,
           "content": {
@@ -8263,7 +9757,105 @@
         "tags": [
           "Admin"
         ],
-        "summary": "Set Admin Organizations Secrets"
+        "summary": "Update Admin Organizations Secrets"
+      }
+    },
+    "/api/admin/licenses": {
+      "post": {
+        "parameters": [],
+        "operationId": "create_admin_licenses",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "partnerOrgId",
+                  "kind"
+                ],
+                "properties": {
+                  "partnerOrgId": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "features": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "expiresInDays": {
+                    "type": "number"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "partnerOrgId",
+                  "kind"
+                ],
+                "properties": {
+                  "partnerOrgId": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "features": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "expiresInDays": {
+                    "type": "number"
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "partnerOrgId",
+                  "kind"
+                ],
+                "properties": {
+                  "partnerOrgId": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "features": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "expiresInDays": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create Admin Licenses"
       }
     },
     "/api/admin/runtime/{kind}/manifest": {
@@ -8746,6 +10338,38 @@
         "summary": "Remove Admin Voice"
       }
     },
+    "/api/inference/{kind}/capability-chain": {
+      "get": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "kind",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "caps",
+            "required": false
+          }
+        ],
+        "operationId": "list_inference_capability_chain",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Inference"
+        ],
+        "summary": "List Inference Capability Chain"
+      }
+    },
     "/api/api-keys": {
       "get": {
         "operationId": "list_api_keys",
@@ -9007,6 +10631,643 @@
         "summary": "Rotate API Key"
       }
     },
+    "/api/datasets/": {
+      "get": {
+        "operationId": "list_datasets",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Datasets"
+        ],
+        "summary": "List Datasets"
+      },
+      "post": {
+        "parameters": [],
+        "operationId": "create_datasets",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 160,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "tags": {
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "maxLength": 64,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 160,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "tags": {
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "maxLength": 64,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 160,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "tags": {
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "maxLength": 64,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Datasets"
+        ],
+        "summary": "Create Datasets"
+      }
+    },
+    "/api/datasets/{datasetId}": {
+      "get": {
+        "operationId": "get_dataset",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "datasetId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Datasets"
+        ],
+        "summary": "Get Dataset"
+      },
+      "patch": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "datasetId",
+            "required": true
+          }
+        ],
+        "operationId": "update_dataset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 160,
+                    "type": "string"
+                  },
+                  "description": {
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "tags": {
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "maxLength": 64,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 160,
+                    "type": "string"
+                  },
+                  "description": {
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "tags": {
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "maxLength": 64,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "minLength": 1,
+                    "maxLength": 160,
+                    "type": "string"
+                  },
+                  "description": {
+                    "anyOf": [
+                      {
+                        "maxLength": 2000,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "tags": {
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "maxLength": 64,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Datasets"
+        ],
+        "summary": "Update Dataset"
+      },
+      "delete": {
+        "operationId": "delete_dataset",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "datasetId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Datasets"
+        ],
+        "summary": "Delete Dataset"
+      }
+    },
+    "/api/datasets/{datasetId}/members": {
+      "get": {
+        "operationId": "list_dataset_members",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "datasetId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Datasets"
+        ],
+        "summary": "List Dataset Members"
+      },
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "datasetId",
+            "required": true
+          }
+        ],
+        "operationId": "create_dataset_members",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "notes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "expectations": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^(.*)$": {}
+                    }
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "notes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "expectations": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^(.*)$": {}
+                    }
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sessionId"
+                ],
+                "properties": {
+                  "sessionId": {
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "notes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  },
+                  "expectations": {
+                    "type": "object",
+                    "patternProperties": {
+                      "^(.*)$": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Datasets"
+        ],
+        "summary": "Create Dataset Members"
+      }
+    },
+    "/api/datasets/{datasetId}/members/{memberId}": {
+      "delete": {
+        "operationId": "remove_dataset_member",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "datasetId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "memberId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Datasets"
+        ],
+        "summary": "Remove Dataset Member"
+      }
+    },
+    "/api/flows/{flowId}/versions": {
+      "get": {
+        "operationId": "list_flow_versions",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Flows"
+        ],
+        "summary": "List Flow Versions"
+      }
+    },
+    "/api/flows/{flowId}/versions/{versionId}": {
+      "get": {
+        "operationId": "get_flow_version",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "versionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Flows"
+        ],
+        "summary": "Get Flow Version"
+      },
+      "patch": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "versionId",
+            "required": true
+          }
+        ],
+        "operationId": "update_flow_version",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "releaseNotes"
+                ],
+                "properties": {
+                  "releaseNotes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "releaseNotes"
+                ],
+                "properties": {
+                  "releaseNotes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "releaseNotes"
+                ],
+                "properties": {
+                  "releaseNotes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Flows"
+        ],
+        "summary": "Update Flow Version"
+      }
+    },
+    "/api/flows/{flowId}/versions/{versionId}/rollback": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "versionId",
+            "required": true
+          }
+        ],
+        "operationId": "create_flow_versions_rollback",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "releaseNotes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "releaseNotes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "releaseNotes": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Flows"
+        ],
+        "summary": "Create Flow Versions Rollback"
+      }
+    },
     "/api/uploads/avatar": {
       "post": {
         "operationId": "create_upload_avatar",
@@ -9149,6 +11410,82 @@
         "summary": "List Reporting Usage Sessions"
       }
     },
+    "/api/reporting/usage/series": {
+      "get": {
+        "operationId": "list_reporting_usage_series",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Reporting"
+        ],
+        "summary": "List Reporting Usage Series"
+      }
+    },
+    "/api/reporting/flows/{flowId}/node-metrics": {
+      "get": {
+        "operationId": "list_reporting_flows_node_metrics",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Reporting"
+        ],
+        "summary": "List Reporting Flows Node Metrics"
+      }
+    },
+    "/api/reporting/flows/{flowId}/edge-metrics": {
+      "get": {
+        "operationId": "list_reporting_flows_edge_metrics",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "flowId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Reporting"
+        ],
+        "summary": "List Reporting Flows Edge Metrics"
+      }
+    },
+    "/api/audit/events": {
+      "get": {
+        "operationId": "list_audit_events",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Audit"
+        ],
+        "summary": "List Audit Events"
+      }
+    },
     "/api/events/stream": {
       "get": {
         "operationId": "stream_event",
@@ -9161,6 +11498,134 @@
           "System"
         ],
         "summary": "Stream Event"
+      }
+    },
+    "/api/notifications/kinds": {
+      "get": {
+        "operationId": "list_notification_kinds",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "List Notification Kinds"
+      }
+    },
+    "/api/notifications/test": {
+      "post": {
+        "parameters": [],
+        "operationId": "test_notification",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject"
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Test Notification"
+      }
+    },
+    "/api/_hello": {
+      "get": {
+        "operationId": "list_hello",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "_hello"
+        ],
+        "summary": "List _hello"
+      }
+    },
+    "/api/plugins": {
+      "get": {
+        "operationId": "list_plugins",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Plugins"
+        ],
+        "summary": "List Plugins"
       }
     }
   },
@@ -9175,13 +11640,28 @@
       "name": "Assets"
     },
     {
+      "name": "Audit"
+    },
+    {
+      "name": "Billing"
+    },
+    {
       "name": "Calls"
     },
     {
       "name": "Channels"
     },
     {
+      "name": "Datasets"
+    },
+    {
+      "name": "Demo"
+    },
+    {
       "name": "Flows"
+    },
+    {
+      "name": "Inference"
     },
     {
       "name": "Integrations"
@@ -9199,7 +11679,19 @@
       "name": "Monitoring"
     },
     {
+      "name": "Notifications"
+    },
+    {
       "name": "Organizations"
+    },
+    {
+      "name": "Partner Customer Report"
+    },
+    {
+      "name": "Partner Heartbeat"
+    },
+    {
+      "name": "Plugins"
     },
     {
       "name": "Providers"
@@ -9215,6 +11707,12 @@
     },
     {
       "name": "Tools"
+    },
+    {
+      "name": "Web"
+    },
+    {
+      "name": "_hello"
     }
   ]
 }

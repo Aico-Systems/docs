@@ -14,8 +14,8 @@
 
   <defs>
     <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(402.621969,408.14978,-408.14978,402.621969,48.689016,42.5)">
-      <stop offset="0" style="stop-color:rgb(61,225,231);stop-opacity:1"/>
-      <stop offset="1" style="stop-color:rgb(144,86,255);stop-opacity:1"/>
+      <stop offset="0" style="stop-color:rgb(251,146,60);stop-opacity:1"/>
+      <stop offset="1" style="stop-color:rgb(234,88,12);stop-opacity:1"/>
     </linearGradient>
   </defs>
 </svg>
