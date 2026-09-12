@@ -156,7 +156,7 @@ surface:
 
 - Disabled by default — each flow must explicitly enable web access.
 - Requests are validated against the flow's **origin allowlist**.
-- **Rate limits** apply per visitor session and per IP.
+- **Rate limits** apply per caller address and flow.
 - No organization data is reachable: the anonymous tier can only
   converse with the enabled flow.
 - Optional **signed identity**: your backend vouches for a visitor
