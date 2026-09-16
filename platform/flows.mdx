@@ -163,32 +163,45 @@ routes the flow onward immediately on a *pending* port or parks the
 session; your system resumes it later by calling a single-use,
 HMAC-signed callback URL.
 
-## Memory
+## Memory — the brain
 
-Three layers, all backed by pgvector:
+One knowledge graph per organization. Every person has a personal
+brain, the organization has a company brain; both live in the same
+graph, separated by scope.
 
 ```mermaid
 flowchart LR
-    UT["Session transcript"] --> FX["Fact extractor<br/>(at session end)"]
-    FX --> EP["Episodic memory<br/>(facts · preferences · observations)"]
+    UT["Session transcript"] --> EP["Episode<br/>(verbatim evidence)"]
+    EP --> FX["Extraction<br/>(at session end)"]
+    FX --> ST["Statements<br/>(facts as edges, bitemporal)"]
+    FD["Feeds<br/>(scans · GPS · machine state)"] --> ST
     PV["Persistent variables"] --> NS["Next session"]
     KB["Knowledge bases<br/>(per-org docs)"]
-    EP -.recall.-> AGC["agentic context"]
+    ST -.brain context.-> AGC["agentic context"]
+    EP -.brain context.-> AGC
     KB -.query.-> RAG["rag node"]
 ```
 
-- **Episodic memory** — at session end, an extraction pass turns the
-  transcript into individually embedded facts, preferences, and
-  observations, recalled in later conversations.
+- **Episodes** — the transcript is kept verbatim as evidence; every
+  fact links back to the conversation it came from.
+- **Statements** — atomic facts about people, assets, locations,
+  processes: subject, predicate, object or value, with the time they
+  held and who asserted them. A new value for a one-per-subject
+  predicate supersedes the old one; nothing is silently overwritten.
+- **Scope** — facts tagged personal stay with the person; facts the
+  flow allows to be learned (`autoLearn`) enter the company brain. A
+  fact inferred about a colleague is shown to that colleague first.
+- **Feeds** — external sources (a scanner, a MES, a phone's location)
+  push events that map to live state without a model in the loop.
 - **Persistent variables** — flow variables marked persistent are
   restored at the start of the user's next session.
 - **Knowledge bases** — per-organization document collections;
   ingestion chunks and embeds, retrieval through the `rag` node.
 
 Identity is unified across channels — the same phone number on voice,
-SMS, and WhatsApp maps to one memory profile, and anonymous web
-memory is merged into the verified identity once the visitor is
-identified.
+SMS, and WhatsApp maps to one person, and an anonymous web visitor's
+brain is merged into the verified identity once the visitor is
+identified. A person can be forgotten entirely on request.
 
 ## Storage + versioning
 

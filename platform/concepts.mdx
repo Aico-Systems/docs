@@ -97,17 +97,18 @@ markdown guidance — same flow definition, different rendering hint.
 
 ## Memory
 
-Three layers, all backed by pgvector:
-
-- **Episodic memory** — long-term semantic chunks of user turns,
-  facts, preferences, and observations. Extracted automatically at
-  session end. Searchable by user.
+- **The brain** — one knowledge graph per organization with a personal
+  scope per person and a shared company scope. Conversations become
+  verbatim episodes; extraction turns them into atomic, time-stamped
+  facts about people, assets, locations and processes, each linked to
+  its evidence. External feeds (scanners, machine state, location) push
+  live facts without a model in the loop.
 - **Persistent variables** — flow variables marked as persistent
   survive across sessions for the same user.
 - **Knowledge bases** — per-organization document collections,
   retrievable through the `rag` flow node.
 
 Identity is unified across channels: a caller's phone number and a
-messaging identity on the same number converge on one memory profile,
-and an anonymous web visitor's memory is merged into their verified
-identity once they are identified.
+messaging identity on the same number converge on one person, and an
+anonymous web visitor's brain is merged into their verified identity
+once they are identified.
