@@ -107990,6 +107990,435 @@
         "summary": "List Brain People Links"
       }
     },
+    "/api/brain/people/{identifier}/links/confirm": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "identifier",
+            "required": true
+          }
+        ],
+        "operationId": "create_brain_people_links_confirm",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "source": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "device": "device",
+                          "voice": "voice",
+                          "phone": "phone",
+                          "badge": "badge",
+                          "name": "name"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "device": "device",
+                        "voice": "voice",
+                        "phone": "phone",
+                        "badge": "badge",
+                        "name": "name"
+                      },
+                      "options": [
+                        "device",
+                        "voice",
+                        "phone",
+                        "badge",
+                        "name"
+                      ]
+                    },
+                    "externalId": {
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "source": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "device": "device",
+                          "voice": "voice",
+                          "phone": "phone",
+                          "badge": "badge",
+                          "name": "name"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "device": "device",
+                        "voice": "voice",
+                        "phone": "phone",
+                        "badge": "badge",
+                        "name": "name"
+                      },
+                      "options": [
+                        "device",
+                        "voice",
+                        "phone",
+                        "badge",
+                        "name"
+                      ]
+                    },
+                    "externalId": {
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "source": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "device": "device",
+                          "voice": "voice",
+                          "phone": "phone",
+                          "badge": "badge",
+                          "name": "name"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "device": "device",
+                        "voice": "voice",
+                        "phone": "phone",
+                        "badge": "badge",
+                        "name": "name"
+                      },
+                      "options": [
+                        "device",
+                        "voice",
+                        "phone",
+                        "badge",
+                        "name"
+                      ]
+                    },
+                    "externalId": {
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Brain"
+        ],
+        "summary": "Create Brain People Links Confirm"
+      }
+    },
+    "/api/brain/people/{identifier}/links/reject": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "identifier",
+            "required": true
+          }
+        ],
+        "operationId": "create_brain_people_links_reject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "source": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "device": "device",
+                          "voice": "voice",
+                          "phone": "phone",
+                          "badge": "badge",
+                          "name": "name"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "device": "device",
+                        "voice": "voice",
+                        "phone": "phone",
+                        "badge": "badge",
+                        "name": "name"
+                      },
+                      "options": [
+                        "device",
+                        "voice",
+                        "phone",
+                        "badge",
+                        "name"
+                      ]
+                    },
+                    "externalId": {
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "source": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "device": "device",
+                          "voice": "voice",
+                          "phone": "phone",
+                          "badge": "badge",
+                          "name": "name"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "device": "device",
+                        "voice": "voice",
+                        "phone": "phone",
+                        "badge": "badge",
+                        "name": "name"
+                      },
+                      "options": [
+                        "device",
+                        "voice",
+                        "phone",
+                        "badge",
+                        "name"
+                      ]
+                    },
+                    "externalId": {
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "source": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "device": "device",
+                          "voice": "voice",
+                          "phone": "phone",
+                          "badge": "badge",
+                          "name": "name"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "device": "device",
+                        "voice": "voice",
+                        "phone": "phone",
+                        "badge": "badge",
+                        "name": "name"
+                      },
+                      "options": [
+                        "device",
+                        "voice",
+                        "phone",
+                        "badge",
+                        "name"
+                      ]
+                    },
+                    "externalId": {
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Brain"
+        ],
+        "summary": "Create Brain People Links Reject"
+      }
+    },
+    "/api/brain/people/{identifier}/merge": {
+      "post": {
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "identifier",
+            "required": true
+          }
+        ],
+        "operationId": "create_brain_people_merge",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "into": {
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "into": {
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "into": {
+                      "def": {
+                        "type": "string",
+                        "checks": [
+                          {},
+                          {}
+                        ]
+                      },
+                      "type": "string"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        },
+        "tags": [
+          "Brain"
+        ],
+        "summary": "Create Brain People Merge"
+      }
+    },
     "/api/brain/people/{identifier}/name": {
       "post": {
         "parameters": [
