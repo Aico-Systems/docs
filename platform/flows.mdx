@@ -38,7 +38,7 @@ straightforward: any backend instance can pick up the next event.
   <Accordion title="Core (9)">
     | Node | Purpose |
     |---|---|
-    | `start` | Entry point; declares the flow's typed input contract (caller-supplied, channel-derived, or auto-generated inputs) |
+    | `start` | Entry point; declares the flow's typed input contract (caller-supplied, channel-derived, or context inputs resolved by the runtime from a provider: identity, zone, lastSession, speaker, device) |
     | `end` | Terminates the flow; archives the transcript and persists variables |
     | `message` | Sends output to the user — a static template with variable interpolation, or LLM-generated. Can deliver on a side channel (e.g. text a link during a voice call) |
     | `condition` | Branches on an expression, or N labelled branches |
