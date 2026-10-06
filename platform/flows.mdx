@@ -19,7 +19,7 @@ stateDiagram-v2
     AwaitingUser --> Running: transcript / message received
     AwaitingUser --> Detached: person leaves / agent steps away
     Detached --> AwaitingUser: person returns (any channel, any day)
-    Running --> ToolCall: tool / integration / rag
+    Running --> ToolCall: tool / rag
     ToolCall --> Running: result added to the session record
     Running --> Invoked: invoke node → child flow
     Invoked --> Running: child returns
@@ -35,18 +35,16 @@ straightforward: any backend instance can pick up the next event.
 
 ## Node types
 
-15 node types organised by purpose:
+13 node types organised by purpose:
 
 <AccordionGroup>
-  <Accordion title="Core (9)">
+  <Accordion title="Core (7)">
     | Node | Purpose |
     |---|---|
     | `start` | Entry point; declares the flow's typed input contract (caller-supplied, channel-derived, or context inputs resolved by the runtime from a provider: identity, zone, lastSession, speaker, device) |
     | `end` | Terminates the flow and closes the conversation |
-    | `message` | Sends output to the user — a static template (`@` references to inputs and the session record), or LLM-generated. Can deliver on a side channel (e.g. text a link during a voice call) |
     | `condition` | Branches on an expression, or N labelled branches |
     | `wait` | Fixed delay between two steps; says nothing |
-    | `pause` | Puts the user on hold (hold music on voice, waiting state in chat) |
     | `disconnect` | Drops the user from the channel while the flow continues headless; can keep the room open for a later re-attach |
     | `reach` | Re-establishes contact after a disconnect — dials the user back on voice, validates the messaging window on chat channels. Ports: connected / no answer / rejected / error |
     | `handoff` | Rings a person in the organization into this conversation (the agent stays with both), or transfers a phone caller to a number or SIP URI. Runs as a job: the conversation goes on while it rings |
@@ -56,18 +54,18 @@ straightforward: any backend instance can pick up the next event.
     |---|---|
     | `agentic` | The conversational engine: response and routing in one LLM call. Awaits user turns and picks the next route; a route into a tool or child flow fills that call's parameters. Can ask the device for a photo or a scan |
   </Accordion>
-  <Accordion title="Tools & knowledge (3)">
+  <Accordion title="Tools & knowledge (2)">
     | Node | Purpose |
     |---|---|
     | `toolExecutor` | Invokes a configured tool; the flow binds some parameters, the agent fills the rest when it routes to the node |
-    | `integration` | Calls an external integration action (CRM, calendar, …) through the authenticated integration proxy |
     | `rag` | Hybrid retrieval (vector + keyword + fuzzy, rank-fused) over the organization's knowledge bases. Ports: found / not found |
   </Accordion>
-  <Accordion title="Composition (2)">
+  <Accordion title="Composition (3)">
     | Node | Purpose |
     |---|---|
     | `invoke` | Spawns a child flow in its own room; can ring people, hold the caller, and narrate progress |
     | `return` | Completes a child flow back to its parent — return a value, bridge the caller to the consulted party, or hand off externally |
+    | `operate` | Runs a tool as a job: the conversation goes on while it works, and the agent hears the result when it settles |
   </Accordion>
 </AccordionGroup>
 
@@ -111,12 +109,10 @@ results.
 
 ```mermaid
 flowchart LR
-    A["agentic"] -- parallel --> C1["message"]
+    A["agentic"] -- parallel --> C1["agentic (say)"]
     A -- parallel --> C2["toolExecutor · rag"]
-    A -- parallel --> C3["integration"]
     C1 --> D["condition (convergence)"]
     C2 --> D
-    C3 --> D
     D --> E["end"]
 ```
 
