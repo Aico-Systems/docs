@@ -14,11 +14,10 @@ Each connector has its own base URL:
 | Connector | Production URL | Local Development |
 |-----------|---------------|-------------------|
 | Brunkhorst | `https://brunkhorst.connectors.aicoflow.com` | `http://localhost:8101` |
-| PlanSo | `https://reit.connectors.aicoflow.com` | `http://localhost:8102` |
 
 ## Authentication
 
-Currently, the connector APIs do not require client-side authentication. Server-side credentials for external systems (Zeitmechanik, PlanSo) are configured via environment variables.
+Currently, the connector APIs do not require client-side authentication. Server-side credentials for external systems (Zeitmechanik) are configured via environment variables.
 
 <Note>
   Rate limiting may apply to prevent abuse. Contact support if you need higher limits.
@@ -82,22 +81,12 @@ Currently, the connector APIs do not require client-side authentication. Server-
         "customer": {
           "surname": "Max Mustermann",
           "email": "max@example.com",
-          "phone": "+49 170 1234567"
+          "phone": "+44 7700 900123"
         }
       }'
     ```
   </Step>
 </Steps>
-
-## Example: Query Orders (PlanSo)
-
-```bash
-# Search by license plate
-curl "https://reit.connectors.aicoflow.com/api/orders?plate=HH-AB"
-
-# Search with multiple filters
-curl "https://reit.connectors.aicoflow.com/api/orders?status=in_progress&missing_parts=true&limit=10"
-```
 
 ## Health Checks
 
@@ -139,8 +128,5 @@ Common HTTP status codes:
 <CardGroup cols={2}>
   <Card title="Brunkhorst API" icon="calendar" href="/brunkhorst/overview">
     Full API reference for the Brunkhorst booking connector
-  </Card>
-  <Card title="PlanSo API" icon="car" href="/reit/overview">
-    Full API reference for the PlanSo order connector
   </Card>
 </CardGroup>

@@ -44,18 +44,22 @@ routing decisions:
 | **Persistent** | The conversation thread survives between turns without a live connection | web, sms, whatsapp, telegram |
 | **Outbound-initiate** | Mandy can start a conversation on this channel | voice, sms, whatsapp, telegram, api |
 
-## Reachability windows
+## Conversations and reachability windows
 
-Persistent channels have a window inside which the session can be
-resumed by the next inbound message:
+A person has one open conversation per flow, on every channel. It has no
+expiry. Leaving pauses it, and their next message, call or start continues it — the
+agent decides on their return whether to pick it up or start a new one. It also
+ends when the flow ends it, the agent starts over, or the person closes it.
+
+Text platforms limit when Mandy may write to someone first — the window after
+their last inbound message. It decides what Mandy may send, not how long a
+conversation lasts:
 
 | Channel | Window | Source |
 |---|---|---|
 | WhatsApp | 24 h | Meta customer-service window (platform-mandated) |
 | SMS | 24 h | Mandy default |
 | Telegram | 7 days | Mandy default |
-| Web widget | 30 min | Tab-idle timeout |
-| Voice | — | Bound to the live call, no window |
 
 ## Channel routing
 

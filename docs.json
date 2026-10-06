@@ -46,10 +46,6 @@
 							{
 								"group": "Brunkhorst",
 								"pages": ["connectors/brunkhorst/overview"]
-							},
-							{
-								"group": "PlanSo",
-								"pages": ["connectors/reit/overview"]
 							}
 						]
 					}
@@ -62,10 +58,6 @@
 			{
 				"tab": "Brunkhorst API",
 				"openapi": "connectors/openapi/brunkhorst-openapi.json"
-			},
-			{
-				"tab": "PlanSo API",
-				"openapi": "connectors/openapi/reit-openapi.json"
 			}
 		],
 		"anchors": [

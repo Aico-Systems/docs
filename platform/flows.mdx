@@ -17,11 +17,14 @@ stateDiagram-v2
     SessionCreated --> Running: session active
     Running --> AwaitingUser: agentic node awaits user turn
     AwaitingUser --> Running: transcript / message received
+    AwaitingUser --> Detached: person leaves / agent steps away
+    Detached --> AwaitingUser: person returns (any channel, any day)
     Running --> ToolCall: tool / integration / rag
-    ToolCall --> Running: result merged into variables
+    ToolCall --> Running: result added to the session record
     Running --> Invoked: invoke node → child flow
     Invoked --> Running: child returns
     Running --> [*]: end / return
+    Detached --> [*]: agent starts over / conversation closed
 ```
 
 The executor is **stateless per request** — every invocation
@@ -39,10 +42,10 @@ straightforward: any backend instance can pick up the next event.
     | Node | Purpose |
     |---|---|
     | `start` | Entry point; declares the flow's typed input contract (caller-supplied, channel-derived, or context inputs resolved by the runtime from a provider: identity, zone, lastSession, speaker, device) |
-    | `end` | Terminates the flow; archives the transcript and persists variables |
-    | `message` | Sends output to the user — a static template with variable interpolation, or LLM-generated. Can deliver on a side channel (e.g. text a link during a voice call) |
+    | `end` | Terminates the flow and closes the conversation |
+    | `message` | Sends output to the user — a static template (`@` references to inputs and the session record), or LLM-generated. Can deliver on a side channel (e.g. text a link during a voice call) |
     | `condition` | Branches on an expression, or N labelled branches |
-    | `wait` | Fixed delay with an optional filler message; auto-cancels when a parallel sibling starts responding |
+    | `wait` | Fixed delay between two steps; says nothing |
     | `pause` | Puts the user on hold (hold music on voice, waiting state in chat) |
     | `disconnect` | Drops the user from the channel while the flow continues headless; can keep the room open for a later re-attach |
     | `reach` | Re-establishes contact after a disconnect — dials the user back on voice, validates the messaging window on chat channels. Ports: connected / no answer / rejected / error |
@@ -51,12 +54,12 @@ straightforward: any backend instance can pick up the next event.
   <Accordion title="LLM (1)">
     | Node | Purpose |
     |---|---|
-    | `agentic` | The conversational engine: routing, variable extraction, and response generation in one LLM-driven node. Awaits user turns, extracts typed variables, and picks the next route |
+    | `agentic` | The conversational engine: response and routing in one LLM call. Awaits user turns and picks the next route; a route into a tool or child flow fills that call's parameters. Can ask the device for a photo or a scan |
   </Accordion>
   <Accordion title="Tools & knowledge (3)">
     | Node | Purpose |
     |---|---|
-    | `toolExecutor` | Invokes a configured tool with parameter bindings from flow variables |
+    | `toolExecutor` | Invokes a configured tool; the flow binds some parameters, the agent fills the rest when it routes to the node |
     | `integration` | Calls an external integration action (CRM, calendar, …) through the authenticated integration proxy |
     | `rag` | Hybrid retrieval (vector + keyword + fuzzy, rank-fused) over the organization's knowledge bases. Ports: found / not found |
   </Accordion>
@@ -68,20 +71,36 @@ straightforward: any backend instance can pick up the next event.
   </Accordion>
 </AccordionGroup>
 
-## Variables
+## Conversation state
 
-The `agentic` node extracts typed variables from the conversation:
-`string`, `number`, `boolean`, `date`, `phone`, `email`, and `image`.
+Flows declare no variables. What a conversation knows lives in four
+places, each with one owner:
 
-- **Asked vs derived** — a variable with a prompt is asked of the
-  user; a variable marked *derived* is authored by the assistant from
-  context and never asked (e.g. a ticket subject line).
-- **Image variables** are filled by the runtime from media the user
-  sends — never by the LLM.
-- **Persistent variables** survive across sessions for the same user.
-- Whether a variable is required is decided per edge: an edge can
-  require variables (or a photo on the current turn) before it can be
-  traversed.
+- **Memory** — facts about the person (name, language, their vehicle)
+  are in the brain, learned from what was said and retrieved into every
+  turn. There is no per-flow persistent store.
+- **The session record** — what the system produced in the
+  conversation: photos and files the person sent, codes their device
+  scanned, and the result of every tool, knowledge search, app operation
+  and child flow. Templates read the latest of each as `@media`, `@scan`
+  and `@result.<node>`. Nothing is ever cleared: what a node still asks
+  for (a photo it `capture`s) and what a route already did (`once`)
+  count from the node's current **visit** — from the turn the
+  conversation entered it. Coming back to a node later is a new visit.
+- **Contracts** — a tool's input schema, a child flow's start inputs and
+  a return node's `returns` fields.
+  A route into such a node *is* the call: the parameters the flow does
+  not bind itself are filled by the agent from the conversation, the
+  record and memory at that moment. A required parameter it cannot fill
+  means it asks.
+
+Templates and conditions read the flow's start inputs, system values
+(time, language, session ids) and the session record — never
+something the model was told to collect.
+
+Edges can carry two gates: `turnHas` (this turn carries a photo, a
+document or a scan) and `once` (the target has not already succeeded since
+the conversation entered the routing node — a report is sent once).
 
 ## Parallel execution
 
@@ -102,44 +121,42 @@ flowchart LR
 ```
 
 Branches coordinate at runtime: only one branch speaks to the user at
-a time (the first to produce output wins the voice), and `wait` nodes
-in sibling branches cancel automatically when another branch starts
-responding.
+a time (the first to produce output wins the voice).
 
 ## Invoke → return (child flows)
 
 A parent flow can invoke a child flow — the pattern behind
-consultations, relays, and warm transfers:
+consultations, relays, and warm transfers. The child runs as a **job**
+beside the conversation: the caller keeps talking with the agent while
+it runs, and its result wakes the agent to tell them.
 
 ```mermaid
 sequenceDiagram
-    participant Caller as Caller (held)
+    participant Caller
     participant P as Parent flow
     participant C as Child flow
     participant T as Consulted party
 
-    P->>C: invoke — child room created
+    P->>C: invoke — child room created (a job)
+    P->>Caller: "I'm asking the shift lead"
     C->>T: ring (in-app + phone, first answer wins)
-    Caller-->>Caller: hold message / music,<br/>progress narration
+    Caller->>P: keeps talking — "also tell him…" is passed on
     T->>C: answers, converses
-    C->>P: return (value | bridge | handoff)
-    P->>Caller: parent resumes with the result
+    C->>P: return (value | bridge)
+    P->>Caller: the agent is woken and tells the result
 ```
 
 - **Ringing** — a dial target is a *person*, not a device: ringing
   reaches all their endpoints (in-app notification on every signed-in
   device + their phone number); the first answer wins. Multiple
   targets can ring in parallel or sequentially.
-- **Hold + narration** — the original caller can be held with a
-  message or music, and the parent can narrate child progress
-  ("I'm reaching your advisor now…") driven by child lifecycle
-  events.
-- **Completion types** — `return` (the agent comes back to the caller
-  with a result), `bridge` (the caller is connected directly to the
-  consulted party), or `handoff` (external transfer).
-- **Keep-alive** — a child can be kept alive after returning, so a
-  follow-up invoke reconnects the same consulted party without
-  ringing again.
+- **Never on hold** — the agent keeps the conversation while the child
+  runs: it can look in, pass something on, or call it off, and on a
+  phone line it may play music for a long wait. Every client sees the
+  job's status (`job.updated`: ringing, who picked up, done).
+- **Completion types** — `return` (the agent tells the caller the
+  result), or `bridge` (the caller is connected directly to the
+  consulted party).
 
 ## Tools
 
@@ -158,10 +175,10 @@ imported from an **OpenAPI spec**. Tool secrets are scoped per
 organization and injected at invocation time — flow definitions never
 contain credentials.
 
-**Asynchronous tools**: a tool that reports async completion either
-routes the flow onward immediately on a *pending* port or parks the
-session; your system resumes it later by calling a single-use,
-HMAC-signed callback URL.
+**Asynchronous tools**: a tool that reports async completion runs as a
+job — the conversation continues (on its *pending* port, or back where
+it was), and your system answers later by calling a single-use,
+HMAC-signed callback URL; the answer wakes the agent to tell the user.
 
 ## Memory — the brain
 
@@ -172,10 +189,9 @@ graph, separated by scope.
 ```mermaid
 flowchart LR
     UT["Session transcript"] --> EP["Episode<br/>(verbatim evidence)"]
-    EP --> FX["Extraction<br/>(at session end)"]
+    EP --> FX["Extraction<br/>(each time the person leaves)"]
     FX --> ST["Statements<br/>(facts as edges, bitemporal)"]
     FD["Feeds<br/>(scans · GPS · machine state)"] --> ST
-    PV["Persistent variables"] --> NS["Next session"]
     KB["Knowledge bases<br/>(per-org docs)"]
     ST -.brain context.-> AGC["agentic context"]
     EP -.brain context.-> AGC
@@ -193,15 +209,13 @@ flowchart LR
   fact inferred about a colleague is shown to that colleague first.
 - **Feeds** — external sources (a scanner, a MES, a phone's location)
   push events that map to live state without a model in the loop.
-- **Persistent variables** — flow variables marked persistent are
-  restored at the start of the user's next session.
 - **Knowledge bases** — per-organization document collections;
   ingestion chunks and embeds, retrieval through the `rag` node.
 
 Identity is unified across channels — the same phone number on voice,
 SMS, and WhatsApp maps to one person, and an anonymous web visitor's
-brain is merged into the verified identity once the visitor is
-identified. A person can be forgotten entirely on request.
+open conversation and brain move to the verified identity once the
+visitor is identified. A person can be forgotten entirely on request.
 
 ## Storage + versioning
 
@@ -214,7 +228,18 @@ workflows.
 
 ## Sessions
 
-Every flow run is persisted with full variable state, tool-call log,
-and final status. Operators can list, inspect, export, end, or resume
-sessions through the dashboard or the REST API (see [API
-reference](/api)).
+A session is a **conversation**: every person — signed in, a phone
+number, an anonymous web visitor — has at most one open conversation
+per flow, with no expiry. Leaving (a call that drops, a closed tab, an
+agent stepping away after silence) pauses it, and the person's next
+call, message or visit continues it, on any channel. On their return
+the agent decides whether to pick up where it stopped or start over. A conversation also ends when its flow ends it, the agent
+starts over, or somebody closes it.
+
+Each call or connection of a conversation is recorded on its own, with
+its duration, recording and call status. Durations, voice minutes and
+costs count the time somebody was connected, not how long the
+conversation stayed open. Every conversation is persisted with its
+session record, tool-call log, and final status. Operators can list,
+inspect, export, or end sessions through the dashboard or the REST
+API (see [API reference](/api)).
