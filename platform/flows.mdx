@@ -49,7 +49,7 @@ straightforward: any backend instance can pick up the next event.
     | `pause` | Puts the user on hold (hold music on voice, waiting state in chat) |
     | `disconnect` | Drops the user from the channel while the flow continues headless; can keep the room open for a later re-attach |
     | `reach` | Re-establishes contact after a disconnect — dials the user back on voice, validates the messaging window on chat channels. Ports: connected / no answer / rejected / error |
-    | `handoff` | Hands the conversation to another party (phone number, SIP URI, or a person in the organization); the flow continues headless |
+    | `handoff` | Rings a person in the organization into this conversation (the agent stays with both), or transfers a phone caller to a number or SIP URI. Runs as a job: the conversation goes on while it rings |
   </Accordion>
   <Accordion title="LLM (1)">
     | Node | Purpose |
