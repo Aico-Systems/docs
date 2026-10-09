@@ -48,9 +48,8 @@ by the deployed STT service. The current engine catalog:
 
 | Engine | Models | Notes |
 |---|---|---|
-| Whisper (faster-whisper) | `whisper-large-v3` (default), `whisper-distil-large-v3`, `whisper-tiny` | Multi-language; the distil variant is English-only and ~6× faster |
+| Whisper (faster-whisper) | `whisper-large-v3` (default), `whisper-tiny` | Multi-language |
 | Qwen3-ASR | `qwen3-asr-1.7b` | Streaming, 52 languages, automatic language detection |
-| Cohere Transcribe | `cohere-transcribe` | 14 languages, long-form chunking |
 | Vosk | `vosk-de` | CPU-only, fully offline, streaming |
 | emotion2vec | `emotion2vec-base`, `emotion2vec-large` | **Paralinguistic sidecar** — emotion + sentiment per utterance, runs alongside a transcribing engine |
 
@@ -76,11 +75,10 @@ Published as `local-tts-<model>`:
 |---|---|---|
 | Piper | `piper-de` | No (preset, CPU-only) |
 | Kokoro | `kokoro` | No (presets, CPU-friendly) |
-| Qwen3-TTS | `qwen3-tts` | Yes |
-| Orpheus | `orpheus-3b` | No (presets, style control) |
-| CosyVoice2 | `cosyvoice2` | Yes, with instruction control |
-| F5-TTS | `f5tts` | Yes |
-| VoxCPM | `voxcpm-2b` | Yes, plus voice design, 48 kHz |
+| Pocket TTS | `pocket-de` (default), `pocket-en` | Yes, CPU real-time |
+| Chatterbox | `chatterbox-turbo`, `chatterbox-multilingual` | Yes |
+| Qwen3-TTS | `qwen3-tts`, `qwen3-tts-base` | Base variant only |
+| CosyVoice3 | `cosyvoice3` | Yes, with instruction control |
 
 ### Voices
 
@@ -129,7 +127,7 @@ sensible defaults:
 
 ### Engine-level endpointing (self-hosted STT)
 
-Streaming self-hosted STT engines (Whisper, Qwen3-ASR, Cohere) also
+Streaming self-hosted STT engines (Whisper, Qwen3-ASR) also
 emit finals via server-side silence detection:
 
 | Field | Default | Range | Purpose |
